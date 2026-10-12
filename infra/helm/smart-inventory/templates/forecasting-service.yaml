@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "smart-inventory.fullname" . }}-forecasting-service
+  labels:
+    app.kubernetes.io/name: forecasting-service
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.forecastingService.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: forecasting-service
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: forecasting-service
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+      containers:
+        - name: forecasting-service
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          image: "{{ .Values.forecastingService.image.repository }}:{{ .Values.forecastingService.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.forecastingService.image.pullPolicy }}
+          ports:
+            - containerPort: 8083
+              name: http
+          env:
+            - name: INVENTORY_SERVICE_URL
+              value: {{ .Values.forecastingService.env.inventoryServiceUrl | quote }}
+            - name: CATALOG_SERVICE_URL
+              value: {{ .Values.forecastingService.env.catalogServiceUrl | quote }}
+          resources:
+            {{- toYaml .Values.forecastingService.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8083
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8083
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: forecasting-service
+  labels:
+    app.kubernetes.io/name: forecasting-service
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  selector:
+    app.kubernetes.io/name: forecasting-service
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  type: {{ .Values.forecastingService.service.type }}
+  ports:
+    - port: {{ .Values.forecastingService.service.port }}
+      targetPort: 8083
+      protocol: TCP
+      name: http

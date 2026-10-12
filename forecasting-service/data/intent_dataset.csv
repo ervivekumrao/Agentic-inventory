@@ -1,0 +1,1521 @@
+query,intent,entities
+kindly list all products available at Warehouse-South,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+could you summarize current supply chain health and risk status,EXECUTIVE_OVERVIEW,{}
+show me identify slow-moving or dead stock risks,RISK_OVERSTOCK,{}
+kindly give me category breakdown with valuations,STOCK_TYPE_CATEGORY,{}
+can you list all products available at Warehouse-North,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+kindly replenishment order audit for depleted items,LOW_STOCK_REORDER,{}
+tell me show all inventory items in category Electronics,CATEGORY_FILTER,"{""category"": ""Electronics""}"
+kindly predict demand trend and reorder timing for MECHANICAL-KEYBOARD,DEMAND_FORECAST,"{""sku"": ""MECHANICAL-KEYBOARD"", ""category"": ""Electronics""}"
+can you show inventory breakdown by category,STOCK_TYPE_CATEGORY,{}
+i want to how much is our inventory portfolio worth?,FINANCIAL_VALUATION,{}
+i want to are any products running out of stock?,LOW_STOCK_REORDER,{}
+could you high level executive summary of operations,EXECUTIVE_OVERVIEW,{}
+i want to which skus require purchase orders immediately?,LOW_STOCK_REORDER,{}
+can you how much stock do we hold for Sports & Outdoors?,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+kindly total count of active skus,SKU_COUNT_QUANTITY,{}
+show me list all products available at Warehouse-North,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+can you which item has highest valuation,CUSTOM_SORT_FILTER,{}
+please unit and sku spread across our 5 warehouses,WAREHOUSE_LOGISTICS,{}
+could you list all skus that have low inventory cushions,LOW_STOCK_REORDER,{}
+operational summary for the chief operations officer,EXECUTIVE_OVERVIEW,{}
+kindly give me a tabular report of all stock,TABULAR_REPORT,{}
+please what is the total worth of our inventory?,FINANCIAL_VALUATION,{}
+could you unit and sku spread across our 5 warehouses,WAREHOUSE_LOGISTICS,{}
+can you how many distinct product skus are registered in the warehouse?,SKU_COUNT_QUANTITY,{}
+predict demand trend and reorder timing for WIRELESS-BUDS,DEMAND_FORECAST,"{""sku"": ""WIRELESS-BUDS"", ""category"": ""Electronics""}"
+please search catalog for Groceries,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+tell me how much stock do we hold for Groceries?,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+please show overstocked items and stockout risks,RISK_OVERSTOCK,{}
+how many units and skus are located in Central-Hub?,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+can you forecast sales for BIKE-HELMET over the next 14 days,DEMAND_FORECAST,"{""sku"": ""BIKE-HELMET"", ""category"": ""Sports & Outdoors""}"
+show me check items below reorder threshold,LOW_STOCK_REORDER,{}
+i want to sort all inventory items by valuation descending,CUSTOM_SORT_FILTER,{}
+show me what is the demand forecast for MERINO-SWEATER?,DEMAND_FORECAST,"{""sku"": ""MERINO-SWEATER"", ""category"": ""Apparel""}"
+can you show total inventory cost and valuation,FINANCIAL_VALUATION,{}
+i want to show top 10 products sorted by quantity,CUSTOM_SORT_FILTER,{}
+tell me which item has the least stock,CUSTOM_SORT_FILTER,{}
+kindly give me details on product Auto-Ranging Digital Multimeter with SKU DIGITAL-MULTIMETER,SPECIFIC_SKU_LOOKUP,"{""sku"": ""DIGITAL-MULTIMETER"", ""category"": ""Tools & Hardware""}"
+i want to executive inventory scorecard and status,EXECUTIVE_OVERVIEW,{}
+please show warehouse distribution of inventory,WAREHOUSE_LOGISTICS,{}
+kindly forecast sales for ORGANIC-HONEY over the next 14 days,DEMAND_FORECAST,"{""sku"": ""ORGANIC-HONEY"", ""category"": ""Groceries""}"
+i want to show catalog listings for Sports & Outdoors,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+which item is the cheapest,CUSTOM_SORT_FILTER,{}
+kindly what stock is currently stored at Warehouse-West?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+please financial audit of inventory value,FINANCIAL_VALUATION,{}
+show me what is the total dollar value of our holdings?,FINANCIAL_VALUATION,{}
+kindly find all items in the Apparel department,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+kindly show catalog listings for Tools & Hardware,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+please can you show the top 10 products sorted by available stock?,CUSTOM_SORT_FILTER,{}
+kindly search catalog for Groceries,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+show me list all products available at Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+tell me what can you do?,HELP_CAPABILITIES,{}
+could you show me all items in a table,TABULAR_REPORT,{}
+i want to display all items sorted by price ascending,CUSTOM_SORT_FILTER,{}
+show me high level executive summary of operations,EXECUTIVE_OVERVIEW,{}
+what items are out of stock right now?,LOW_STOCK_REORDER,{}
+please what is the current stock level of CERAMIC-MUG-SET?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CERAMIC-MUG-SET"", ""category"": ""Home & Kitchen""}"
+can you list all products available at Central-Hub,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+tell me show inventory matrix with reorder points and locations,TABULAR_REPORT,{}
+i want to check inventory status for SKU AIR-FRYER,SPECIFIC_SKU_LOOKUP,"{""sku"": ""AIR-FRYER"", ""category"": ""Home & Kitchen""}"
+tell me forecast sales for RUNNING-SHOES over the next 14 days,DEMAND_FORECAST,"{""sku"": ""RUNNING-SHOES"", ""category"": ""Apparel""}"
+can you hello,GENERAL_ASSISTANT,{}
+please is CHEF-KNIFE below its reorder point?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CHEF-KNIFE"", ""category"": ""Home & Kitchen""}"
+can you show warehouse distribution of inventory,WAREHOUSE_LOGISTICS,{}
+could you rank items by stock quantity,CUSTOM_SORT_FILTER,{}
+kindly category distribution report,STOCK_TYPE_CATEGORY,{}
+tell me which product has highest value,CUSTOM_SORT_FILTER,{}
+tell me what features does this assistant offer?,HELP_CAPABILITIES,{}
+can you what stock is currently stored at Warehouse-West?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+tell me what are our most expensive inventory holdings?,FINANCIAL_VALUATION,{}
+kindly category level stock aggregation,STOCK_TYPE_CATEGORY,{}
+kindly inventory carrying cost risk analysis,RISK_OVERSTOCK,{}
+list all skus that have low inventory cushions,LOW_STOCK_REORDER,{}
+can you show me all items in Central-Hub,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+could you show total inventory cost and valuation,FINANCIAL_VALUATION,{}
+please i need a tabular breakdown of every SKU,TABULAR_REPORT,{}
+show me what is our total inventory valuation and warehouse breakdown?,FINANCIAL_VALUATION,{}
+i want to how many units and skus are located in Warehouse-North?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+show me stock type wise volume and dollar value summary,STOCK_TYPE_CATEGORY,{}
+tell me how much capital is tied up in stock?,FINANCIAL_VALUATION,{}
+i want to item with highest quantity,CUSTOM_SORT_FILTER,{}
+kindly list all products available at Central-Hub,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+show me give me the total sku number,SKU_COUNT_QUANTITY,{}
+i want to lookup SKU DENIM-JACKET,SPECIFIC_SKU_LOOKUP,"{""sku"": ""DENIM-JACKET"", ""category"": ""Apparel""}"
+could you do we have excess capital locked in overstock?,RISK_OVERSTOCK,{}
+i want to how many different items are in inventory?,SKU_COUNT_QUANTITY,{}
+show me show out of stock and critically depleted products,LOW_STOCK_REORDER,{}
+i want to which items are low in stock?,LOW_STOCK_REORDER,{}
+good morning assistant,GENERAL_ASSISTANT,{}
+please how much stock do we hold for Home & Kitchen?,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+i need to show items ordered by price,CUSTOM_SORT_FILTER,{}
+please what is the total physical unit count and sku count?,SKU_COUNT_QUANTITY,{}
+i want to who are you and what do you do?,GENERAL_ASSISTANT,{}
+i want to what features does this assistant offer?,HELP_CAPABILITIES,{}
+tell me how much stock do we hold for Sports & Outdoors?,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+tell me run a 14-day demand prediction for LED-WORK-LIGHT,DEMAND_FORECAST,"{""sku"": ""LED-WORK-LIGHT"", ""category"": ""Tools & Hardware""}"
+i need to which product is the most expensive,CUSTOM_SORT_FILTER,{}
+i need to will LEATHER-BELT run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""LEATHER-BELT"", ""category"": ""Apparel""}"
+tell me who are you and what do you do?,GENERAL_ASSISTANT,{}
+could you render a markdown grid with all inventory columns,TABULAR_REPORT,{}
+category distribution report,STOCK_TYPE_CATEGORY,{}
+break down stock units and valuation by product type,STOCK_TYPE_CATEGORY,{}
+list all commands and queries you support,HELP_CAPABILITIES,{}
+please show inventory matrix with reorder points and locations,TABULAR_REPORT,{}
+show me generate a complete stock ledger table,TABULAR_REPORT,{}
+i want to give me an executive brief on inventory health,EXECUTIVE_OVERVIEW,{}
+kindly show me all items in Warehouse-North,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+i need to evaluate capital tie-up risk across products,RISK_OVERSTOCK,{}
+i need to filter inventory for Warehouse-North,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+show me predict demand trend and reorder timing for BLENDER-PRO,DEMAND_FORECAST,"{""sku"": ""BLENDER-PRO"", ""category"": ""Home & Kitchen""}"
+what questions can I ask you?,HELP_CAPABILITIES,{}
+tell me how is stock distributed across facilities?,WAREHOUSE_LOGISTICS,{}
+i need to output stock items in table layout,TABULAR_REPORT,{}
+tell me do we have excess capital locked in overstock?,RISK_OVERSTOCK,{}
+show me show top 5 items sorted by quantity,CUSTOM_SORT_FILTER,{}
+show me what is the price and stock level of INSULATED-FLASK?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""INSULATED-FLASK"", ""category"": ""Sports & Outdoors""}"
+where is our inventory physically stored?,WAREHOUSE_LOGISTICS,{}
+how much demand is expected for AirStride Running Shoes (RUNNING-SHOES)?,DEMAND_FORECAST,"{""sku"": ""RUNNING-SHOES"", ""category"": ""Apparel""}"
+tell me list stock items belonging to Tools & Hardware,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+tell me show out of stock and critically depleted products,LOW_STOCK_REORDER,{}
+tell me list stock items belonging to Apparel,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+could you how do I use the inventory ai assistant?,HELP_CAPABILITIES,{}
+i need to table view of current stock items,TABULAR_REPORT,{}
+i need to run a 14-day demand prediction for STAINLESS-SCREWS,DEMAND_FORECAST,"{""sku"": ""STAINLESS-SCREWS"", ""category"": ""Tools & Hardware""}"
+tell me show top 10 products sorted by quantity,CUSTOM_SORT_FILTER,{}
+kindly can you share this data in more details in tabular form?,TABULAR_REPORT,{}
+please analyze obsolete and surplus inventory exposure,RISK_OVERSTOCK,{}
+can you how much demand is expected for High-Speed Blender (BLENDER-PRO)?,DEMAND_FORECAST,"{""sku"": ""BLENDER-PRO"", ""category"": ""Home & Kitchen""}"
+please will LED-WORK-LIGHT run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""LED-WORK-LIGHT"", ""category"": ""Tools & Hardware""}"
+i want to capital valuation breakdown across facilities,FINANCIAL_VALUATION,{}
+analyze obsolete and surplus inventory exposure,RISK_OVERSTOCK,{}
+i need to display details in tabular format please,TABULAR_REPORT,{}
+can you do we have any inventory shortage?,LOW_STOCK_REORDER,{}
+i want to evaluate capital tie-up risk across products,RISK_OVERSTOCK,{}
+please filter products by Apparel category,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+show me hello,GENERAL_ASSISTANT,{}
+kindly show inventory matrix with reorder points and locations,TABULAR_REPORT,{}
+could you which item is the cheapest,CUSTOM_SORT_FILTER,{}
+i want to i need a tabular breakdown of every SKU,TABULAR_REPORT,{}
+kindly how many units belong to each product type?,STOCK_TYPE_CATEGORY,{}
+i want to will BLENDER-PRO run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""BLENDER-PRO"", ""category"": ""Home & Kitchen""}"
+can you show out of stock and critically depleted products,LOW_STOCK_REORDER,{}
+show me what is the current stock level of TOOL-SET?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""TOOL-SET"", ""category"": ""Tools & Hardware""}"
+i need to lookup SKU TOOL-SET,SPECIFIC_SKU_LOOKUP,"{""sku"": ""TOOL-SET"", ""category"": ""Tools & Hardware""}"
+could you how many units and skus are located in Warehouse-South?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+show me list all commands and queries you support,HELP_CAPABILITIES,{}
+kindly filter inventory for Central-Hub,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+lookup SKU INSULATED-FLASK,SPECIFIC_SKU_LOOKUP,"{""sku"": ""INSULATED-FLASK"", ""category"": ""Sports & Outdoors""}"
+could you find all items in the Groceries department,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+tell me check inventory status for SKU CAMPING-TENT,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CAMPING-TENT"", ""category"": ""Sports & Outdoors""}"
+give me details on product 4-Person Waterproof Camping Tent with SKU CAMPING-TENT,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CAMPING-TENT"", ""category"": ""Sports & Outdoors""}"
+i need to distinct sku count check,SKU_COUNT_QUANTITY,{}
+tell me find all items in the Apparel department,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+i need to show category-wise stock allocation,STOCK_TYPE_CATEGORY,{}
+kindly forecast sales for INSULATED-FLASK over the next 14 days,DEMAND_FORECAST,"{""sku"": ""INSULATED-FLASK"", ""category"": ""Sports & Outdoors""}"
+kindly show overstocked items and stockout risks,RISK_OVERSTOCK,{}
+tell me look up products matching Home & Kitchen,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+i want to generate senior management inventory dashboard brief,EXECUTIVE_OVERVIEW,{}
+kindly show top 10 inventory data sorted by quantity,CUSTOM_SORT_FILTER,{}
+kindly how much stock do we hold for Groceries?,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+i need to top 5 inventory items sorted by stock,CUSTOM_SORT_FILTER,{}
+please list stock items belonging to Apparel,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+what is the total dollar value of our holdings?,FINANCIAL_VALUATION,{}
+i need to what can you do?,HELP_CAPABILITIES,{}
+kindly what is the total dollar value of our holdings?,FINANCIAL_VALUATION,{}
+show me which skus require purchase orders immediately?,LOW_STOCK_REORDER,{}
+kindly is STAINLESS-SCREWS below its reorder point?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""STAINLESS-SCREWS"", ""category"": ""Tools & Hardware""}"
+i want to top 3 products by stock,CUSTOM_SORT_FILTER,{}
+i need to list all products available at Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+tell me high level executive summary of operations,EXECUTIVE_OVERVIEW,{}
+show me logistics breakdown across all sites,WAREHOUSE_LOGISTICS,{}
+i need to how do I use the inventory ai assistant?,HELP_CAPABILITIES,{}
+i need to render a markdown grid with all inventory columns,TABULAR_REPORT,{}
+please show full inventory spreadsheet view,TABULAR_REPORT,{}
+could you give me details on product AirStride Running Shoes with SKU RUNNING-SHOES,SPECIFIC_SKU_LOOKUP,"{""sku"": ""RUNNING-SHOES"", ""category"": ""Apparel""}"
+i want to search catalog for Apparel,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+can you is ALMOND-BUTTER below its reorder point?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""ALMOND-BUTTER"", ""category"": ""Groceries""}"
+can you what questions can I ask you?,HELP_CAPABILITIES,{}
+i want to number of distinct skus in stock,SKU_COUNT_QUANTITY,{}
+show me what is the inventory count in each distribution center?,WAREHOUSE_LOGISTICS,{}
+show me provide tabular summary of all inventory records,TABULAR_REPORT,{}
+tell me filter products by Apparel category,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+could you what is our total sku count?,SKU_COUNT_QUANTITY,{}
+i want to what products do we have under Tools & Hardware?,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+i need to capital valuation breakdown across facilities,FINANCIAL_VALUATION,{}
+could you which products reached minimum threshold?,LOW_STOCK_REORDER,{}
+show me show lowest 5 items sorted by quantity,CUSTOM_SORT_FILTER,{}
+please forecast sales for ORGANIC-HONEY over the next 14 days,DEMAND_FORECAST,"{""sku"": ""ORGANIC-HONEY"", ""category"": ""Groceries""}"
+i want to filter inventory for Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+i want to predict demand trend and reorder timing for CHEF-KNIFE,DEMAND_FORECAST,"{""sku"": ""CHEF-KNIFE"", ""category"": ""Home & Kitchen""}"
+please how many different items are in inventory?,SKU_COUNT_QUANTITY,{}
+please which product has the highest value,CUSTOM_SORT_FILTER,{}
+kindly stock type wise volume and dollar value summary,STOCK_TYPE_CATEGORY,{}
+i need to what questions can I ask you?,HELP_CAPABILITIES,{}
+tell me what is the total physical unit count and sku count?,SKU_COUNT_QUANTITY,{}
+i need to how many different skus stock has?,SKU_COUNT_QUANTITY,{}
+show me what items need replenishment?,LOW_STOCK_REORDER,{}
+can you calculate deficit units needed to restock safety cushion,LOW_STOCK_REORDER,{}
+tell me what items are out of stock right now?,LOW_STOCK_REORDER,{}
+please give me the total sku number,SKU_COUNT_QUANTITY,{}
+print inventory grid,TABULAR_REPORT,{}
+show all inventory items in category Electronics,CATEGORY_FILTER,"{""category"": ""Electronics""}"
+i need to find all items in the Groceries department,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+kindly hello,GENERAL_ASSISTANT,{}
+can you which product has highest valuation,CUSTOM_SORT_FILTER,{}
+can you number of distinct skus in stock,SKU_COUNT_QUANTITY,{}
+distinct sku count check,SKU_COUNT_QUANTITY,{}
+i want to output stock items in table layout,TABULAR_REPORT,{}
+can you sort inventory data by quantity,CUSTOM_SORT_FILTER,{}
+please what products do we have under Sports & Outdoors?,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+filter products by Tools & Hardware category,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+show inventory breakdown by category,STOCK_TYPE_CATEGORY,{}
+how many units of YOGA-MAT are available?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""YOGA-MAT"", ""category"": ""Sports & Outdoors""}"
+kindly which products reached minimum threshold?,LOW_STOCK_REORDER,{}
+check inventory status for SKU DARK-CHOCOLATE,SPECIFIC_SKU_LOOKUP,"{""sku"": ""DARK-CHOCOLATE"", ""category"": ""Groceries""}"
+predict demand trend and reorder timing for SMARTPHONE-X,DEMAND_FORECAST,"{""sku"": ""SMARTPHONE-X"", ""category"": ""Electronics""}"
+i want to which item has lowest quantity,CUSTOM_SORT_FILTER,{}
+please check inventory status for SKU CORDLESS-DRILL,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CORDLESS-DRILL"", ""category"": ""Tools & Hardware""}"
+kindly what products do we have under Sports & Outdoors?,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+show me show low stock items,LOW_STOCK_REORDER,{}
+kindly show out of stock and critically depleted products,LOW_STOCK_REORDER,{}
+i want to how many distinct skus do we carry?,SKU_COUNT_QUANTITY,{}
+kindly what is our total sku count?,SKU_COUNT_QUANTITY,{}
+calculate deficit units needed to restock safety cushion,LOW_STOCK_REORDER,{}
+kindly what is the demand forecast for STAINLESS-SCREWS?,DEMAND_FORECAST,"{""sku"": ""STAINLESS-SCREWS"", ""category"": ""Tools & Hardware""}"
+tell me what is the balance sheet asset value of inventory?,FINANCIAL_VALUATION,{}
+kindly evaluate capital tie-up risk across products,RISK_OVERSTOCK,{}
+can you give me details on product Pro 15-inch Laptop with SKU LAPTOP-PRO-15,SPECIFIC_SKU_LOOKUP,"{""sku"": ""LAPTOP-PRO-15"", ""category"": ""Electronics""}"
+i need to item with highest quantity,CUSTOM_SORT_FILTER,{}
+please executive inventory scorecard and status,EXECUTIVE_OVERVIEW,{}
+can you how much stock do we hold for Apparel?,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+what items need replenishment?,LOW_STOCK_REORDER,{}
+can you sort stock by valuation,CUSTOM_SORT_FILTER,{}
+show me how much is our inventory portfolio worth?,FINANCIAL_VALUATION,{}
+could you filter products by Tools & Hardware category,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+i need to generate a complete stock ledger table,TABULAR_REPORT,{}
+please stock type wise volume and dollar value summary,STOCK_TYPE_CATEGORY,{}
+i need to stock type wise volume and dollar value summary,STOCK_TYPE_CATEGORY,{}
+kindly how many different items are in inventory?,SKU_COUNT_QUANTITY,{}
+kindly what stock is currently stored at Warehouse-East?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-East""}"
+can you provide tabular summary of all inventory records,TABULAR_REPORT,{}
+i need to where is our inventory physically stored?,WAREHOUSE_LOGISTICS,{}
+could you will COTTON-HOODIE run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""COTTON-HOODIE"", ""category"": ""Apparel""}"
+kindly how many units and skus are located in Warehouse-East?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-East""}"
+tell me give me category breakdown with valuations,STOCK_TYPE_CATEGORY,{}
+please filter products by Groceries category,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+please are any products running out of stock?,LOW_STOCK_REORDER,{}
+tell me hello,GENERAL_ASSISTANT,{}
+tell me how is inventory distributed across categories?,STOCK_TYPE_CATEGORY,{}
+kindly generate senior management inventory dashboard brief,EXECUTIVE_OVERVIEW,{}
+could you can you show top 10 items sorted by price,CUSTOM_SORT_FILTER,{}
+what is the total worth of our inventory?,FINANCIAL_VALUATION,{}
+please search catalog for Electronics,CATALOG_SEARCH,"{""category"": ""Electronics""}"
+can you tell me the total number of skus,SKU_COUNT_QUANTITY,{}
+kindly generate a complete stock ledger table,TABULAR_REPORT,{}
+please show me all items in Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+how is stock distributed across facilities?,WAREHOUSE_LOGISTICS,{}
+could you filter products by Groceries category,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+kindly check items below reorder threshold,LOW_STOCK_REORDER,{}
+i want to what is the demand forecast for BLENDER-PRO?,DEMAND_FORECAST,"{""sku"": ""BLENDER-PRO"", ""category"": ""Home & Kitchen""}"
+kindly warehouse storage capacity and current stock allocation,WAREHOUSE_LOGISTICS,{}
+i need to can you assist me with inventory management?,GENERAL_ASSISTANT,{}
+could you what is the status of the inventory database?,GENERAL_ASSISTANT,{}
+show me what is the current stock level of CAMPING-TENT?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CAMPING-TENT"", ""category"": ""Sports & Outdoors""}"
+how do I use the inventory ai assistant?,HELP_CAPABILITIES,{}
+show me show catalog listings for Electronics,CATALOG_SEARCH,"{""category"": ""Electronics""}"
+i want to filter products by Tools & Hardware category,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+can you identify slow-moving or dead stock risks,RISK_OVERSTOCK,{}
+kindly item with lowest quantity,CUSTOM_SORT_FILTER,{}
+i need to how much demand is expected for Espresso Machine (COFFEE-MAKER)?,DEMAND_FORECAST,"{""sku"": ""COFFEE-MAKER"", ""category"": ""Home & Kitchen""}"
+i want to find all items in the Home & Kitchen department,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+please what is the status of the inventory database?,GENERAL_ASSISTANT,{}
+show all inventory items in category Groceries,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+show me are any products running out of stock?,LOW_STOCK_REORDER,{}
+i want to display details in tabular format please,TABULAR_REPORT,{}
+show me list stock items belonging to Electronics,CATEGORY_FILTER,"{""category"": ""Electronics""}"
+i want to hi there,GENERAL_ASSISTANT,{}
+please forecast sales for MERINO-SWEATER over the next 14 days,DEMAND_FORECAST,"{""sku"": ""MERINO-SWEATER"", ""category"": ""Apparel""}"
+i want to show all inventory items in category Apparel,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+total count of active skus,SKU_COUNT_QUANTITY,{}
+how many different skus stock has?,SKU_COUNT_QUANTITY,{}
+tell me generate senior management inventory dashboard brief,EXECUTIVE_OVERVIEW,{}
+can you filter products by Groceries category,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+tell me can you show top 10 inventory data sorted by quantity,CUSTOM_SORT_FILTER,{}
+can you operational summary for the chief operations officer,EXECUTIVE_OVERVIEW,{}
+tell me good morning assistant,GENERAL_ASSISTANT,{}
+i need to filter inventory for Warehouse-South,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+could you can you show top 10 inventory data sorted by quantity,CUSTOM_SORT_FILTER,{}
+i need to what is the balance sheet asset value of inventory?,FINANCIAL_VALUATION,{}
+tell me logistics breakdown across all sites,WAREHOUSE_LOGISTICS,{}
+show me filter products by Apparel category,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+kindly what is the demand forecast for ALMOND-BUTTER?,DEMAND_FORECAST,"{""sku"": ""ALMOND-BUTTER"", ""category"": ""Groceries""}"
+can you forecast sales for DIGITAL-MULTIMETER over the next 14 days,DEMAND_FORECAST,"{""sku"": ""DIGITAL-MULTIMETER"", ""category"": ""Tools & Hardware""}"
+show me will STAINLESS-SCREWS run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""STAINLESS-SCREWS"", ""category"": ""Tools & Hardware""}"
+can you how much demand is expected for Damascus Chef Knife (CHEF-KNIFE)?,DEMAND_FORECAST,"{""sku"": ""CHEF-KNIFE"", ""category"": ""Home & Kitchen""}"
+could you search catalog for Groceries,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+kindly which items have too much stock sitting idle?,RISK_OVERSTOCK,{}
+tell me operational summary for the chief operations officer,EXECUTIVE_OVERVIEW,{}
+tell me list stock items belonging to Sports & Outdoors,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+kindly forecast sales for SMARTPHONE-X over the next 14 days,DEMAND_FORECAST,"{""sku"": ""SMARTPHONE-X"", ""category"": ""Electronics""}"
+can you what features does this assistant offer?,HELP_CAPABILITIES,{}
+provide tabular summary of all inventory records,TABULAR_REPORT,{}
+show me all items in a table,TABULAR_REPORT,{}
+i want to look up products matching Tools & Hardware,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+i want to restock recommendations for low inventory,LOW_STOCK_REORDER,{}
+please what is the balance sheet asset value of inventory?,FINANCIAL_VALUATION,{}
+top 20 inventory items sorted by quantity,CUSTOM_SORT_FILTER,{}
+kindly check inventory status for SKU MECHANICAL-KEYBOARD,SPECIFIC_SKU_LOOKUP,"{""sku"": ""MECHANICAL-KEYBOARD"", ""category"": ""Electronics""}"
+i want to what is the total worth of our inventory?,FINANCIAL_VALUATION,{}
+i want to what is our total sku count?,SKU_COUNT_QUANTITY,{}
+i want to give me category breakdown with valuations,STOCK_TYPE_CATEGORY,{}
+could you show all inventory items in category Apparel,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+can you show catalog listings for Sports & Outdoors,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+predict demand trend and reorder timing for ORGANIC-HONEY,DEMAND_FORECAST,"{""sku"": ""ORGANIC-HONEY"", ""category"": ""Groceries""}"
+please how many units of ALMOND-BUTTER are available?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""ALMOND-BUTTER"", ""category"": ""Groceries""}"
+can you what are our quantities per category?,STOCK_TYPE_CATEGORY,{}
+i want to warehouse storage capacity and current stock allocation,WAREHOUSE_LOGISTICS,{}
+is DARK-CHOCOLATE below its reorder point?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""DARK-CHOCOLATE"", ""category"": ""Groceries""}"
+please check items below reorder threshold,LOW_STOCK_REORDER,{}
+tell me what questions can I ask you?,HELP_CAPABILITIES,{}
+could you what is the demand forecast for BLENDER-PRO?,DEMAND_FORECAST,"{""sku"": ""BLENDER-PRO"", ""category"": ""Home & Kitchen""}"
+i need to what is the price and stock level of CERAMIC-MUG-SET?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CERAMIC-MUG-SET"", ""category"": ""Home & Kitchen""}"
+what is the price and stock level of MECHANICAL-KEYBOARD?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""MECHANICAL-KEYBOARD"", ""category"": ""Electronics""}"
+please who are you and what do you do?,GENERAL_ASSISTANT,{}
+please category distribution report,STOCK_TYPE_CATEGORY,{}
+kindly show me all items in Central-Hub,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+can you high level executive summary of operations,EXECUTIVE_OVERVIEW,{}
+show me list all products available at Warehouse-South,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+could you show stock volume per warehouse,WAREHOUSE_LOGISTICS,{}
+i need to forecast sales for DARK-CHOCOLATE over the next 14 days,DEMAND_FORECAST,"{""sku"": ""DARK-CHOCOLATE"", ""category"": ""Groceries""}"
+show me how many units and skus are located in Warehouse-North?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+tell me hi there,GENERAL_ASSISTANT,{}
+can you run a 14-day demand prediction for MECHANICAL-KEYBOARD,DEMAND_FORECAST,"{""sku"": ""MECHANICAL-KEYBOARD"", ""category"": ""Electronics""}"
+kindly format the inventory as a table,TABULAR_REPORT,{}
+could you give me total stock count stock type wise,STOCK_TYPE_CATEGORY,{}
+can you what is our risk assessment for overstocked items?,RISK_OVERSTOCK,{}
+show me show all inventory items in category Home & Kitchen,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+i need to what item has the highest stock,CUSTOM_SORT_FILTER,{}
+please total count of active skus,SKU_COUNT_QUANTITY,{}
+i need to what is our most valuable item,CUSTOM_SORT_FILTER,{}
+please what products do we have under Groceries?,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+can you what items are out of stock right now?,LOW_STOCK_REORDER,{}
+can you show catalog listings for Apparel,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+tell me what is the demand forecast for DARK-CHOCOLATE?,DEMAND_FORECAST,"{""sku"": ""DARK-CHOCOLATE"", ""category"": ""Groceries""}"
+show items ordered by price,CUSTOM_SORT_FILTER,{}
+please render a markdown grid with all inventory columns,TABULAR_REPORT,{}
+which items have too much stock sitting idle?,RISK_OVERSTOCK,{}
+kindly table view of current stock items,TABULAR_REPORT,{}
+show me list all skus that have low inventory cushions,LOW_STOCK_REORDER,{}
+show me all items in Central-Hub,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+tell me filter inventory for Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+please give me an executive inventory health brief,EXECUTIVE_OVERVIEW,{}
+i need to show all inventory items in category Home & Kitchen,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+please are all systems operational?,GENERAL_ASSISTANT,{}
+can you what is the inventory count in each distribution center?,WAREHOUSE_LOGISTICS,{}
+kindly how much demand is expected for Artisan Espresso Coffee Beans (ESPRESSO-BEANS)?,DEMAND_FORECAST,"{""sku"": ""ESPRESSO-BEANS"", ""category"": ""Groceries""}"
+i want to do we have excess capital locked in overstock?,RISK_OVERSTOCK,{}
+could you show inventory breakdown by category,STOCK_TYPE_CATEGORY,{}
+show me show all inventory items in category Sports & Outdoors,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+kindly restock recommendations for low inventory,LOW_STOCK_REORDER,{}
+i need to give me the total sku number,SKU_COUNT_QUANTITY,{}
+show me what is the current stock level of CERAMIC-MUG-SET?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CERAMIC-MUG-SET"", ""category"": ""Home & Kitchen""}"
+show me what is the status of the inventory database?,GENERAL_ASSISTANT,{}
+sort stock by valuation,CUSTOM_SORT_FILTER,{}
+kindly list stock items belonging to Tools & Hardware,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+tell me provide tabular summary of all inventory records,TABULAR_REPORT,{}
+i need to logistics breakdown across all sites,WAREHOUSE_LOGISTICS,{}
+can you show all inventory items in category Apparel,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+could you operational summary for the chief operations officer,EXECUTIVE_OVERVIEW,{}
+what can you do?,HELP_CAPABILITIES,{}
+could you item with highest value,CUSTOM_SORT_FILTER,{}
+tell me what is the total worth of our inventory?,FINANCIAL_VALUATION,{}
+i want to give me a tabular report of all stock,TABULAR_REPORT,{}
+tell me search catalog for Home & Kitchen,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+could you where is our inventory physically stored?,WAREHOUSE_LOGISTICS,{}
+i need to show inventory matrix with reorder points and locations,TABULAR_REPORT,{}
+please what products do we have under Tools & Hardware?,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+please show me all items in Warehouse-South,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+could you facility footprint and unit breakdown,WAREHOUSE_LOGISTICS,{}
+i want to distinct sku count check,SKU_COUNT_QUANTITY,{}
+i want to show all inventory items in category Tools & Hardware,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+can you logistics breakdown across all sites,WAREHOUSE_LOGISTICS,{}
+show me how many different skus stock has?,SKU_COUNT_QUANTITY,{}
+tell me what is the demand forecast for LAPTOP-PRO-15?,DEMAND_FORECAST,"{""sku"": ""LAPTOP-PRO-15"", ""category"": ""Electronics""}"
+kindly how is stock distributed across facilities?,WAREHOUSE_LOGISTICS,{}
+list stock items belonging to Electronics,CATEGORY_FILTER,"{""category"": ""Electronics""}"
+how much demand is expected for 20V Cordless Drill Driver (CORDLESS-DRILL)?,DEMAND_FORECAST,"{""sku"": ""CORDLESS-DRILL"", ""category"": ""Tools & Hardware""}"
+please show catalog listings for Apparel,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+i want to how many different skus stock has?,SKU_COUNT_QUANTITY,{}
+show me lookup SKU 4K-MONITOR,SPECIFIC_SKU_LOOKUP,"{""sku"": ""4K-MONITOR"", ""category"": ""Electronics""}"
+tell me show all inventory items in category Home & Kitchen,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+i want to where is LAPTOP-PRO-15 stored and how much is in stock?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""LAPTOP-PRO-15"", ""category"": ""Electronics""}"
+i want to which product has highest value,CUSTOM_SORT_FILTER,{}
+tell me can you share this data in more details in tabular form?,TABULAR_REPORT,{}
+can you evaluate capital tie-up risk across products,RISK_OVERSTOCK,{}
+show me what is the total worth of our inventory?,FINANCIAL_VALUATION,{}
+show me good morning assistant,GENERAL_ASSISTANT,{}
+show me give me details on product Eco-Friendly Yoga Mat with SKU YOGA-MAT,SPECIFIC_SKU_LOOKUP,"{""sku"": ""YOGA-MAT"", ""category"": ""Sports & Outdoors""}"
+show me show inventory breakdown by category,STOCK_TYPE_CATEGORY,{}
+tell me list lowest 10 products by quantity,CUSTOM_SORT_FILTER,{}
+please how many units and skus are located in Warehouse-South?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+kindly which product has highest valuation,CUSTOM_SORT_FILTER,{}
+i want to how much capital is tied up in stock?,FINANCIAL_VALUATION,{}
+i need to show low stock items,LOW_STOCK_REORDER,{}
+show me all items in Warehouse-North,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+could you show catalog listings for Tools & Hardware,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+i want to help me understand your capabilities,HELP_CAPABILITIES,{}
+show me give me total stock count stock type wise,STOCK_TYPE_CATEGORY,{}
+i want to show stock volume per warehouse,WAREHOUSE_LOGISTICS,{}
+kindly number of distinct skus in stock,SKU_COUNT_QUANTITY,{}
+tell me category distribution report,STOCK_TYPE_CATEGORY,{}
+kindly how many units of ORGANIC-HONEY are available?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""ORGANIC-HONEY"", ""category"": ""Groceries""}"
+tell me list all products available at Warehouse-South,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+can you who are you and what do you do?,GENERAL_ASSISTANT,{}
+show me what is the balance sheet asset value of inventory?,FINANCIAL_VALUATION,{}
+i need to what is our total sku count?,SKU_COUNT_QUANTITY,{}
+tell me display details in tabular format please,TABULAR_REPORT,{}
+could you category distribution report,STOCK_TYPE_CATEGORY,{}
+flag skus holding more than 5x safety threshold,RISK_OVERSTOCK,{}
+kindly do we have excess capital locked in overstock?,RISK_OVERSTOCK,{}
+i need to show total inventory cost and valuation,FINANCIAL_VALUATION,{}
+show me give me details on product AirStride Running Shoes with SKU RUNNING-SHOES,SPECIFIC_SKU_LOOKUP,"{""sku"": ""RUNNING-SHOES"", ""category"": ""Apparel""}"
+please what is our total inventory valuation and warehouse breakdown?,FINANCIAL_VALUATION,{}
+kindly is MERINO-SWEATER below its reorder point?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""MERINO-SWEATER"", ""category"": ""Apparel""}"
+show me look up products matching Apparel,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+can you show inventory matrix with reorder points and locations,TABULAR_REPORT,{}
+i want to show lowest 5 items sorted by quantity,CUSTOM_SORT_FILTER,{}
+could you what is the price and stock level of BIKE-HELMET?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""BIKE-HELMET"", ""category"": ""Sports & Outdoors""}"
+i need to how is stock distributed across facilities?,WAREHOUSE_LOGISTICS,{}
+can you operations leadership overview report,EXECUTIVE_OVERVIEW,{}
+i want to show total inventory cost and valuation,FINANCIAL_VALUATION,{}
+kindly check inventory status for SKU AIR-FRYER,SPECIFIC_SKU_LOOKUP,"{""sku"": ""AIR-FRYER"", ""category"": ""Home & Kitchen""}"
+tell me top 10 items sorted by quantity descending,CUSTOM_SORT_FILTER,{}
+unit and sku spread across our 5 warehouses,WAREHOUSE_LOGISTICS,{}
+which item has the highest value,CUSTOM_SORT_FILTER,{}
+i need to are all systems operational?,GENERAL_ASSISTANT,{}
+i want to find all items in the Electronics department,CATALOG_SEARCH,"{""category"": ""Electronics""}"
+tell me total count of active skus,SKU_COUNT_QUANTITY,{}
+could you what is the total physical unit count and sku count?,SKU_COUNT_QUANTITY,{}
+what is the price and stock level of SMARTPHONE-X?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""SMARTPHONE-X"", ""category"": ""Electronics""}"
+can you filter inventory for Warehouse-North,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+can you analyze obsolete and surplus inventory exposure,RISK_OVERSTOCK,{}
+can you how many distinct skus do we carry?,SKU_COUNT_QUANTITY,{}
+could you what are our quantities per category?,STOCK_TYPE_CATEGORY,{}
+could you list all commands and queries you support,HELP_CAPABILITIES,{}
+could you warehouse storage capacity and current stock allocation,WAREHOUSE_LOGISTICS,{}
+i need to predict demand trend and reorder timing for ORGANIC-HONEY,DEMAND_FORECAST,"{""sku"": ""ORGANIC-HONEY"", ""category"": ""Groceries""}"
+tell me i need a tabular breakdown of every SKU,TABULAR_REPORT,{}
+tell me output stock items in table layout,TABULAR_REPORT,{}
+could you predict demand trend and reorder timing for CORDLESS-DRILL,DEMAND_FORECAST,"{""sku"": ""CORDLESS-DRILL"", ""category"": ""Tools & Hardware""}"
+show me will SMARTPHONE-X run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""SMARTPHONE-X"", ""category"": ""Electronics""}"
+can you what is the current stock level of ORGANIC-HONEY?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""ORGANIC-HONEY"", ""category"": ""Groceries""}"
+show me what questions can I ask you?,HELP_CAPABILITIES,{}
+show me can you list all products in tabular form with quantities and prices?,TABULAR_REPORT,{}
+can you how is stock distributed across facilities?,WAREHOUSE_LOGISTICS,{}
+which item has lowest quantity,CUSTOM_SORT_FILTER,{}
+i want to logistics breakdown across all sites,WAREHOUSE_LOGISTICS,{}
+i want to how many units of DIGITAL-MULTIMETER are available?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""DIGITAL-MULTIMETER"", ""category"": ""Tools & Hardware""}"
+please evaluate capital tie-up risk across products,RISK_OVERSTOCK,{}
+i need to how many distinct skus do we carry?,SKU_COUNT_QUANTITY,{}
+kindly filter products by Electronics category,CATEGORY_FILTER,"{""category"": ""Electronics""}"
+tell me what is our total sku count?,SKU_COUNT_QUANTITY,{}
+could you show inventory matrix with reorder points and locations,TABULAR_REPORT,{}
+tell me filter inventory for Central-Hub,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+kindly what items are out of stock right now?,LOW_STOCK_REORDER,{}
+i want to forecast sales for SMARTPHONE-X over the next 14 days,DEMAND_FORECAST,"{""sku"": ""SMARTPHONE-X"", ""category"": ""Electronics""}"
+can you what stock is currently stored at Warehouse-East?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-East""}"
+how much stock do we hold for Groceries?,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+show me show category-wise stock allocation,STOCK_TYPE_CATEGORY,{}
+can you what is the status of the inventory database?,GENERAL_ASSISTANT,{}
+please how many units of BLENDER-PRO are available?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""BLENDER-PRO"", ""category"": ""Home & Kitchen""}"
+show me hi there,GENERAL_ASSISTANT,{}
+please give me category breakdown with valuations,STOCK_TYPE_CATEGORY,{}
+show me give me an executive brief on inventory health,EXECUTIVE_OVERVIEW,{}
+could you logistics breakdown across all sites,WAREHOUSE_LOGISTICS,{}
+please which items have too much stock sitting idle?,RISK_OVERSTOCK,{}
+i need to forecast sales for ORGANIC-HONEY over the next 14 days,DEMAND_FORECAST,"{""sku"": ""ORGANIC-HONEY"", ""category"": ""Groceries""}"
+can you show all inventory items in category Tools & Hardware,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+i want to list all products available at Warehouse-South,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+show me facility footprint and unit breakdown,WAREHOUSE_LOGISTICS,{}
+do we have any inventory shortage?,LOW_STOCK_REORDER,{}
+i need to unit and sku spread across our 5 warehouses,WAREHOUSE_LOGISTICS,{}
+i need to which items are low in stock and need reordering?,LOW_STOCK_REORDER,{}
+i want to can you list all products in tabular form with quantities and prices?,TABULAR_REPORT,{}
+list lowest 10 products by quantity,CUSTOM_SORT_FILTER,{}
+kindly find all items in the Tools & Hardware department,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+tell me how many distinct skus do we carry?,SKU_COUNT_QUANTITY,{}
+hello,GENERAL_ASSISTANT,{}
+i want to how many unique products are in the system?,SKU_COUNT_QUANTITY,{}
+please show low stock items,LOW_STOCK_REORDER,{}
+i want to list stock items belonging to Groceries,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+tell me show catalog listings for Groceries,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+could you how many units and skus are located in Central-Hub?,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+i want to stock type wise volume and dollar value summary,STOCK_TYPE_CATEGORY,{}
+show me forecast sales for HIKING-BACKPACK over the next 14 days,DEMAND_FORECAST,"{""sku"": ""HIKING-BACKPACK"", ""category"": ""Sports & Outdoors""}"
+what is the balance sheet asset value of inventory?,FINANCIAL_VALUATION,{}
+show me what is our total sku count?,SKU_COUNT_QUANTITY,{}
+can you what is our total sku count?,SKU_COUNT_QUANTITY,{}
+show me how is stock distributed across facilities?,WAREHOUSE_LOGISTICS,{}
+kindly how is inventory distributed across categories?,STOCK_TYPE_CATEGORY,{}
+tell me executive inventory scorecard and status,EXECUTIVE_OVERVIEW,{}
+i want to what stock is currently stored at Warehouse-North?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+i want to list top 10 products with highest quantity,CUSTOM_SORT_FILTER,{}
+show me break down stock units and valuation by product type,STOCK_TYPE_CATEGORY,{}
+could you what products do we have under Apparel?,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+kindly hi there,GENERAL_ASSISTANT,{}
+please what is the inventory count in each distribution center?,WAREHOUSE_LOGISTICS,{}
+please give me an executive brief on inventory health,EXECUTIVE_OVERVIEW,{}
+please find all items in the Tools & Hardware department,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+could you how much stock do we hold for Tools & Hardware?,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+tell me what are our quantities per category?,STOCK_TYPE_CATEGORY,{}
+i need to show me all items in Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+could you stock type wise volume and dollar value summary,STOCK_TYPE_CATEGORY,{}
+how many unique products are in the system?,SKU_COUNT_QUANTITY,{}
+show all inventory items in category Sports & Outdoors,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+show me restock recommendations for low inventory,LOW_STOCK_REORDER,{}
+show inventory matrix with reorder points and locations,TABULAR_REPORT,{}
+show me all items in Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+i want to financial audit of inventory value,FINANCIAL_VALUATION,{}
+which product has highest valuation,CUSTOM_SORT_FILTER,{}
+kindly are any products running out of stock?,LOW_STOCK_REORDER,{}
+please hello,GENERAL_ASSISTANT,{}
+can you predict demand trend and reorder timing for CERAMIC-MUG-SET,DEMAND_FORECAST,"{""sku"": ""CERAMIC-MUG-SET"", ""category"": ""Home & Kitchen""}"
+could you financial audit of inventory value,FINANCIAL_VALUATION,{}
+kindly what is our most expensive product,CUSTOM_SORT_FILTER,{}
+what is the status of the inventory database?,GENERAL_ASSISTANT,{}
+please break down stock units and valuation by product type,STOCK_TYPE_CATEGORY,{}
+how many distinct skus do we carry?,SKU_COUNT_QUANTITY,{}
+can you which item has highest price,CUSTOM_SORT_FILTER,{}
+could you identify slow-moving or dead stock risks,RISK_OVERSTOCK,{}
+please generate senior management inventory dashboard brief,EXECUTIVE_OVERVIEW,{}
+i want to how many units and skus are located in Warehouse-East?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-East""}"
+please will LEATHER-BELT run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""LEATHER-BELT"", ""category"": ""Apparel""}"
+show me number of distinct skus in stock,SKU_COUNT_QUANTITY,{}
+can you do we have excess capital locked in overstock?,RISK_OVERSTOCK,{}
+i need to search catalog for Apparel,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+can you what is the current stock level of 4K-MONITOR?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""4K-MONITOR"", ""category"": ""Electronics""}"
+please show catalog listings for Groceries,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+please predict demand trend and reorder timing for BLENDER-PRO,DEMAND_FORECAST,"{""sku"": ""BLENDER-PRO"", ""category"": ""Home & Kitchen""}"
+are any products running out of stock?,LOW_STOCK_REORDER,{}
+can you give me an executive inventory health brief,EXECUTIVE_OVERVIEW,{}
+i need to find all items in the Sports & Outdoors department,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+please show category-wise stock allocation,STOCK_TYPE_CATEGORY,{}
+could you search catalog for Electronics,CATALOG_SEARCH,"{""category"": ""Electronics""}"
+can you where is STAINLESS-SCREWS stored and how much is in stock?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""STAINLESS-SCREWS"", ""category"": ""Tools & Hardware""}"
+tell me is MERINO-SWEATER below its reorder point?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""MERINO-SWEATER"", ""category"": ""Apparel""}"
+i need to filter products by Groceries category,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+please good morning assistant,GENERAL_ASSISTANT,{}
+can you what is the highest value item,CUSTOM_SORT_FILTER,{}
+please category level stock aggregation,STOCK_TYPE_CATEGORY,{}
+can you are any products running out of stock?,LOW_STOCK_REORDER,{}
+please which item has lowest price,CUSTOM_SORT_FILTER,{}
+please show catalog listings for Sports & Outdoors,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+tell me give me an executive brief on inventory health,EXECUTIVE_OVERVIEW,{}
+tell me give me details on product SmartPhone X with SKU SMARTPHONE-X,SPECIFIC_SKU_LOOKUP,"{""sku"": ""SMARTPHONE-X"", ""category"": ""Electronics""}"
+please give me total stock count stock type wise,STOCK_TYPE_CATEGORY,{}
+kindly list all commands and queries you support,HELP_CAPABILITIES,{}
+kindly unit and sku spread across our 5 warehouses,WAREHOUSE_LOGISTICS,{}
+table view of current stock items,TABULAR_REPORT,{}
+could you item with lowest quantity,CUSTOM_SORT_FILTER,{}
+please list all products available at Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+show me unit and sku spread across our 5 warehouses,WAREHOUSE_LOGISTICS,{}
+can you list all products in tabular form with quantities and prices?,TABULAR_REPORT,{}
+can you how many different items are in inventory?,SKU_COUNT_QUANTITY,{}
+could you how much is our inventory portfolio worth?,FINANCIAL_VALUATION,{}
+please forecast sales for STAINLESS-SCREWS over the next 14 days,DEMAND_FORECAST,"{""sku"": ""STAINLESS-SCREWS"", ""category"": ""Tools & Hardware""}"
+item with highest value,CUSTOM_SORT_FILTER,{}
+i want to can you share this data in more details in tabular form?,TABULAR_REPORT,{}
+can you break down inventory by warehouse location,WAREHOUSE_LOGISTICS,{}
+show me how many units of COTTON-HOODIE are available?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""COTTON-HOODIE"", ""category"": ""Apparel""}"
+show me show catalog listings for Sports & Outdoors,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+i want to what is the balance sheet asset value of inventory?,FINANCIAL_VALUATION,{}
+can you share this data in more details in tabular form?,TABULAR_REPORT,{}
+could you what is the total worth of our inventory?,FINANCIAL_VALUATION,{}
+kindly identify slow-moving or dead stock risks,RISK_OVERSTOCK,{}
+can you filter products by Sports & Outdoors category,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+please run a 14-day demand prediction for LED-WORK-LIGHT,DEMAND_FORECAST,"{""sku"": ""LED-WORK-LIGHT"", ""category"": ""Tools & Hardware""}"
+kindly list lowest 10 products by quantity,CUSTOM_SORT_FILTER,{}
+generate a complete stock ledger table,TABULAR_REPORT,{}
+evaluate capital tie-up risk across products,RISK_OVERSTOCK,{}
+can you facility footprint and unit breakdown,WAREHOUSE_LOGISTICS,{}
+kindly how many units and skus are located in Central-Hub?,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+kindly what is the total physical unit count and sku count?,SKU_COUNT_QUANTITY,{}
+show me how many unique products are in the system?,SKU_COUNT_QUANTITY,{}
+can you show category-wise stock allocation,STOCK_TYPE_CATEGORY,{}
+i want to search catalog for Home & Kitchen,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+kindly what is our most valuable item,CUSTOM_SORT_FILTER,{}
+filter products by Sports & Outdoors category,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+could you restock recommendations for low inventory,LOW_STOCK_REORDER,{}
+show me print inventory grid,TABULAR_REPORT,{}
+kindly show warehouse distribution of inventory,WAREHOUSE_LOGISTICS,{}
+show me search catalog for Home & Kitchen,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+could you filter inventory for Central-Hub,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+could you how many distinct skus do we carry?,SKU_COUNT_QUANTITY,{}
+please print inventory grid,TABULAR_REPORT,{}
+can you category distribution report,STOCK_TYPE_CATEGORY,{}
+kindly show catalog listings for Groceries,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+i need to inventory carrying cost risk analysis,RISK_OVERSTOCK,{}
+i want to filter inventory for Warehouse-South,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+could you what products do we have under Home & Kitchen?,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+i want to how is stock distributed across facilities?,WAREHOUSE_LOGISTICS,{}
+i need to what is the total worth of our inventory?,FINANCIAL_VALUATION,{}
+could you calculate deficit units needed to restock safety cushion,LOW_STOCK_REORDER,{}
+show me list all products available at Warehouse-East,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-East""}"
+i need to give me details on product AirStride Running Shoes with SKU RUNNING-SHOES,SPECIFIC_SKU_LOOKUP,"{""sku"": ""RUNNING-SHOES"", ""category"": ""Apparel""}"
+please show inventory sorted by quantity,CUSTOM_SORT_FILTER,{}
+show me give me details on product 70% Dark Chocolate Bar with SKU DARK-CHOCOLATE,SPECIFIC_SKU_LOOKUP,"{""sku"": ""DARK-CHOCOLATE"", ""category"": ""Groceries""}"
+show me break down inventory by warehouse location,WAREHOUSE_LOGISTICS,{}
+please give me details on product Espresso Machine with SKU COFFEE-MAKER,SPECIFIC_SKU_LOOKUP,"{""sku"": ""COFFEE-MAKER"", ""category"": ""Home & Kitchen""}"
+can you what is the demand forecast for INSULATED-FLASK?,DEMAND_FORECAST,"{""sku"": ""INSULATED-FLASK"", ""category"": ""Sports & Outdoors""}"
+i need to generate senior management inventory dashboard brief,EXECUTIVE_OVERVIEW,{}
+tell me filter products by Electronics category,CATEGORY_FILTER,"{""category"": ""Electronics""}"
+tell me list stock items belonging to Home & Kitchen,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+i want to what is the total physical unit count and sku count?,SKU_COUNT_QUANTITY,{}
+kindly show top 10 inventory records ordered by quantity,CUSTOM_SORT_FILTER,{}
+could you flag skus holding more than 5x safety threshold,RISK_OVERSTOCK,{}
+kindly high level executive summary of operations,EXECUTIVE_OVERVIEW,{}
+can you hi there,GENERAL_ASSISTANT,{}
+could you what is the current stock level of RUNNING-SHOES?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""RUNNING-SHOES"", ""category"": ""Apparel""}"
+can you generate a complete stock ledger table,TABULAR_REPORT,{}
+show me how much stock do we hold for Tools & Hardware?,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+please distinct sku count check,SKU_COUNT_QUANTITY,{}
+i need to can you show the top 10 products sorted by available stock?,CUSTOM_SORT_FILTER,{}
+show me filter inventory for Central-Hub,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+show stock volume per warehouse,WAREHOUSE_LOGISTICS,{}
+could you show all inventory items in category Groceries,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+i want to facility footprint and unit breakdown,WAREHOUSE_LOGISTICS,{}
+tell me where is BLENDER-PRO stored and how much is in stock?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""BLENDER-PRO"", ""category"": ""Home & Kitchen""}"
+please generate a complete stock ledger table,TABULAR_REPORT,{}
+please show total inventory cost and valuation,FINANCIAL_VALUATION,{}
+please operations leadership overview report,EXECUTIVE_OVERVIEW,{}
+i need to which items are low in stock?,LOW_STOCK_REORDER,{}
+how much capital is tied up in stock?,FINANCIAL_VALUATION,{}
+tell me financial audit of inventory value,FINANCIAL_VALUATION,{}
+what is the demand forecast for BIKE-HELMET?,DEMAND_FORECAST,"{""sku"": ""BIKE-HELMET"", ""category"": ""Sports & Outdoors""}"
+can you show me all items in Warehouse-North,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+show me how many distinct skus do we carry?,SKU_COUNT_QUANTITY,{}
+could you can you assist me with inventory management?,GENERAL_ASSISTANT,{}
+predict demand trend and reorder timing for STAINLESS-SCREWS,DEMAND_FORECAST,"{""sku"": ""STAINLESS-SCREWS"", ""category"": ""Tools & Hardware""}"
+show me what are our quantities per category?,STOCK_TYPE_CATEGORY,{}
+i need to how much stock do we hold for Apparel?,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+run a 14-day demand prediction for MERINO-SWEATER,DEMAND_FORECAST,"{""sku"": ""MERINO-SWEATER"", ""category"": ""Apparel""}"
+tell me inventory carrying cost risk analysis,RISK_OVERSTOCK,{}
+who are you and what do you do?,GENERAL_ASSISTANT,{}
+show me give me details on product Auto-Ranging Digital Multimeter with SKU DIGITAL-MULTIMETER,SPECIFIC_SKU_LOOKUP,"{""sku"": ""DIGITAL-MULTIMETER"", ""category"": ""Tools & Hardware""}"
+i want to look up products matching Groceries,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+operations leadership overview report,EXECUTIVE_OVERVIEW,{}
+please show top 10 items sorted by reorder threshold,CUSTOM_SORT_FILTER,{}
+can you forecast sales for ALMOND-BUTTER over the next 14 days,DEMAND_FORECAST,"{""sku"": ""ALMOND-BUTTER"", ""category"": ""Groceries""}"
+what is the overall health score of our stock?,EXECUTIVE_OVERVIEW,{}
+please find all items in the Apparel department,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+kindly show category-wise stock allocation,STOCK_TYPE_CATEGORY,{}
+i need to provide tabular summary of all inventory records,TABULAR_REPORT,{}
+i want to give me the total sku number,SKU_COUNT_QUANTITY,{}
+could you tell me the total number of skus,SKU_COUNT_QUANTITY,{}
+i want to flag skus holding more than 5x safety threshold,RISK_OVERSTOCK,{}
+i need to show catalog listings for Tools & Hardware,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+could you how many units of BLENDER-PRO are available?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""BLENDER-PRO"", ""category"": ""Home & Kitchen""}"
+i want to what can you do?,HELP_CAPABILITIES,{}
+please what items are out of stock right now?,LOW_STOCK_REORDER,{}
+could you generate senior management inventory dashboard brief,EXECUTIVE_OVERVIEW,{}
+help me understand your capabilities,HELP_CAPABILITIES,{}
+please list stock items belonging to Home & Kitchen,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+tell me show full inventory spreadsheet view,TABULAR_REPORT,{}
+could you will WIRELESS-BUDS run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""WIRELESS-BUDS"", ""category"": ""Electronics""}"
+facility footprint and unit breakdown,WAREHOUSE_LOGISTICS,{}
+could you which items are low in stock?,LOW_STOCK_REORDER,{}
+look up products matching Tools & Hardware,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+could you show all inventory items in category Home & Kitchen,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+tell me show low stock items,LOW_STOCK_REORDER,{}
+please lookup SKU STAINLESS-SCREWS,SPECIFIC_SKU_LOOKUP,"{""sku"": ""STAINLESS-SCREWS"", ""category"": ""Tools & Hardware""}"
+calculate overall portfolio valuation,FINANCIAL_VALUATION,{}
+show me generate senior management inventory dashboard brief,EXECUTIVE_OVERVIEW,{}
+show me what items are out of stock right now?,LOW_STOCK_REORDER,{}
+kindly search catalog for Sports & Outdoors,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+can you what can you do?,HELP_CAPABILITIES,{}
+show me executive inventory scorecard and status,EXECUTIVE_OVERVIEW,{}
+inventory carrying cost risk analysis,RISK_OVERSTOCK,{}
+please what are our quantities per category?,STOCK_TYPE_CATEGORY,{}
+can you what is the total physical unit count and sku count?,SKU_COUNT_QUANTITY,{}
+kindly provide tabular summary of all inventory records,TABULAR_REPORT,{}
+i want to list all products available at Warehouse-North,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+show me which item has lowest value,CUSTOM_SORT_FILTER,{}
+tell me give me total stock count stock type wise,STOCK_TYPE_CATEGORY,{}
+please replenishment order audit for depleted items,LOW_STOCK_REORDER,{}
+please show inventory breakdown by category,STOCK_TYPE_CATEGORY,{}
+tell me what is our total inventory valuation and warehouse breakdown?,FINANCIAL_VALUATION,{}
+tell me what is the total dollar value of our holdings?,FINANCIAL_VALUATION,{}
+show me filter products by Electronics category,CATEGORY_FILTER,"{""category"": ""Electronics""}"
+can you look up products matching Tools & Hardware,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+could you operations leadership overview report,EXECUTIVE_OVERVIEW,{}
+can you list stock items belonging to Home & Kitchen,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+i need to give me category breakdown with valuations,STOCK_TYPE_CATEGORY,{}
+logistics breakdown across all sites,WAREHOUSE_LOGISTICS,{}
+is YOGA-MAT below its reorder point?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""YOGA-MAT"", ""category"": ""Sports & Outdoors""}"
+tell me give me a tabular report of all stock,TABULAR_REPORT,{}
+i need to top 20 inventory items sorted by quantity,CUSTOM_SORT_FILTER,{}
+show me list stock items belonging to Tools & Hardware,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+can you assist me with inventory management?,GENERAL_ASSISTANT,{}
+could you evaluate capital tie-up risk across products,RISK_OVERSTOCK,{}
+i want to how many units belong to each product type?,STOCK_TYPE_CATEGORY,{}
+please what is the demand forecast for TOOL-SET?,DEMAND_FORECAST,"{""sku"": ""TOOL-SET"", ""category"": ""Tools & Hardware""}"
+kindly filter products by Groceries category,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+kindly which items are low in stock and need reordering?,LOW_STOCK_REORDER,{}
+i need to give me total stock count stock type wise,STOCK_TYPE_CATEGORY,{}
+i need to financial audit of inventory value,FINANCIAL_VALUATION,{}
+i need to show me all items in Warehouse-East,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-East""}"
+show me are all systems operational?,GENERAL_ASSISTANT,{}
+i want to show out of stock and critically depleted products,LOW_STOCK_REORDER,{}
+i need to flag skus holding more than 5x safety threshold,RISK_OVERSTOCK,{}
+tell me show me all items in a table,TABULAR_REPORT,{}
+please which products reached minimum threshold?,LOW_STOCK_REORDER,{}
+please is MERINO-SWEATER below its reorder point?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""MERINO-SWEATER"", ""category"": ""Apparel""}"
+can you predict demand trend and reorder timing for CORDLESS-DRILL,DEMAND_FORECAST,"{""sku"": ""CORDLESS-DRILL"", ""category"": ""Tools & Hardware""}"
+i need to i need a tabular breakdown of every SKU,TABULAR_REPORT,{}
+show me find all items in the Electronics department,CATALOG_SEARCH,"{""category"": ""Electronics""}"
+can you good morning assistant,GENERAL_ASSISTANT,{}
+could you find all items in the Home & Kitchen department,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+show me category distribution report,STOCK_TYPE_CATEGORY,{}
+kindly list all products available at Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+i need to tell me the total number of skus,SKU_COUNT_QUANTITY,{}
+tell me facility footprint and unit breakdown,WAREHOUSE_LOGISTICS,{}
+i want to give me details on product Artisan Espresso Coffee Beans with SKU ESPRESSO-BEANS,SPECIFIC_SKU_LOOKUP,"{""sku"": ""ESPRESSO-BEANS"", ""category"": ""Groceries""}"
+show me do we have any inventory shortage?,LOW_STOCK_REORDER,{}
+could you what is the price and stock level of AIR-FRYER?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""AIR-FRYER"", ""category"": ""Home & Kitchen""}"
+tell me how much is our inventory portfolio worth?,FINANCIAL_VALUATION,{}
+tell me show top 10 inventory data sorted by quantity,CUSTOM_SORT_FILTER,{}
+could you which items have too much stock sitting idle?,RISK_OVERSTOCK,{}
+show overstocked items and stockout risks,RISK_OVERSTOCK,{}
+tell me how many units belong to each product type?,STOCK_TYPE_CATEGORY,{}
+i need to what is our risk assessment for overstocked items?,RISK_OVERSTOCK,{}
+please summarize current supply chain health and risk status,EXECUTIVE_OVERVIEW,{}
+kindly give me an executive inventory health brief,EXECUTIVE_OVERVIEW,{}
+kindly where is our inventory physically stored?,WAREHOUSE_LOGISTICS,{}
+please item with lowest stock,CUSTOM_SORT_FILTER,{}
+replenishment order audit for depleted items,LOW_STOCK_REORDER,{}
+give me total stock count stock type wise,STOCK_TYPE_CATEGORY,{}
+can you show full inventory spreadsheet view,TABULAR_REPORT,{}
+i need to search catalog for Electronics,CATALOG_SEARCH,"{""category"": ""Electronics""}"
+i want to find all items in the Groceries department,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+kindly analyze obsolete and surplus inventory exposure,RISK_OVERSTOCK,{}
+show me what is the price and stock level of DARK-CHOCOLATE?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""DARK-CHOCOLATE"", ""category"": ""Groceries""}"
+can you unit and sku spread across our 5 warehouses,WAREHOUSE_LOGISTICS,{}
+could you search catalog for Sports & Outdoors,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+please how many units and skus are located in Warehouse-North?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+show catalog listings for Tools & Hardware,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+show me what is the current stock level of BIKE-HELMET?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""BIKE-HELMET"", ""category"": ""Sports & Outdoors""}"
+kindly tell me the total number of skus,SKU_COUNT_QUANTITY,{}
+i need to show all inventory items in category Sports & Outdoors,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+i want to format the inventory as a table,TABULAR_REPORT,{}
+i need to what items need replenishment?,LOW_STOCK_REORDER,{}
+i want to category distribution report,STOCK_TYPE_CATEGORY,{}
+tell me capital valuation breakdown across facilities,FINANCIAL_VALUATION,{}
+tell me format the inventory as a table,TABULAR_REPORT,{}
+show me total count of active skus,SKU_COUNT_QUANTITY,{}
+could you what is our risk assessment for overstocked items?,RISK_OVERSTOCK,{}
+i want to provide tabular summary of all inventory records,TABULAR_REPORT,{}
+tell me which items have too much stock sitting idle?,RISK_OVERSTOCK,{}
+please where is our inventory physically stored?,WAREHOUSE_LOGISTICS,{}
+kindly what stock is currently stored at Warehouse-South?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+tell me how much stock do we hold for Tools & Hardware?,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+what is our risk assessment for overstocked items?,RISK_OVERSTOCK,{}
+kindly give me an executive brief on inventory health,EXECUTIVE_OVERVIEW,{}
+please number of distinct skus in stock,SKU_COUNT_QUANTITY,{}
+can you generate senior management inventory dashboard brief,EXECUTIVE_OVERVIEW,{}
+what products do we have under Sports & Outdoors?,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+show me which products reached minimum threshold?,LOW_STOCK_REORDER,{}
+could you how many distinct product skus are registered in the warehouse?,SKU_COUNT_QUANTITY,{}
+i want to identify slow-moving or dead stock risks,RISK_OVERSTOCK,{}
+i need to check inventory status for SKU AIR-FRYER,SPECIFIC_SKU_LOOKUP,"{""sku"": ""AIR-FRYER"", ""category"": ""Home & Kitchen""}"
+tell me show lowest 5 items by stock,CUSTOM_SORT_FILTER,{}
+could you are all systems operational?,GENERAL_ASSISTANT,{}
+show me how much stock do we hold for Groceries?,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+i need to forecast sales for TOOL-SET over the next 14 days,DEMAND_FORECAST,"{""sku"": ""TOOL-SET"", ""category"": ""Tools & Hardware""}"
+please how many units belong to each product type?,STOCK_TYPE_CATEGORY,{}
+kindly how many different skus stock has?,SKU_COUNT_QUANTITY,{}
+please what features does this assistant offer?,HELP_CAPABILITIES,{}
+what products do we have under Groceries?,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+i want to show catalog listings for Apparel,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+tell me what is the price and stock level of GREEN-TEA?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""GREEN-TEA"", ""category"": ""Groceries""}"
+can you what stock is currently stored at Warehouse-South?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+could you show warehouse distribution of inventory,WAREHOUSE_LOGISTICS,{}
+i need to what is the demand forecast for LED-WORK-LIGHT?,DEMAND_FORECAST,"{""sku"": ""LED-WORK-LIGHT"", ""category"": ""Tools & Hardware""}"
+i need to list all products available at Warehouse-South,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+tell me show catalog listings for Apparel,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+could you will TOOL-SET run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""TOOL-SET"", ""category"": ""Tools & Hardware""}"
+i need to filter products by Apparel category,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+could you give me an executive inventory health brief,EXECUTIVE_OVERVIEW,{}
+show me warehouse storage capacity and current stock allocation,WAREHOUSE_LOGISTICS,{}
+can you give me total stock count stock type wise,STOCK_TYPE_CATEGORY,{}
+show me what features does this assistant offer?,HELP_CAPABILITIES,{}
+i need to how much is our inventory portfolio worth?,FINANCIAL_VALUATION,{}
+kindly how much capital is tied up in stock?,FINANCIAL_VALUATION,{}
+please how much capital is tied up in stock?,FINANCIAL_VALUATION,{}
+i want to which products reached minimum threshold?,LOW_STOCK_REORDER,{}
+kindly show stock volume per warehouse,WAREHOUSE_LOGISTICS,{}
+i want to show inventory breakdown by category,STOCK_TYPE_CATEGORY,{}
+show me item with highest value,CUSTOM_SORT_FILTER,{}
+tell me which items are low in stock and need reordering?,LOW_STOCK_REORDER,{}
+please show out of stock and critically depleted products,LOW_STOCK_REORDER,{}
+please give me a tabular report of all stock,TABULAR_REPORT,{}
+i want to operational summary for the chief operations officer,EXECUTIVE_OVERVIEW,{}
+tell me check items below reorder threshold,LOW_STOCK_REORDER,{}
+could you give me details on product Rechargeable LED Work Light with SKU LED-WORK-LIGHT,SPECIFIC_SKU_LOOKUP,"{""sku"": ""LED-WORK-LIGHT"", ""category"": ""Tools & Hardware""}"
+i need to forecast sales for BLENDER-PRO over the next 14 days,DEMAND_FORECAST,"{""sku"": ""BLENDER-PRO"", ""category"": ""Home & Kitchen""}"
+i need to help me understand your capabilities,HELP_CAPABILITIES,{}
+show me do we have excess capital locked in overstock?,RISK_OVERSTOCK,{}
+show me give me category breakdown with valuations,STOCK_TYPE_CATEGORY,{}
+list stock items belonging to Tools & Hardware,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+i need to what is the demand forecast for SMARTPHONE-X?,DEMAND_FORECAST,"{""sku"": ""SMARTPHONE-X"", ""category"": ""Electronics""}"
+can you which items are low in stock and need reordering?,LOW_STOCK_REORDER,{}
+show me will DIGITAL-MULTIMETER run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""DIGITAL-MULTIMETER"", ""category"": ""Tools & Hardware""}"
+tell me filter products by Sports & Outdoors category,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+can you what stock is currently stored at Central-Hub?,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+show me how is inventory distributed across categories?,STOCK_TYPE_CATEGORY,{}
+tell me show overstocked items and stockout risks,RISK_OVERSTOCK,{}
+can you total count of active skus,SKU_COUNT_QUANTITY,{}
+could you which product has the highest value,CUSTOM_SORT_FILTER,{}
+i want to what products do we have under Electronics?,CATALOG_SEARCH,"{""category"": ""Electronics""}"
+could you which item has lowest quantity,CUSTOM_SORT_FILTER,{}
+please filter products by Home & Kitchen category,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+tell me flag skus holding more than 5x safety threshold,RISK_OVERSTOCK,{}
+identify slow-moving or dead stock risks,RISK_OVERSTOCK,{}
+can you stock type wise volume and dollar value summary,STOCK_TYPE_CATEGORY,{}
+can you show all inventory items in category Electronics,CATEGORY_FILTER,"{""category"": ""Electronics""}"
+financial audit of inventory value,FINANCIAL_VALUATION,{}
+i want to look up products matching Electronics,CATALOG_SEARCH,"{""category"": ""Electronics""}"
+can you what are our most expensive inventory holdings?,FINANCIAL_VALUATION,{}
+please capital valuation breakdown across facilities,FINANCIAL_VALUATION,{}
+can you executive inventory scorecard and status,EXECUTIVE_OVERVIEW,{}
+i want to run a 14-day demand prediction for LEATHER-BELT,DEMAND_FORECAST,"{""sku"": ""LEATHER-BELT"", ""category"": ""Apparel""}"
+can you how is inventory distributed across categories?,STOCK_TYPE_CATEGORY,{}
+could you filter products by Electronics category,CATEGORY_FILTER,"{""category"": ""Electronics""}"
+show me output stock items in table layout,TABULAR_REPORT,{}
+tell me show category-wise stock allocation,STOCK_TYPE_CATEGORY,{}
+i need to give me an executive brief on inventory health,EXECUTIVE_OVERVIEW,{}
+please show stock volume per warehouse,WAREHOUSE_LOGISTICS,{}
+show me where is our inventory physically stored?,WAREHOUSE_LOGISTICS,{}
+show me what is the current stock level of 4K-MONITOR?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""4K-MONITOR"", ""category"": ""Electronics""}"
+tell me filter products by Tools & Hardware category,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+tell me category level stock aggregation,STOCK_TYPE_CATEGORY,{}
+can you run a 14-day demand prediction for CORDLESS-DRILL,DEMAND_FORECAST,"{""sku"": ""CORDLESS-DRILL"", ""category"": ""Tools & Hardware""}"
+could you give me the total sku number,SKU_COUNT_QUANTITY,{}
+tell me break down inventory by warehouse location,WAREHOUSE_LOGISTICS,{}
+can you calculate overall portfolio valuation,FINANCIAL_VALUATION,{}
+can you display all items sorted by price ascending,CUSTOM_SORT_FILTER,{}
+tell me break down stock units and valuation by product type,STOCK_TYPE_CATEGORY,{}
+can you how much capital is tied up in stock?,FINANCIAL_VALUATION,{}
+i need to show inventory breakdown by category,STOCK_TYPE_CATEGORY,{}
+i need to analyze obsolete and surplus inventory exposure,RISK_OVERSTOCK,{}
+i want to what is our total inventory valuation and warehouse breakdown?,FINANCIAL_VALUATION,{}
+i want to what is our risk assessment for overstocked items?,RISK_OVERSTOCK,{}
+could you category level stock aggregation,STOCK_TYPE_CATEGORY,{}
+i want to render a markdown grid with all inventory columns,TABULAR_REPORT,{}
+please what stock is currently stored at Warehouse-West?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+tell me how much demand is expected for 70% Dark Chocolate Bar (DARK-CHOCOLATE)?,DEMAND_FORECAST,"{""sku"": ""DARK-CHOCOLATE"", ""category"": ""Groceries""}"
+could you show overstocked items and stockout risks,RISK_OVERSTOCK,{}
+could you what items are out of stock right now?,LOW_STOCK_REORDER,{}
+could you show me all items in Warehouse-South,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+i want to replenishment order audit for depleted items,LOW_STOCK_REORDER,{}
+i want to show me all items in Warehouse-North,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+i want to inventory carrying cost risk analysis,RISK_OVERSTOCK,{}
+i need to total count of active skus,SKU_COUNT_QUANTITY,{}
+show me how much stock do we hold for Electronics?,CATEGORY_FILTER,"{""category"": ""Electronics""}"
+i want to forecast sales for COTTON-HOODIE over the next 14 days,DEMAND_FORECAST,"{""sku"": ""COTTON-HOODIE"", ""category"": ""Apparel""}"
+i need to warehouse storage capacity and current stock allocation,WAREHOUSE_LOGISTICS,{}
+filter products by Electronics category,CATEGORY_FILTER,"{""category"": ""Electronics""}"
+tell me look up products matching Sports & Outdoors,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+i need a tabular breakdown of every SKU,TABULAR_REPORT,{}
+please what is the total dollar value of our holdings?,FINANCIAL_VALUATION,{}
+tell me what stock is currently stored at Warehouse-West?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+generate senior management inventory dashboard brief,EXECUTIVE_OVERVIEW,{}
+i want to show warehouse distribution of inventory,WAREHOUSE_LOGISTICS,{}
+kindly operational summary for the chief operations officer,EXECUTIVE_OVERVIEW,{}
+kindly what items need replenishment?,LOW_STOCK_REORDER,{}
+i want to operations leadership overview report,EXECUTIVE_OVERVIEW,{}
+restock recommendations for low inventory,LOW_STOCK_REORDER,{}
+i need to list stock items belonging to Sports & Outdoors,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+kindly give me total stock count stock type wise,STOCK_TYPE_CATEGORY,{}
+show me give me an executive inventory health brief,EXECUTIVE_OVERVIEW,{}
+will COFFEE-MAKER run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""COFFEE-MAKER"", ""category"": ""Home & Kitchen""}"
+kindly help me understand your capabilities,HELP_CAPABILITIES,{}
+show out of stock and critically depleted products,LOW_STOCK_REORDER,{}
+please how many distinct skus do we carry?,SKU_COUNT_QUANTITY,{}
+could you help me understand your capabilities,HELP_CAPABILITIES,{}
+please what is the current stock level of BIKE-HELMET?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""BIKE-HELMET"", ""category"": ""Sports & Outdoors""}"
+show me list lowest 10 products by quantity,CUSTOM_SORT_FILTER,{}
+show top 5 items sorted by valuation,CUSTOM_SORT_FILTER,{}
+could you what is the demand forecast for DARK-CHOCOLATE?,DEMAND_FORECAST,"{""sku"": ""DARK-CHOCOLATE"", ""category"": ""Groceries""}"
+can you what stock is currently stored at Warehouse-North?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+kindly predict demand trend and reorder timing for ALMOND-BUTTER,DEMAND_FORECAST,"{""sku"": ""ALMOND-BUTTER"", ""category"": ""Groceries""}"
+i want to lookup SKU WIRELESS-BUDS,SPECIFIC_SKU_LOOKUP,"{""sku"": ""WIRELESS-BUDS"", ""category"": ""Electronics""}"
+i want to how much stock do we hold for Groceries?,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+can you give me an executive brief on inventory health,EXECUTIVE_OVERVIEW,{}
+tell me how many distinct product skus are registered in the warehouse?,SKU_COUNT_QUANTITY,{}
+please what is the price and stock level of AIR-FRYER?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""AIR-FRYER"", ""category"": ""Home & Kitchen""}"
+show me how many different items are in inventory?,SKU_COUNT_QUANTITY,{}
+could you lookup SKU BIKE-HELMET,SPECIFIC_SKU_LOOKUP,"{""sku"": ""BIKE-HELMET"", ""category"": ""Sports & Outdoors""}"
+please will MERINO-SWEATER run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""MERINO-SWEATER"", ""category"": ""Apparel""}"
+can you lookup SKU CHEF-KNIFE,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CHEF-KNIFE"", ""category"": ""Home & Kitchen""}"
+tell me what is the demand forecast for ALMOND-BUTTER?,DEMAND_FORECAST,"{""sku"": ""ALMOND-BUTTER"", ""category"": ""Groceries""}"
+tell me give me the total sku number,SKU_COUNT_QUANTITY,{}
+can you warehouse storage capacity and current stock allocation,WAREHOUSE_LOGISTICS,{}
+please how is stock distributed across facilities?,WAREHOUSE_LOGISTICS,{}
+kindly print inventory grid,TABULAR_REPORT,{}
+kindly what is the overall health score of our stock?,EXECUTIVE_OVERVIEW,{}
+kindly forecast sales for LEATHER-BELT over the next 14 days,DEMAND_FORECAST,"{""sku"": ""LEATHER-BELT"", ""category"": ""Apparel""}"
+tell me list all commands and queries you support,HELP_CAPABILITIES,{}
+format the inventory as a table,TABULAR_REPORT,{}
+show me run a 14-day demand prediction for WIRELESS-BUDS,DEMAND_FORECAST,"{""sku"": ""WIRELESS-BUDS"", ""category"": ""Electronics""}"
+kindly what questions can I ask you?,HELP_CAPABILITIES,{}
+tell me warehouse storage capacity and current stock allocation,WAREHOUSE_LOGISTICS,{}
+show me analyze obsolete and surplus inventory exposure,RISK_OVERSTOCK,{}
+please inventory carrying cost risk analysis,RISK_OVERSTOCK,{}
+kindly what is the total worth of our inventory?,FINANCIAL_VALUATION,{}
+kindly what is the inventory count in each distribution center?,WAREHOUSE_LOGISTICS,{}
+kindly do we have any inventory shortage?,LOW_STOCK_REORDER,{}
+what are our quantities per category?,STOCK_TYPE_CATEGORY,{}
+show me all items in Warehouse-East,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-East""}"
+i want to tell me the total number of skus,SKU_COUNT_QUANTITY,{}
+kindly executive inventory scorecard and status,EXECUTIVE_OVERVIEW,{}
+i need to break down inventory by warehouse location,WAREHOUSE_LOGISTICS,{}
+can you how much is our inventory portfolio worth?,FINANCIAL_VALUATION,{}
+i need to calculate overall portfolio valuation,FINANCIAL_VALUATION,{}
+tell me lookup SKU ESPRESSO-BEANS,SPECIFIC_SKU_LOOKUP,"{""sku"": ""ESPRESSO-BEANS"", ""category"": ""Groceries""}"
+i want to show all inventory items in category Sports & Outdoors,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+kindly what is our total inventory valuation and warehouse breakdown?,FINANCIAL_VALUATION,{}
+could you list stock items belonging to Sports & Outdoors,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+filter inventory for Warehouse-North,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+kindly list stock items belonging to Electronics,CATEGORY_FILTER,"{""category"": ""Electronics""}"
+i want to good morning assistant,GENERAL_ASSISTANT,{}
+i need to forecast sales for AIR-FRYER over the next 14 days,DEMAND_FORECAST,"{""sku"": ""AIR-FRYER"", ""category"": ""Home & Kitchen""}"
+could you how much capital is tied up in stock?,FINANCIAL_VALUATION,{}
+please calculate deficit units needed to restock safety cushion,LOW_STOCK_REORDER,{}
+kindly logistics breakdown across all sites,WAREHOUSE_LOGISTICS,{}
+could you list stock items belonging to Home & Kitchen,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+tell me show me all items in Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+can you what is the demand forecast for 4K-MONITOR?,DEMAND_FORECAST,"{""sku"": ""4K-MONITOR"", ""category"": ""Electronics""}"
+i need to show out of stock and critically depleted products,LOW_STOCK_REORDER,{}
+could you filter inventory for Warehouse-South,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+check inventory status for SKU TOOL-SET,SPECIFIC_SKU_LOOKUP,"{""sku"": ""TOOL-SET"", ""category"": ""Tools & Hardware""}"
+please how do I use the inventory ai assistant?,HELP_CAPABILITIES,{}
+please what questions can I ask you?,HELP_CAPABILITIES,{}
+could you filter inventory for Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+please how much is our inventory portfolio worth?,FINANCIAL_VALUATION,{}
+show me how many units and skus are located in Central-Hub?,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+i want to what is the overall health score of our stock?,EXECUTIVE_OVERVIEW,{}
+can you flag skus holding more than 5x safety threshold,RISK_OVERSTOCK,{}
+i want to show inventory sorted by quantity,CUSTOM_SORT_FILTER,{}
+i want to print inventory grid,TABULAR_REPORT,{}
+please tell me the total number of skus,SKU_COUNT_QUANTITY,{}
+kindly find all items in the Home & Kitchen department,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+tell me show top 5 items sorted by quantity,CUSTOM_SORT_FILTER,{}
+tell me show inventory breakdown by category,STOCK_TYPE_CATEGORY,{}
+kindly display details in tabular format please,TABULAR_REPORT,{}
+tell me search catalog for Tools & Hardware,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+tell me show warehouse distribution of inventory,WAREHOUSE_LOGISTICS,{}
+show me show catalog listings for Home & Kitchen,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+i need to executive inventory scorecard and status,EXECUTIVE_OVERVIEW,{}
+how many different items are in inventory?,SKU_COUNT_QUANTITY,{}
+show me what stock is currently stored at Warehouse-North?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+i want to which product has highest valuation,CUSTOM_SORT_FILTER,{}
+i need to how much capital is tied up in stock?,FINANCIAL_VALUATION,{}
+please what is the overall health score of our stock?,EXECUTIVE_OVERVIEW,{}
+show lowest 5 items sorted by quantity,CUSTOM_SORT_FILTER,{}
+show me what is the total physical unit count and sku count?,SKU_COUNT_QUANTITY,{}
+i want to check inventory status for SKU ALMOND-BUTTER,SPECIFIC_SKU_LOOKUP,"{""sku"": ""ALMOND-BUTTER"", ""category"": ""Groceries""}"
+please logistics breakdown across all sites,WAREHOUSE_LOGISTICS,{}
+kindly how many unique products are in the system?,SKU_COUNT_QUANTITY,{}
+i need to high level executive summary of operations,EXECUTIVE_OVERVIEW,{}
+i want to lookup SKU BLENDER-PRO,SPECIFIC_SKU_LOOKUP,"{""sku"": ""BLENDER-PRO"", ""category"": ""Home & Kitchen""}"
+please calculate overall portfolio valuation,FINANCIAL_VALUATION,{}
+show category-wise stock allocation,STOCK_TYPE_CATEGORY,{}
+can you is RUNNING-SHOES below its reorder point?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""RUNNING-SHOES"", ""category"": ""Apparel""}"
+can you how much demand is expected for Artisan Espresso Coffee Beans (ESPRESSO-BEANS)?,DEMAND_FORECAST,"{""sku"": ""ESPRESSO-BEANS"", ""category"": ""Groceries""}"
+please identify slow-moving or dead stock risks,RISK_OVERSTOCK,{}
+i want to show full inventory spreadsheet view,TABULAR_REPORT,{}
+tell me help me understand your capabilities,HELP_CAPABILITIES,{}
+i want to how many units and skus are located in Warehouse-West?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+can you list all commands and queries you support,HELP_CAPABILITIES,{}
+i need to list all skus that have low inventory cushions,LOW_STOCK_REORDER,{}
+i need to what are our most expensive inventory holdings?,FINANCIAL_VALUATION,{}
+kindly how many units and skus are located in Warehouse-West?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+tell me operations leadership overview report,EXECUTIVE_OVERVIEW,{}
+please will WIRELESS-BUDS run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""WIRELESS-BUDS"", ""category"": ""Electronics""}"
+show me how many units and skus are located in Warehouse-South?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+can you filter inventory for Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+please how many units and skus are located in Central-Hub?,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+kindly how much is our inventory portfolio worth?,FINANCIAL_VALUATION,{}
+i want to what are our most expensive inventory holdings?,FINANCIAL_VALUATION,{}
+filter inventory for Warehouse-East,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-East""}"
+could you check items below reorder threshold,LOW_STOCK_REORDER,{}
+can you which items are low in stock?,LOW_STOCK_REORDER,{}
+tell me what is the demand forecast for LED-WORK-LIGHT?,DEMAND_FORECAST,"{""sku"": ""LED-WORK-LIGHT"", ""category"": ""Tools & Hardware""}"
+i need to show me all items in a table,TABULAR_REPORT,{}
+can you help me understand your capabilities,HELP_CAPABILITIES,{}
+tell me calculate overall portfolio valuation,FINANCIAL_VALUATION,{}
+i want to what is the demand forecast for INSULATED-FLASK?,DEMAND_FORECAST,"{""sku"": ""INSULATED-FLASK"", ""category"": ""Sports & Outdoors""}"
+i need to find all items in the Home & Kitchen department,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+show warehouse distribution of inventory,WAREHOUSE_LOGISTICS,{}
+kindly who are you and what do you do?,GENERAL_ASSISTANT,{}
+i want to what stock is currently stored at Central-Hub?,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+can you inventory carrying cost risk analysis,RISK_OVERSTOCK,{}
+show me flag skus holding more than 5x safety threshold,RISK_OVERSTOCK,{}
+can you what products do we have under Groceries?,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+i want to show inventory matrix with reorder points and locations,TABULAR_REPORT,{}
+could you do we have any inventory shortage?,LOW_STOCK_REORDER,{}
+can you what is the overall health score of our stock?,EXECUTIVE_OVERVIEW,{}
+could you how many unique products are in the system?,SKU_COUNT_QUANTITY,{}
+tell me distinct sku count check,SKU_COUNT_QUANTITY,{}
+tell me stock type wise volume and dollar value summary,STOCK_TYPE_CATEGORY,{}
+show me what is the demand forecast for BLENDER-PRO?,DEMAND_FORECAST,"{""sku"": ""BLENDER-PRO"", ""category"": ""Home & Kitchen""}"
+could you filter products by Sports & Outdoors category,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+tell me summarize current supply chain health and risk status,EXECUTIVE_OVERVIEW,{}
+show me i need a tabular breakdown of every SKU,TABULAR_REPORT,{}
+i need to what products do we have under Groceries?,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+i need to category level stock aggregation,STOCK_TYPE_CATEGORY,{}
+find all items in the Tools & Hardware department,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+could you what is the total dollar value of our holdings?,FINANCIAL_VALUATION,{}
+can you what is the current stock level of INSULATED-FLASK?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""INSULATED-FLASK"", ""category"": ""Sports & Outdoors""}"
+can you search catalog for Tools & Hardware,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+look up products matching Home & Kitchen,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+can you print inventory grid,TABULAR_REPORT,{}
+can you are all systems operational?,GENERAL_ASSISTANT,{}
+kindly good morning assistant,GENERAL_ASSISTANT,{}
+show me what is the price and stock level of GREEN-TEA?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""GREEN-TEA"", ""category"": ""Groceries""}"
+kindly can you assist me with inventory management?,GENERAL_ASSISTANT,{}
+could you what can you do?,HELP_CAPABILITIES,{}
+could you hello,GENERAL_ASSISTANT,{}
+kindly find all items in the Groceries department,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+could you good morning assistant,GENERAL_ASSISTANT,{}
+i want to show catalog listings for Home & Kitchen,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+please what can you do?,HELP_CAPABILITIES,{}
+could you capital valuation breakdown across facilities,FINANCIAL_VALUATION,{}
+kindly show inventory breakdown by category,STOCK_TYPE_CATEGORY,{}
+kindly render a markdown grid with all inventory columns,TABULAR_REPORT,{}
+can you how many unique products are in the system?,SKU_COUNT_QUANTITY,{}
+kindly look up products matching Electronics,CATALOG_SEARCH,"{""category"": ""Electronics""}"
+i want to give me total stock count stock type wise,STOCK_TYPE_CATEGORY,{}
+tell me generate a complete stock ledger table,TABULAR_REPORT,{}
+can you how many units and skus are located in Warehouse-West?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+what features does this assistant offer?,HELP_CAPABILITIES,{}
+give me an executive brief on inventory health,EXECUTIVE_OVERVIEW,{}
+i want to show lowest 5 inventory items by stock count,CUSTOM_SORT_FILTER,{}
+i want to break down inventory by warehouse location,WAREHOUSE_LOGISTICS,{}
+please table view of current stock items,TABULAR_REPORT,{}
+how much is our inventory portfolio worth?,FINANCIAL_VALUATION,{}
+could you what products do we have under Electronics?,CATALOG_SEARCH,"{""category"": ""Electronics""}"
+tell me what products do we have under Tools & Hardware?,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+can you search catalog for Home & Kitchen,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+do we have excess capital locked in overstock?,RISK_OVERSTOCK,{}
+show me show stock volume per warehouse,WAREHOUSE_LOGISTICS,{}
+i want to show category-wise stock allocation,STOCK_TYPE_CATEGORY,{}
+could you what is the balance sheet asset value of inventory?,FINANCIAL_VALUATION,{}
+Give me an executive inventory health brief,EXECUTIVE_OVERVIEW,{}
+where is CERAMIC-MUG-SET stored and how much is in stock?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CERAMIC-MUG-SET"", ""category"": ""Home & Kitchen""}"
+could you break down inventory by warehouse location,WAREHOUSE_LOGISTICS,{}
+can you how many units belong to each product type?,STOCK_TYPE_CATEGORY,{}
+kindly break down stock units and valuation by product type,STOCK_TYPE_CATEGORY,{}
+i want to show overstocked items and stockout risks,RISK_OVERSTOCK,{}
+could you how is inventory distributed across categories?,STOCK_TYPE_CATEGORY,{}
+show me show all inventory items in category Apparel,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+i need to list all commands and queries you support,HELP_CAPABILITIES,{}
+can you which items have too much stock sitting idle?,RISK_OVERSTOCK,{}
+i need to which skus require purchase orders immediately?,LOW_STOCK_REORDER,{}
+i want to table view of current stock items,TABULAR_REPORT,{}
+tell me how many units and skus are located in Warehouse-South?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+please how many unique products are in the system?,SKU_COUNT_QUANTITY,{}
+tell me filter inventory for Warehouse-North,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+please facility footprint and unit breakdown,WAREHOUSE_LOGISTICS,{}
+kindly filter inventory for Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+i want to how many distinct product skus are registered in the warehouse?,SKU_COUNT_QUANTITY,{}
+could you how many different skus stock has?,SKU_COUNT_QUANTITY,{}
+tell me lookup SKU LAPTOP-PRO-15,SPECIFIC_SKU_LOOKUP,"{""sku"": ""LAPTOP-PRO-15"", ""category"": ""Electronics""}"
+can you how many units of CORDLESS-DRILL are available?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CORDLESS-DRILL"", ""category"": ""Tools & Hardware""}"
+please what is our total sku count?,SKU_COUNT_QUANTITY,{}
+tell me how many unique products are in the system?,SKU_COUNT_QUANTITY,{}
+show me financial audit of inventory value,FINANCIAL_VALUATION,{}
+could you show all inventory items in category Sports & Outdoors,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+i need to what is the overall health score of our stock?,EXECUTIVE_OVERVIEW,{}
+show all inventory items in category Apparel,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+i want to generate a complete stock ledger table,TABULAR_REPORT,{}
+tell me what is the inventory count in each distribution center?,WAREHOUSE_LOGISTICS,{}
+run a 14-day demand prediction for SMARTPHONE-X,DEMAND_FORECAST,"{""sku"": ""SMARTPHONE-X"", ""category"": ""Electronics""}"
+kindly show low stock items,LOW_STOCK_REORDER,{}
+tell me unit and sku spread across our 5 warehouses,WAREHOUSE_LOGISTICS,{}
+i want to calculate deficit units needed to restock safety cushion,LOW_STOCK_REORDER,{}
+could you executive inventory scorecard and status,EXECUTIVE_OVERVIEW,{}
+is MECHANICAL-KEYBOARD below its reorder point?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""MECHANICAL-KEYBOARD"", ""category"": ""Electronics""}"
+kindly i need a tabular breakdown of every SKU,TABULAR_REPORT,{}
+i need to facility footprint and unit breakdown,WAREHOUSE_LOGISTICS,{}
+could you how many units belong to each product type?,STOCK_TYPE_CATEGORY,{}
+kindly what is our risk assessment for overstocked items?,RISK_OVERSTOCK,{}
+i want to what is our most valuable item,CUSTOM_SORT_FILTER,{}
+i want to give me an executive inventory health brief,EXECUTIVE_OVERVIEW,{}
+please do we have excess capital locked in overstock?,RISK_OVERSTOCK,{}
+i need to show all inventory items in category Tools & Hardware,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+kindly list all skus that have low inventory cushions,LOW_STOCK_REORDER,{}
+please flag skus holding more than 5x safety threshold,RISK_OVERSTOCK,{}
+show me all items in Warehouse-South,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+could you what are our most expensive inventory holdings?,FINANCIAL_VALUATION,{}
+please predict demand trend and reorder timing for INSULATED-FLASK,DEMAND_FORECAST,"{""sku"": ""INSULATED-FLASK"", ""category"": ""Sports & Outdoors""}"
+can you list all skus that have low inventory cushions,LOW_STOCK_REORDER,{}
+please display details in tabular format please,TABULAR_REPORT,{}
+i want to where is our inventory physically stored?,WAREHOUSE_LOGISTICS,{}
+please forecast sales for GREEN-TEA over the next 14 days,DEMAND_FORECAST,"{""sku"": ""GREEN-TEA"", ""category"": ""Groceries""}"
+could you run a 14-day demand prediction for COFFEE-MAKER,DEMAND_FORECAST,"{""sku"": ""COFFEE-MAKER"", ""category"": ""Home & Kitchen""}"
+i need to how much demand is expected for Assorted Stainless Screws Box (STAINLESS-SCREWS)?,DEMAND_FORECAST,"{""sku"": ""STAINLESS-SCREWS"", ""category"": ""Tools & Hardware""}"
+what product has the lowest stock,CUSTOM_SORT_FILTER,{}
+can you what products do we have under Home & Kitchen?,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+show me how do I use the inventory ai assistant?,HELP_CAPABILITIES,{}
+i want to high level executive summary of operations,EXECUTIVE_OVERVIEW,{}
+i want to what is the status of the inventory database?,GENERAL_ASSISTANT,{}
+kindly what are our quantities per category?,STOCK_TYPE_CATEGORY,{}
+i need to what products do we have under Apparel?,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+kindly what features does this assistant offer?,HELP_CAPABILITIES,{}
+i want to how many units of GREEN-TEA are available?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""GREEN-TEA"", ""category"": ""Groceries""}"
+please how many units and skus are located in Warehouse-West?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+i need to how many units belong to each product type?,STOCK_TYPE_CATEGORY,{}
+kindly what is the balance sheet asset value of inventory?,FINANCIAL_VALUATION,{}
+i need to where is ALMOND-BUTTER stored and how much is in stock?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""ALMOND-BUTTER"", ""category"": ""Groceries""}"
+could you which skus require purchase orders immediately?,LOW_STOCK_REORDER,{}
+tell me calculate deficit units needed to restock safety cushion,LOW_STOCK_REORDER,{}
+i need to what stock is currently stored at Central-Hub?,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+show me calculate overall portfolio valuation,FINANCIAL_VALUATION,{}
+show me which item has highest price,CUSTOM_SORT_FILTER,{}
+can you output stock items in table layout,TABULAR_REPORT,{}
+i want to hello,GENERAL_ASSISTANT,{}
+please how many different skus stock has?,SKU_COUNT_QUANTITY,{}
+could you show top 10 items sorted by reorder threshold,CUSTOM_SORT_FILTER,{}
+please hi there,GENERAL_ASSISTANT,{}
+please warehouse storage capacity and current stock allocation,WAREHOUSE_LOGISTICS,{}
+kindly look up products matching Tools & Hardware,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+could you show top 10 inventory records ordered by quantity,CUSTOM_SORT_FILTER,{}
+which product has highest value,CUSTOM_SORT_FILTER,{}
+i want to analyze obsolete and surplus inventory exposure,RISK_OVERSTOCK,{}
+tell me find all items in the Electronics department,CATALOG_SEARCH,"{""category"": ""Electronics""}"
+i want to lookup SKU COTTON-HOODIE,SPECIFIC_SKU_LOOKUP,"{""sku"": ""COTTON-HOODIE"", ""category"": ""Apparel""}"
+i want to what are our quantities per category?,STOCK_TYPE_CATEGORY,{}
+please list all skus that have low inventory cushions,LOW_STOCK_REORDER,{}
+can you check items below reorder threshold,LOW_STOCK_REORDER,{}
+please high level executive summary of operations,EXECUTIVE_OVERVIEW,{}
+i need to show stock volume per warehouse,WAREHOUSE_LOGISTICS,{}
+could you look up products matching Groceries,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+kindly item with lowest stock,CUSTOM_SORT_FILTER,{}
+tell me which products reached minimum threshold?,LOW_STOCK_REORDER,{}
+show me what is our risk assessment for overstocked items?,RISK_OVERSTOCK,{}
+i want to unit and sku spread across our 5 warehouses,WAREHOUSE_LOGISTICS,{}
+i want to what stock is currently stored at Warehouse-West?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+kindly break down inventory by warehouse location,WAREHOUSE_LOGISTICS,{}
+can you show me all items in a table,TABULAR_REPORT,{}
+i want to are all systems operational?,GENERAL_ASSISTANT,{}
+can you show overstocked items and stockout risks,RISK_OVERSTOCK,{}
+i want to summarize current supply chain health and risk status,EXECUTIVE_OVERVIEW,{}
+tell me run a 14-day demand prediction for CERAMIC-MUG-SET,DEMAND_FORECAST,"{""sku"": ""CERAMIC-MUG-SET"", ""category"": ""Home & Kitchen""}"
+i need to display all items sorted by price ascending,CUSTOM_SORT_FILTER,{}
+could you filter inventory for Warehouse-East,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-East""}"
+could you what features does this assistant offer?,HELP_CAPABILITIES,{}
+kindly show all inventory items in category Home & Kitchen,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+can you restock recommendations for low inventory,LOW_STOCK_REORDER,{}
+i want to which items are low in stock and need reordering?,LOW_STOCK_REORDER,{}
+kindly how many units and skus are located in Warehouse-North?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+i need to which items have too much stock sitting idle?,RISK_OVERSTOCK,{}
+show me list stock items belonging to Apparel,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+can you financial audit of inventory value,FINANCIAL_VALUATION,{}
+i want to what is the total dollar value of our holdings?,FINANCIAL_VALUATION,{}
+i need to can you list all products in tabular form with quantities and prices?,TABULAR_REPORT,{}
+tell me order inventory by quantity descending,CUSTOM_SORT_FILTER,{}
+what products do we have under Electronics?,CATALOG_SEARCH,"{""category"": ""Electronics""}"
+i need to show full inventory spreadsheet view,TABULAR_REPORT,{}
+could you replenishment order audit for depleted items,LOW_STOCK_REORDER,{}
+kindly search catalog for Electronics,CATALOG_SEARCH,"{""category"": ""Electronics""}"
+i want to how much demand is expected for Raw Organic Honey (ORGANIC-HONEY)?,DEMAND_FORECAST,"{""sku"": ""ORGANIC-HONEY"", ""category"": ""Groceries""}"
+i need to replenishment order audit for depleted items,LOW_STOCK_REORDER,{}
+i need to check inventory status for SKU ESPRESSO-BEANS,SPECIFIC_SKU_LOOKUP,"{""sku"": ""ESPRESSO-BEANS"", ""category"": ""Groceries""}"
+stock type wise volume and dollar value summary,STOCK_TYPE_CATEGORY,{}
+show me what can you do?,HELP_CAPABILITIES,{}
+i want to show me all items in Warehouse-South,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+tell me what is the status of the inventory database?,GENERAL_ASSISTANT,{}
+i want to which item has highest quantity,CUSTOM_SORT_FILTER,{}
+how many distinct product skus are registered in the warehouse?,SKU_COUNT_QUANTITY,{}
+can you category level stock aggregation,STOCK_TYPE_CATEGORY,{}
+what stock is currently stored at Warehouse-North?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+could you filter products by Apparel category,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+i need to how much stock do we hold for Home & Kitchen?,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+tell me show total inventory cost and valuation,FINANCIAL_VALUATION,{}
+kindly distinct sku count check,SKU_COUNT_QUANTITY,{}
+please show top 5 items sorted by quantity,CUSTOM_SORT_FILTER,{}
+could you show me all items in Warehouse-East,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-East""}"
+please look up products matching Sports & Outdoors,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+kindly calculate deficit units needed to restock safety cushion,LOW_STOCK_REORDER,{}
+show me what is the overall health score of our stock?,EXECUTIVE_OVERVIEW,{}
+could you show items ordered by price,CUSTOM_SORT_FILTER,{}
+could you look up products matching Tools & Hardware,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+show total inventory cost and valuation,FINANCIAL_VALUATION,{}
+look up products matching Apparel,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+tell me what products do we have under Groceries?,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+i want to what is the inventory count in each distribution center?,WAREHOUSE_LOGISTICS,{}
+can you how much stock do we hold for Home & Kitchen?,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+kindly what can you do?,HELP_CAPABILITIES,{}
+i need to print inventory grid,TABULAR_REPORT,{}
+kindly how many distinct skus do we carry?,SKU_COUNT_QUANTITY,{}
+please forecast sales for 4K-MONITOR over the next 14 days,DEMAND_FORECAST,"{""sku"": ""4K-MONITOR"", ""category"": ""Electronics""}"
+kindly where is AIR-FRYER stored and how much is in stock?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""AIR-FRYER"", ""category"": ""Home & Kitchen""}"
+can you display details in tabular format please,TABULAR_REPORT,{}
+i need to operations leadership overview report,EXECUTIVE_OVERVIEW,{}
+high level executive summary of operations,EXECUTIVE_OVERVIEW,{}
+show me how many units belong to each product type?,STOCK_TYPE_CATEGORY,{}
+kindly how much stock do we hold for Apparel?,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+show me how much stock do we hold for Sports & Outdoors?,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+could you can you list all products in tabular form with quantities and prices?,TABULAR_REPORT,{}
+show me list stock items belonging to Groceries,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+executive inventory scorecard and status,EXECUTIVE_OVERVIEW,{}
+show me show warehouse distribution of inventory,WAREHOUSE_LOGISTICS,{}
+kindly capital valuation breakdown across facilities,FINANCIAL_VALUATION,{}
+i need to what is the status of the inventory database?,GENERAL_ASSISTANT,{}
+i want to show catalog listings for Electronics,CATALOG_SEARCH,"{""category"": ""Electronics""}"
+What is our total inventory valuation and warehouse breakdown?,FINANCIAL_VALUATION,{}
+what is the current stock level of WIRELESS-BUDS?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""WIRELESS-BUDS"", ""category"": ""Electronics""}"
+please how is inventory distributed across categories?,STOCK_TYPE_CATEGORY,{}
+i need to where is MERINO-SWEATER stored and how much is in stock?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""MERINO-SWEATER"", ""category"": ""Apparel""}"
+can you what is the total worth of our inventory?,FINANCIAL_VALUATION,{}
+i need to do we have excess capital locked in overstock?,RISK_OVERSTOCK,{}
+could you total count of active skus,SKU_COUNT_QUANTITY,{}
+show me which item is the most expensive,CUSTOM_SORT_FILTER,{}
+could you what questions can I ask you?,HELP_CAPABILITIES,{}
+could you analyze obsolete and surplus inventory exposure,RISK_OVERSTOCK,{}
+i want to do we have any inventory shortage?,LOW_STOCK_REORDER,{}
+i want to show all inventory items in category Groceries,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+please what is the price and stock level of ALMOND-BUTTER?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""ALMOND-BUTTER"", ""category"": ""Groceries""}"
+i need to good morning assistant,GENERAL_ASSISTANT,{}
+what products do we have under Home & Kitchen?,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+could you what is the demand forecast for INSULATED-FLASK?,DEMAND_FORECAST,"{""sku"": ""INSULATED-FLASK"", ""category"": ""Sports & Outdoors""}"
+tell me number of distinct skus in stock,SKU_COUNT_QUANTITY,{}
+i need to show overstocked items and stockout risks,RISK_OVERSTOCK,{}
+show me operational summary for the chief operations officer,EXECUTIVE_OVERVIEW,{}
+kindly what is the demand forecast for INSULATED-FLASK?,DEMAND_FORECAST,"{""sku"": ""INSULATED-FLASK"", ""category"": ""Sports & Outdoors""}"
+could you what is the inventory count in each distribution center?,WAREHOUSE_LOGISTICS,{}
+could you list all products available at Warehouse-North,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+show me tell me the total number of skus,SKU_COUNT_QUANTITY,{}
+i want to show me all items in a table,TABULAR_REPORT,{}
+tell me how do I use the inventory ai assistant?,HELP_CAPABILITIES,{}
+i need to check inventory status for SKU CORDLESS-DRILL,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CORDLESS-DRILL"", ""category"": ""Tools & Hardware""}"
+kindly show top 10 products sorted by quantity,CUSTOM_SORT_FILTER,{}
+i want to what stock is currently stored at Warehouse-East?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-East""}"
+kindly are all systems operational?,GENERAL_ASSISTANT,{}
+i need to what items are out of stock right now?,LOW_STOCK_REORDER,{}
+i want to rank items by stock quantity,CUSTOM_SORT_FILTER,{}
+show me which items are low in stock?,LOW_STOCK_REORDER,{}
+can you distinct sku count check,SKU_COUNT_QUANTITY,{}
+could you which product is the most expensive,CUSTOM_SORT_FILTER,{}
+i need to how many unique products are in the system?,SKU_COUNT_QUANTITY,{}
+tell me search catalog for Electronics,CATALOG_SEARCH,"{""category"": ""Electronics""}"
+show me table view of current stock items,TABULAR_REPORT,{}
+can you where is our inventory physically stored?,WAREHOUSE_LOGISTICS,{}
+tell me give me an executive inventory health brief,EXECUTIVE_OVERVIEW,{}
+i want to show me all items in Warehouse-East,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-East""}"
+can you show low stock items,LOW_STOCK_REORDER,{}
+i want to what products do we have under Home & Kitchen?,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+i need to number of distinct skus in stock,SKU_COUNT_QUANTITY,{}
+can you list stock items belonging to Sports & Outdoors,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+product with highest valuation,CUSTOM_SORT_FILTER,{}
+kindly how do I use the inventory ai assistant?,HELP_CAPABILITIES,{}
+can you how many units and skus are located in Central-Hub?,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+i need to break down stock units and valuation by product type,STOCK_TYPE_CATEGORY,{}
+how many units and skus are located in Warehouse-West?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+show me which items are low in stock and need reordering?,LOW_STOCK_REORDER,{}
+i want to category level stock aggregation,STOCK_TYPE_CATEGORY,{}
+show me can you share this data in more details in tabular form?,TABULAR_REPORT,{}
+tell me show stock volume per warehouse,WAREHOUSE_LOGISTICS,{}
+kindly list stock items belonging to Sports & Outdoors,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+capital valuation breakdown across facilities,FINANCIAL_VALUATION,{}
+show me how many distinct product skus are registered in the warehouse?,SKU_COUNT_QUANTITY,{}
+kindly what is the demand forecast for DARK-CHOCOLATE?,DEMAND_FORECAST,"{""sku"": ""DARK-CHOCOLATE"", ""category"": ""Groceries""}"
+i need to what are our quantities per category?,STOCK_TYPE_CATEGORY,{}
+show me what stock is currently stored at Warehouse-East?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-East""}"
+kindly give me the total sku number,SKU_COUNT_QUANTITY,{}
+tell me run a 14-day demand prediction for MECHANICAL-KEYBOARD,DEMAND_FORECAST,"{""sku"": ""MECHANICAL-KEYBOARD"", ""category"": ""Electronics""}"
+i want to which item has lowest value,CUSTOM_SORT_FILTER,{}
+warehouse storage capacity and current stock allocation,WAREHOUSE_LOGISTICS,{}
+i need to identify slow-moving or dead stock risks,RISK_OVERSTOCK,{}
+i need to do we have any inventory shortage?,LOW_STOCK_REORDER,{}
+find all items in the Apparel department,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+i need to show catalog listings for Apparel,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+kindly what are our most expensive inventory holdings?,FINANCIAL_VALUATION,{}
+could you show category-wise stock allocation,STOCK_TYPE_CATEGORY,{}
+i need to what is the total dollar value of our holdings?,FINANCIAL_VALUATION,{}
+i need to will CORDLESS-DRILL run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""CORDLESS-DRILL"", ""category"": ""Tools & Hardware""}"
+could you calculate overall portfolio valuation,FINANCIAL_VALUATION,{}
+kindly output stock items in table layout,TABULAR_REPORT,{}
+show me how much capital is tied up in stock?,FINANCIAL_VALUATION,{}
+how many units belong to each product type?,STOCK_TYPE_CATEGORY,{}
+i want to lookup SKU BIKE-HELMET,SPECIFIC_SKU_LOOKUP,"{""sku"": ""BIKE-HELMET"", ""category"": ""Sports & Outdoors""}"
+display details in tabular format please,TABULAR_REPORT,{}
+can you show all inventory items in category Home & Kitchen,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+please operational summary for the chief operations officer,EXECUTIVE_OVERVIEW,{}
+i need to how is inventory distributed across categories?,STOCK_TYPE_CATEGORY,{}
+hi there,GENERAL_ASSISTANT,{}
+kindly financial audit of inventory value,FINANCIAL_VALUATION,{}
+tell me analyze obsolete and surplus inventory exposure,RISK_OVERSTOCK,{}
+show me show inventory matrix with reorder points and locations,TABULAR_REPORT,{}
+tell me show all inventory items in category Groceries,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+how is inventory distributed across categories?,STOCK_TYPE_CATEGORY,{}
+could you predict demand trend and reorder timing for BLENDER-PRO,DEMAND_FORECAST,"{""sku"": ""BLENDER-PRO"", ""category"": ""Home & Kitchen""}"
+show me distinct sku count check,SKU_COUNT_QUANTITY,{}
+how many units of CHEF-KNIFE are available?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CHEF-KNIFE"", ""category"": ""Home & Kitchen""}"
+could you inventory carrying cost risk analysis,RISK_OVERSTOCK,{}
+i need to category distribution report,STOCK_TYPE_CATEGORY,{}
+tell me what is the current stock level of DIGITAL-MULTIMETER?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""DIGITAL-MULTIMETER"", ""category"": ""Tools & Hardware""}"
+what is the total physical unit count and sku count?,SKU_COUNT_QUANTITY,{}
+show me who are you and what do you do?,GENERAL_ASSISTANT,{}
+tell me restock recommendations for low inventory,LOW_STOCK_REORDER,{}
+can you summarize current supply chain health and risk status,EXECUTIVE_OVERVIEW,{}
+what is our total sku count?,SKU_COUNT_QUANTITY,{}
+i need to what features does this assistant offer?,HELP_CAPABILITIES,{}
+tell me show catalog listings for Home & Kitchen,CATALOG_SEARCH,"{""category"": ""Home & Kitchen""}"
+tell me the total number of skus,SKU_COUNT_QUANTITY,{}
+i want to what is the price and stock level of SMARTPHONE-X?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""SMARTPHONE-X"", ""category"": ""Electronics""}"
+please can you assist me with inventory management?,GENERAL_ASSISTANT,{}
+category level stock aggregation,STOCK_TYPE_CATEGORY,{}
+tell me forecast sales for MECHANICAL-KEYBOARD over the next 14 days,DEMAND_FORECAST,"{""sku"": ""MECHANICAL-KEYBOARD"", ""category"": ""Electronics""}"
+i need to how many distinct product skus are registered in the warehouse?,SKU_COUNT_QUANTITY,{}
+could you how is stock distributed across facilities?,WAREHOUSE_LOGISTICS,{}
+i want to calculate overall portfolio valuation,FINANCIAL_VALUATION,{}
+could you generate a complete stock ledger table,TABULAR_REPORT,{}
+tell me identify slow-moving or dead stock risks,RISK_OVERSTOCK,{}
+kindly can you list all products in tabular form with quantities and prices?,TABULAR_REPORT,{}
+please show me all items in a table,TABULAR_REPORT,{}
+i need to which products reached minimum threshold?,LOW_STOCK_REORDER,{}
+can you what is the total dollar value of our holdings?,FINANCIAL_VALUATION,{}
+show me how much stock do we hold for Apparel?,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+i need to what is our total inventory valuation and warehouse breakdown?,FINANCIAL_VALUATION,{}
+could you number of distinct skus in stock,SKU_COUNT_QUANTITY,{}
+please what is our risk assessment for overstocked items?,RISK_OVERSTOCK,{}
+please what are our most expensive inventory holdings?,FINANCIAL_VALUATION,{}
+show me help me understand your capabilities,HELP_CAPABILITIES,{}
+tell me what is the current stock level of ALMOND-BUTTER?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""ALMOND-BUTTER"", ""category"": ""Groceries""}"
+show me show overstocked items and stockout risks,RISK_OVERSTOCK,{}
+could you break down stock units and valuation by product type,STOCK_TYPE_CATEGORY,{}
+i need to filter inventory for Central-Hub,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+kindly where is CERAMIC-MUG-SET stored and how much is in stock?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CERAMIC-MUG-SET"", ""category"": ""Home & Kitchen""}"
+show me what products do we have under Electronics?,CATALOG_SEARCH,"{""category"": ""Electronics""}"
+i want to what is the demand forecast for DIGITAL-MULTIMETER?,DEMAND_FORECAST,"{""sku"": ""DIGITAL-MULTIMETER"", ""category"": ""Tools & Hardware""}"
+could you display details in tabular format please,TABULAR_REPORT,{}
+could you how many units of GREEN-TEA are available?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""GREEN-TEA"", ""category"": ""Groceries""}"
+tell me forecast sales for COTTON-HOODIE over the next 14 days,DEMAND_FORECAST,"{""sku"": ""COTTON-HOODIE"", ""category"": ""Apparel""}"
+show me which item has the least stock,CUSTOM_SORT_FILTER,{}
+tell me what is our risk assessment for overstocked items?,RISK_OVERSTOCK,{}
+i need to search catalog for Sports & Outdoors,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+i want to list all skus that have low inventory cushions,LOW_STOCK_REORDER,{}
+summarize current supply chain health and risk status,EXECUTIVE_OVERVIEW,{}
+could you will LEATHER-BELT run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""LEATHER-BELT"", ""category"": ""Apparel""}"
+please break down inventory by warehouse location,WAREHOUSE_LOGISTICS,{}
+kindly show me all items in a table,TABULAR_REPORT,{}
+what is the inventory count in each distribution center?,WAREHOUSE_LOGISTICS,{}
+i need to what is the inventory count in each distribution center?,WAREHOUSE_LOGISTICS,{}
+show me filter inventory for Warehouse-East,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-East""}"
+i need to show catalog listings for Sports & Outdoors,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+i want to list all commands and queries you support,HELP_CAPABILITIES,{}
+can you show me all items in Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+show me which items have too much stock sitting idle?,RISK_OVERSTOCK,{}
+i want to break down stock units and valuation by product type,STOCK_TYPE_CATEGORY,{}
+can you render a markdown grid with all inventory columns,TABULAR_REPORT,{}
+i need to which item has the least stock,CUSTOM_SORT_FILTER,{}
+i need to how much stock do we hold for Tools & Hardware?,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+kindly sort all inventory items by valuation descending,CUSTOM_SORT_FILTER,{}
+could you show low stock items,LOW_STOCK_REORDER,{}
+tell me evaluate capital tie-up risk across products,RISK_OVERSTOCK,{}
+could you what items need replenishment?,LOW_STOCK_REORDER,{}
+show me summarize current supply chain health and risk status,EXECUTIVE_OVERVIEW,{}
+could you show catalog listings for Groceries,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+i want to show me all items in Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+please show me all items in Warehouse-East,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-East""}"
+show me can you assist me with inventory management?,GENERAL_ASSISTANT,{}
+show me filter inventory for Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+tell me are all systems operational?,GENERAL_ASSISTANT,{}
+i need to list stock items belonging to Groceries,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+show me operations leadership overview report,EXECUTIVE_OVERVIEW,{}
+can you what is the balance sheet asset value of inventory?,FINANCIAL_VALUATION,{}
+show low stock items,LOW_STOCK_REORDER,{}
+i want to how do I use the inventory ai assistant?,HELP_CAPABILITIES,{}
+kindly how many units of CERAMIC-MUG-SET are available?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CERAMIC-MUG-SET"", ""category"": ""Home & Kitchen""}"
+can you give me category breakdown with valuations,STOCK_TYPE_CATEGORY,{}
+i want to show me all items in Central-Hub,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+filter inventory for Warehouse-South,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+i need to product with highest valuation,CUSTOM_SORT_FILTER,{}
+please search catalog for Sports & Outdoors,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+could you filter products by Home & Kitchen category,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+i want to what items need replenishment?,LOW_STOCK_REORDER,{}
+i need to give me an executive inventory health brief,EXECUTIVE_OVERVIEW,{}
+i need to where is RUNNING-SHOES stored and how much is in stock?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""RUNNING-SHOES"", ""category"": ""Apparel""}"
+can you how many units of CHEF-KNIFE are available?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CHEF-KNIFE"", ""category"": ""Home & Kitchen""}"
+can you what is our total inventory valuation and warehouse breakdown?,FINANCIAL_VALUATION,{}
+can you how do I use the inventory ai assistant?,HELP_CAPABILITIES,{}
+tell me how much stock do we hold for Home & Kitchen?,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+please how much stock do we hold for Tools & Hardware?,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+can you predict demand trend and reorder timing for ESPRESSO-BEANS,DEMAND_FORECAST,"{""sku"": ""ESPRESSO-BEANS"", ""category"": ""Groceries""}"
+kindly give me details on product Damascus Chef Knife with SKU CHEF-KNIFE,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CHEF-KNIFE"", ""category"": ""Home & Kitchen""}"
+can you what is the demand forecast for DIGITAL-MULTIMETER?,DEMAND_FORECAST,"{""sku"": ""DIGITAL-MULTIMETER"", ""category"": ""Tools & Hardware""}"
+can you give me the total sku number,SKU_COUNT_QUANTITY,{}
+can you how many different skus stock has?,SKU_COUNT_QUANTITY,{}
+could you give me an executive brief on inventory health,EXECUTIVE_OVERVIEW,{}
+i need to how many units of RUNNING-SHOES are available?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""RUNNING-SHOES"", ""category"": ""Apparel""}"
+tell me list all products available at Warehouse-West,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-West""}"
+show me category level stock aggregation,STOCK_TYPE_CATEGORY,{}
+can you find all items in the Groceries department,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+can you which products reached minimum threshold?,LOW_STOCK_REORDER,{}
+i need to show top 5 items sorted by quantity,CUSTOM_SORT_FILTER,{}
+i need to show warehouse distribution of inventory,WAREHOUSE_LOGISTICS,{}
+i need to who are you and what do you do?,GENERAL_ASSISTANT,{}
+tell me where is our inventory physically stored?,WAREHOUSE_LOGISTICS,{}
+tell me how many different skus stock has?,SKU_COUNT_QUANTITY,{}
+show me filter products by Home & Kitchen category,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+could you what is the overall health score of our stock?,EXECUTIVE_OVERVIEW,{}
+give me category breakdown with valuations,STOCK_TYPE_CATEGORY,{}
+please what is the demand forecast for AIR-FRYER?,DEMAND_FORECAST,"{""sku"": ""AIR-FRYER"", ""category"": ""Home & Kitchen""}"
+can you how much stock do we hold for Tools & Hardware?,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+please can you share this data in more details in tabular form?,TABULAR_REPORT,{}
+could you will STAINLESS-SCREWS run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""STAINLESS-SCREWS"", ""category"": ""Tools & Hardware""}"
+kindly how much demand is expected for 27-inch 4K Monitor (4K-MONITOR)?,DEMAND_FORECAST,"{""sku"": ""4K-MONITOR"", ""category"": ""Electronics""}"
+number of distinct skus in stock,SKU_COUNT_QUANTITY,{}
+could you format the inventory as a table,TABULAR_REPORT,{}
+please check inventory status for SKU RUNNING-SHOES,SPECIFIC_SKU_LOOKUP,"{""sku"": ""RUNNING-SHOES"", ""category"": ""Apparel""}"
+tell me how many different items are in inventory?,SKU_COUNT_QUANTITY,{}
+could you search catalog for Apparel,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+tell me what is the highest value item,CUSTOM_SORT_FILTER,{}
+show me look up products matching Tools & Hardware,CATALOG_SEARCH,"{""category"": ""Tools & Hardware""}"
+please list all commands and queries you support,HELP_CAPABILITIES,{}
+could you what products do we have under Sports & Outdoors?,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+tell me can you assist me with inventory management?,GENERAL_ASSISTANT,{}
+kindly show total inventory cost and valuation,FINANCIAL_VALUATION,{}
+could you print inventory grid,TABULAR_REPORT,{}
+break down inventory by warehouse location,WAREHOUSE_LOGISTICS,{}
+kindly list stock items belonging to Groceries,CATEGORY_FILTER,"{""category"": ""Groceries""}"
+can you give me details on product 150-Piece Mechanics Tool Set with SKU TOOL-SET,SPECIFIC_SKU_LOOKUP,"{""sku"": ""TOOL-SET"", ""category"": ""Tools & Hardware""}"
+could you who are you and what do you do?,GENERAL_ASSISTANT,{}
+please show all inventory items in category Apparel,CATEGORY_FILTER,"{""category"": ""Apparel""}"
+could you give me category breakdown with valuations,STOCK_TYPE_CATEGORY,{}
+please filter products by Sports & Outdoors category,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+please how many distinct product skus are registered in the warehouse?,SKU_COUNT_QUANTITY,{}
+could you what products do we have under Groceries?,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+what are our most expensive inventory holdings?,FINANCIAL_VALUATION,{}
+can you order inventory by quantity descending,CUSTOM_SORT_FILTER,{}
+could you how many different items are in inventory?,SKU_COUNT_QUANTITY,{}
+i want to how much stock do we hold for Sports & Outdoors?,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+kindly flag skus holding more than 5x safety threshold,RISK_OVERSTOCK,{}
+i need to what is the total physical unit count and sku count?,SKU_COUNT_QUANTITY,{}
+please what items need replenishment?,LOW_STOCK_REORDER,{}
+could you which items are low in stock and need reordering?,LOW_STOCK_REORDER,{}
+could you find all items in the Sports & Outdoors department,CATALOG_SEARCH,"{""category"": ""Sports & Outdoors""}"
+could you item with highest quantity,CUSTOM_SORT_FILTER,{}
+tell me what is the overall health score of our stock?,EXECUTIVE_OVERVIEW,{}
+could you give me a tabular report of all stock,TABULAR_REPORT,{}
+are all systems operational?,GENERAL_ASSISTANT,{}
+show me render a markdown grid with all inventory columns,TABULAR_REPORT,{}
+please help me understand your capabilities,HELP_CAPABILITIES,{}
+search catalog for Groceries,CATALOG_SEARCH,"{""category"": ""Groceries""}"
+kindly filter products by Tools & Hardware category,CATEGORY_FILTER,"{""category"": ""Tools & Hardware""}"
+i need to how many units of HIKING-BACKPACK are available?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""HIKING-BACKPACK"", ""category"": ""Sports & Outdoors""}"
+show me check inventory status for SKU DIGITAL-MULTIMETER,SPECIFIC_SKU_LOOKUP,"{""sku"": ""DIGITAL-MULTIMETER"", ""category"": ""Tools & Hardware""}"
+check items below reorder threshold,LOW_STOCK_REORDER,{}
+show me what are our most expensive inventory holdings?,FINANCIAL_VALUATION,{}
+could you which product is the cheapest,CUSTOM_SORT_FILTER,{}
+could you sort inventory data by quantity,CUSTOM_SORT_FILTER,{}
+can you top 10 inventory data sorted by quantity,CUSTOM_SORT_FILTER,{}
+i need to how many different items are in inventory?,SKU_COUNT_QUANTITY,{}
+kindly operations leadership overview report,EXECUTIVE_OVERVIEW,{}
+can you show stock volume per warehouse,WAREHOUSE_LOGISTICS,{}
+i need to what is the demand forecast for AIR-FRYER?,DEMAND_FORECAST,"{""sku"": ""AIR-FRYER"", ""category"": ""Home & Kitchen""}"
+kindly what is the price and stock level of CAMPING-TENT?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""CAMPING-TENT"", ""category"": ""Sports & Outdoors""}"
+kindly what is the status of the inventory database?,GENERAL_ASSISTANT,{}
+show me capital valuation breakdown across facilities,FINANCIAL_VALUATION,{}
+show me inventory carrying cost risk analysis,RISK_OVERSTOCK,{}
+could you distinct sku count check,SKU_COUNT_QUANTITY,{}
+i need to what is the price and stock level of TOOL-SET?,SPECIFIC_SKU_LOOKUP,"{""sku"": ""TOOL-SET"", ""category"": ""Tools & Hardware""}"
+i need to hi there,GENERAL_ASSISTANT,{}
+kindly show full inventory spreadsheet view,TABULAR_REPORT,{}
+could you which item has highest stock,CUSTOM_SORT_FILTER,{}
+i want to total count of active skus,SKU_COUNT_QUANTITY,{}
+can you capital valuation breakdown across facilities,FINANCIAL_VALUATION,{}
+could you hi there,GENERAL_ASSISTANT,{}
+could you what stock is currently stored at Warehouse-South?,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+i need to operational summary for the chief operations officer,EXECUTIVE_OVERVIEW,{}
+kindly calculate overall portfolio valuation,FINANCIAL_VALUATION,{}
+can you forecast sales for MERINO-SWEATER over the next 14 days,DEMAND_FORECAST,"{""sku"": ""MERINO-SWEATER"", ""category"": ""Apparel""}"
+i need to lookup SKU SMARTPHONE-X,SPECIFIC_SKU_LOOKUP,"{""sku"": ""SMARTPHONE-X"", ""category"": ""Electronics""}"
+i want to which items have too much stock sitting idle?,RISK_OVERSTOCK,{}
+kindly summarize current supply chain health and risk status,EXECUTIVE_OVERVIEW,{}
+could you what is our total inventory valuation and warehouse breakdown?,FINANCIAL_VALUATION,{}
+tell me do we have any inventory shortage?,LOW_STOCK_REORDER,{}
+i need to list stock items belonging to Home & Kitchen,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"
+tell me lookup SKU MERINO-SWEATER,SPECIFIC_SKU_LOOKUP,"{""sku"": ""MERINO-SWEATER"", ""category"": ""Apparel""}"
+top 10 inventory data sorted by quantity,CUSTOM_SORT_FILTER,{}
+i need to can you share this data in more details in tabular form?,TABULAR_REPORT,{}
+i need to summarize current supply chain health and risk status,EXECUTIVE_OVERVIEW,{}
+i need to hello,GENERAL_ASSISTANT,{}
+i want to list all products available at Warehouse-East,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-East""}"
+please which items are low in stock?,LOW_STOCK_REORDER,{}
+can you break down stock units and valuation by product type,STOCK_TYPE_CATEGORY,{}
+list all products available at Warehouse-South,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-South""}"
+show me show total inventory cost and valuation,FINANCIAL_VALUATION,{}
+i want to how is inventory distributed across categories?,STOCK_TYPE_CATEGORY,{}
+kindly what stock is currently stored at Central-Hub?,WAREHOUSE_FILTER,"{""warehouse"": ""Central-Hub""}"
+i want to filter products by Sports & Outdoors category,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+kindly how many distinct product skus are registered in the warehouse?,SKU_COUNT_QUANTITY,{}
+please will CERAMIC-MUG-SET run out based on projected demand?,DEMAND_FORECAST,"{""sku"": ""CERAMIC-MUG-SET"", ""category"": ""Home & Kitchen""}"
+please show all inventory items in category Sports & Outdoors,CATEGORY_FILTER,"{""category"": ""Sports & Outdoors""}"
+could you i need a tabular breakdown of every SKU,TABULAR_REPORT,{}
+i need to show top 5 most expensive products in stock,CUSTOM_SORT_FILTER,{}
+i want to what questions can I ask you?,HELP_CAPABILITIES,{}
+show me evaluate capital tie-up risk across products,RISK_OVERSTOCK,{}
+show me run a 14-day demand prediction for MERINO-SWEATER,DEMAND_FORECAST,"{""sku"": ""MERINO-SWEATER"", ""category"": ""Apparel""}"
+i want to can you assist me with inventory management?,GENERAL_ASSISTANT,{}
+i need to list all products available at Warehouse-North,WAREHOUSE_FILTER,"{""warehouse"": ""Warehouse-North""}"
+show me show full inventory spreadsheet view,TABULAR_REPORT,{}
+can you replenishment order audit for depleted items,LOW_STOCK_REORDER,{}
+kindly facility footprint and unit breakdown,WAREHOUSE_LOGISTICS,{}
+kindly search catalog for Apparel,CATALOG_SEARCH,"{""category"": ""Apparel""}"
+tell me show top 10 items sorted by reorder threshold,CUSTOM_SORT_FILTER,{}
+check inventory status for SKU RUNNING-SHOES,SPECIFIC_SKU_LOOKUP,"{""sku"": ""RUNNING-SHOES"", ""category"": ""Apparel""}"
+show me how much stock do we hold for Home & Kitchen?,CATEGORY_FILTER,"{""category"": ""Home & Kitchen""}"

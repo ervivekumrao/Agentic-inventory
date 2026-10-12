@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Inventory AI Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- SheetJS for modern Excel (.xlsx) OpenXML Spreadsheets -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- docx.js for modern Microsoft Word (.docx) OpenXML Documents -->
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+    <!-- html2pdf for modern PDF (.pdf) Documents -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        :root {
+            --bg-body: #0b0f19;
+            --bg-surface: #111827;
+            --bg-surface-elevated: #1f2937;
+            --bubble-agent: #151e2e;
+            --bubble-user: #2563eb;
+            --border-subtle: #243044;
+            --border-hover: #3b82f6;
+            --primary: #38bdf8;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, Helvetica, Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Top Header */
+        .app-header {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0.85rem 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 20;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-brand-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #0284c7, #6366f1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35);
+        }
+
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .header-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .live-tag {
+            font-size: 0.725rem;
+            background-color: rgba(34, 197, 94, 0.12);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-weight: 500;
+        }
+
+        .live-tag::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 6px #22c55e;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .btn-header {
+            background-color: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+
+        .btn-header:hover {
+            background-color: var(--bg-surface-elevated);
+            color: var(--text-primary);
+            border-color: var(--border-hover);
+        }
+
+        /* Message Stream */
+        .chat-scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            scroll-behavior: smooth;
+        }
+
+        .message-item {
+            display: flex;
+            gap: 0.85rem;
+            max-width: 90%;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-item.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-item.agent {
+            align-self: flex-start;
+        }
+
+        .msg-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .message-item.agent .msg-avatar {
+            background: linear-gradient(135deg, #0284c7, #3b82f6);
+            color: white;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+        }
+
+        .message-item.user .msg-avatar {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+        }
+
+        .msg-body-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            max-width: 100%;
+        }
+
+        .msg-bubble {
+            padding: 0.85rem 1.15rem;
+            border-radius: 12px;
+            font-size: 0.925rem;
+            line-height: 1.55;
+            word-break: break-word;
+        }
+
+        .message-item.user .msg-bubble {
+            background-color: var(--bubble-user);
+            color: #ffffff;
+            border-bottom-right-radius: 3px;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+        }
+
+        .message-item.agent .msg-bubble {
+            background-color: var(--bubble-agent);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            border-bottom-left-radius: 3px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .msg-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-left: 0.25rem;
+            margin-top: 0.2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-copy, .btn-export-item {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            cursor: pointer;
+            padding: 0.15rem 0.45rem;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: all 0.15s ease;
+        }
+
+        .btn-copy:hover {
+            color: var(--primary);
+            background-color: rgba(56, 189, 248, 0.1);
+            border-color: rgba(56, 189, 248, 0.25);
+        }
+
+        .btn-export-item:hover {
+            background-color: rgba(255, 255, 255, 0.06);
+            border-color: var(--border-subtle);
+        }
+
+        .btn-export-item.excel:hover {
+            color: #4ade80 !important;
+            background-color: rgba(34, 197, 94, 0.12);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-export-item.docx:hover {
+            color: #60a5fa !important;
+            background-color: rgba(37, 99, 235, 0.12);
+            border-color: rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-export-item.pdf:hover {
+            color: #f87171 !important;
+            background-color: rgba(239, 68, 68, 0.12);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Direct & Clean Markdown Styles */
+        .msg-bubble p {
+            margin-bottom: 0.65rem;
+        }
+
+        .msg-bubble p:last-child {
+            margin-bottom: 0;
+        }
+
+        .msg-bubble h1, .msg-bubble h2, .msg-bubble h3, .msg-bubble h4 {
+            color: #f1f5f9;
+            font-weight: 700;
+            margin-top: 0.25rem;
+            margin-bottom: 0.65rem;
+            font-size: 1.05rem;
+        }
+
+        .msg-bubble ul, .msg-bubble ol {
+            margin-bottom: 0.65rem;
+            padding-left: 1.25rem;
+        }
+
+        .msg-bubble li {
+            margin-bottom: 0.25rem;
+        }
+
+        .msg-bubble code {
+            background-color: #0d131f;
+            color: #38bdf8;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        /* Clean Table Presentation */
+        .msg-bubble table {
+            width: 100%;
+            margin: 0.85rem 0;
+            border-collapse: separate;
+            border-spacing: 0;
+            background-color: #0b1120;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.85rem;
+        }
+
+        .msg-bubble th {
+            background-color: #1a2436;
+            color: #38bdf8;
+            padding: 0.6rem 0.8rem;
+            font-weight: 600;
+            text-align: left;
+            border-bottom: 1px solid var(--border-subtle);
+            letter-spacing: 0.02em;
+        }
+
+        .msg-bubble td {
+            padding: 0.55rem 0.8rem;
+            border-bottom: 1px solid rgba(36, 48, 68, 0.6);
+            color: #cbd5e1;
+        }
+
+        .msg-bubble tr:last-child td {
+            border-bottom: none;
+        }
+
+        .msg-bubble tr:hover td {
+            background-color: rgba(56, 189, 248, 0.06);
+        }
+
+        .msg-bubble hr {
+            border: 0;
+            height: 1px;
+            background: var(--border-subtle);
+            margin: 0.75rem 0;
+        }
+
+        /* Typing Indicator */
+        .typing-row {
+            display: none;
+            align-items: center;
+            gap: 0.6rem;
+            padding-left: 3.25rem;
+            font-size: 0.825rem;
+            color: var(--text-muted);
+        }
+
+        .typing-pulse {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            animation: pulseDot 1.2s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes pulseDot {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Redesigned Interaction Panel */
+        .interaction-panel {
+            background-color: var(--bg-surface);
+            border-top: 1px solid var(--border-subtle);
+            padding: 0.85rem 2rem 1.25rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            z-index: 20;
+        }
+
+        /* Action Chips */
+        .chips-bar {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 0.15rem;
+        }
+
+        .chips-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chip-button {
+            background-color: #172033;
+            color: #94a3b8;
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 0.35rem 0.85rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .chip-button:hover {
+            background-color: #1e293b;
+            color: #f8fafc;
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Input Controls */
+        .input-bar {
+            display: flex;
+            align-items: center;
+            background-color: #0b1120;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 0.35rem 0.5rem 0.35rem 1rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+        }
+
+        .input-bar:focus-within {
+            border-color: var(--border-hover);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            outline: none;
+            padding: 0.5rem 0.25rem;
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .btn-send {
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.55rem 1.15rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.15s ease;
+        }
+
+        .btn-send:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+
+        .btn-send:active {
+            transform: translateY(0);
+        }
+
+        /* Toast Notification */
+        .toast-notification {
+            position: fixed;
+            bottom: 86px;
+            right: 28px;
+            background-color: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #38bdf8;
+            padding: 0.65rem 1.15rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            gap: 0.55rem;
+            animation: fadeIn 0.15s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-brand">
+            <div class="header-brand-icon">
+                <i class="bi bi-box-seam-fill"></i>
+            </div>
+            <div>
+                <h1 class="header-title">Smart Inventory Agent</h1>
+                <p class="header-subtitle"><span class="live-tag">Online</span> Database Connected</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <!-- Export Dropdown -->
+            <div class="dropdown">
+                <button class="btn-header dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Export Chat Data">
+                    <i class="bi bi-box-arrow-up"></i> Export
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow-lg" aria-labelledby="exportDropdown" style="background-color: #111827; border: 1px solid var(--border-subtle); font-size: 0.85rem; min-width: 230px;">
+                    <li><h6 class="dropdown-header text-uppercase text-muted" style="font-size: 0.7rem; letter-spacing: 0.05em;">Smart Auto-Export</h6></li>
+                    <li>
+                        <button class="dropdown-item d-flex align-items-center gap-2 py-2" onclick="exportChatSmart()">
+                            <i class="bi bi-magic text-warning fs-5"></i>
+                            <div>
+                                <span class="fw-semibold">Auto by Data Type</span><br>
+                                <small class="text-muted" style="font-size: 0.72rem;">Tables &rarr; .xlsx, Reports &rarr; .docx/.pdf</small>
+                            </div>
+                        </button>
+                    </li>
+                    <li><hr class="dropdown-divider" style="border-color: var(--border-subtle);"></li>
+                    <li><h6 class="dropdown-header text-uppercase text-muted" style="font-size: 0.7rem; letter-spacing: 0.05em;">Latest Formats</h6></li>
+                    <li>
+                        <button class="dropdown-item d-flex align-items-center gap-2 py-2" onclick="exportChatExcel()">
+                            <i class="bi bi-file-earmark-excel-fill text-success fs-5"></i>
+                            <div>
+                                <span class="fw-semibold">Excel Spreadsheet (.xlsx)</span><br>
+                                <small class="text-muted" style="font-size: 0.72rem;">Native OpenXML Workbook</small>
+                            </div>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item d-flex align-items-center gap-2 py-2" onclick="exportChatDocx()">
+                            <i class="bi bi-file-earmark-word-fill text-primary fs-5"></i>
+                            <div>
+                                <span class="fw-semibold">Word Document (.docx)</span><br>
+                                <small class="text-muted" style="font-size: 0.72rem;">Modern OpenXML Document</small>
+                            </div>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item d-flex align-items-center gap-2 py-2" onclick="exportChatPdf()">
+                            <i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>
+                            <div>
+                                <span class="fw-semibold">PDF Document (.pdf)</span><br>
+                                <small class="text-muted" style="font-size: 0.72rem;">Printable A4 Report</small>
+                            </div>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <button class="btn-header" onclick="clearConversation()" title="Clear Chat History">
+                <i class="bi bi-arrow-counterclockwise"></i> Clear
+            </button>
+            <a href="/logging-admin.html" class="btn-header" title="Log Level Controller">
+                <i class="bi bi-sliders"></i> Logger Admin
+            </a>
+            <a href="/swagger-ui.html" target="_blank" class="btn-header" title="API Docs">
+                <i class="bi bi-terminal"></i> Swagger
+            </a>
+        </div>
+    </header>
+
+    <!-- Chat Messages Scroll Area -->
+    <main class="chat-scroll-area" id="chatContainer">
+        <div class="message-item agent">
+            <div class="msg-avatar">
+                <i class="bi bi-robot"></i>
+            </div>
+            <div class="msg-body-wrapper">
+                <div class="msg-bubble">
+                    Hello! I am your <strong>Smart Inventory Assistant</strong>.<br><br>
+                    Ask any direct operational query to inspect inventory stock, find extremes, or analyze forecasts:
+                    <ul class="mt-2 mb-0">
+                        <li><strong>Item Extremes</strong>: <em>"which item has highest value"</em>, <em>"which product is the most expensive"</em></li>
+                        <li><strong>Sorted Rankings</strong>: <em>"can you show top 10 inventory data sorted by quantity"</em></li>
+                        <li><strong>Replenishment</strong>: <em>"which items are low in stock"</em></li>
+                        <li><strong>Portfolio Scale</strong>: <em>"how many different skus stock has"</em></li>
+                    </ul>
+                </div>
+                <div class="msg-actions">
+                    <button class="btn-copy" onclick="copyText(this)">
+                        <i class="bi bi-clipboard"></i> Copy
+                    </button>
+                    <button class="btn-export-item docx" onclick="exportMessageDocx(this)" title="Export to Word (.docx)">
+                        <i class="bi bi-file-earmark-word-fill text-primary"></i> Word (.docx)
+                    </button>
+                    <button class="btn-export-item pdf" onclick="exportMessagePdf(this)" title="Export to PDF (.pdf)">
+                        <i class="bi bi-file-earmark-pdf-fill text-danger"></i> PDF (.pdf)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Typing Indicator -->
+    <div class="typing-row" id="typingIndicator">
+        <span>Processing query...</span>
+        <div class="typing-pulse">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+        </div>
+    </div>
+
+    <!-- Interaction Panel -->
+    <footer class="interaction-panel">
+        <!-- Quick Action Chips -->
+        <div class="chips-bar">
+            <button class="chip-button" onclick="exportChatSmart()" title="Auto-detect data type and export">
+                <i class="bi bi-box-arrow-up-right text-warning"></i> Export (Auto Format)
+            </button>
+            <button class="chip-button" onclick="sendQuickQuery('which item has highest value')">
+                <i class="bi bi-trophy-fill text-warning"></i> Highest Value Item
+            </button>
+            <button class="chip-button" onclick="sendQuickQuery('can you show top 10 inventory data sorted by quantity')">
+                <i class="bi bi-sort-numeric-down text-info"></i> Top 10 by Quantity
+            </button>
+            <button class="chip-button" onclick="sendQuickQuery('Which items are low in stock and need reordering?')">
+                <i class="bi bi-exclamation-triangle-fill text-danger"></i> Low Stock Items
+            </button>
+            <button class="chip-button" onclick="sendQuickQuery('can you share this data in more details in tabular form?')">
+                <i class="bi bi-table text-primary"></i> Tabular Matrix
+            </button>
+            <button class="chip-button" onclick="sendQuickQuery('What is our total inventory valuation and warehouse breakdown?')">
+                <i class="bi bi-currency-dollar text-success"></i> Portfolio Valuation
+            </button>
+            <button class="chip-button" onclick="sendQuickQuery('how many different skus stock has?')">
+                <i class="bi bi-hash text-light"></i> SKU Count
+            </button>
+        </div>
+
+        <!-- Input Bar -->
+        <div class="input-bar">
+            <input 
+                type="text" 
+                id="userInput" 
+                class="chat-input" 
+                placeholder="Ask a point-to-point question (e.g. which item has highest value)..." 
+                onkeydown="handleKeyPress(event)" 
+                autocomplete="off"
+                aria-label="Inventory query input"
+            >
+            <button class="btn-send" onclick="submitMessage()" id="sendBtn" title="Send Query">
+                <span>Send</span>
+                <i class="bi bi-arrow-up-right"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Toast Feedback -->
+    <div id="toastNotification" class="toast-notification"></div>
+
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const userInput = document.getElementById('userInput');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        if (typeof marked !== 'undefined') {
+            marked.setOptions({
+                gfm: true,
+                breaks: true
+            });
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                submitMessage();
+            }
+        }
+
+        function sendQuickQuery(text) {
+            userInput.value = text;
+            submitMessage();
+        }
+
+        function clearConversation() {
+            chatContainer.innerHTML = `
+                <div class="message-item agent">
+                    <div class="msg-avatar"><i class="bi bi-robot"></i></div>
+                    <div class="msg-body-wrapper">
+                        <div class="msg-bubble">
+                            Conversation cleared. How can I assist you with your inventory today?
+                        </div>
+                        <div class="msg-actions">
+                            <button class="btn-copy" onclick="copyText(this)"><i class="bi bi-clipboard"></i> Copy</button>
+                            <button class="btn-export-item docx" onclick="exportMessageDocx(this)"><i class="bi bi-file-earmark-word-fill text-primary"></i> Word (.docx)</button>
+                            <button class="btn-export-item pdf" onclick="exportMessagePdf(this)"><i class="bi bi-file-earmark-pdf-fill text-danger"></i> PDF (.pdf)</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            userInput.value = '';
+            userInput.focus();
+            showToast('Conversation cleared', 'info');
+        }
+
+        async function submitMessage() {
+            const query = userInput.value.trim();
+            if (!query) return;
+
+            // 1. Render User Message
+            appendUserMessage(query);
+            userInput.value = '';
+
+            // 2. Show Typing Indicator
+            typingIndicator.style.display = 'flex';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            try {
+                // 3. Call Spring Boot AI Agent Service
+                const response = await fetch('/api/ai/agent/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query })
+                });
+
+                typingIndicator.style.display = 'none';
+
+                if (!response.ok) {
+                    appendAgentText('⚠️ Error: Unable to retrieve response from AI Agent service.');
+                    return;
+                }
+
+                const data = await response.json();
+                appendAgentAnswer(data.answer || 'No response returned.');
+
+            } catch (error) {
+                typingIndicator.style.display = 'none';
+                appendAgentText('⚠️ Network Error: Unable to reach the backend service.');
+            }
+        }
+
+        function appendUserMessage(text) {
+            const item = document.createElement('div');
+            item.className = 'message-item user';
+
+            const avatar = document.createElement('div');
+            avatar.className = 'msg-avatar';
+            avatar.innerHTML = '<i class="bi bi-person-fill"></i>';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'msg-body-wrapper';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'msg-bubble';
+            bubble.textContent = text;
+
+            wrapper.appendChild(bubble);
+            item.appendChild(avatar);
+            item.appendChild(wrapper);
+
+            chatContainer.appendChild(item);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function appendAgentAnswer(markdownText) {
+            const item = document.createElement('div');
+            item.className = 'message-item agent';
+
+            const avatar = document.createElement('div');
+            avatar.className = 'msg-avatar';
+            avatar.innerHTML = '<i class="bi bi-robot"></i>';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'msg-body-wrapper';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'msg-bubble';
+            bubble.innerHTML = renderMarkdown(markdownText);
+
+            // Detect if this specific response contains tabular data
+            const hasTable = bubble.querySelector('table') !== null;
+
+            // Actions: Copy + Export based on data type
+            const actions = document.createElement('div');
+            actions.className = 'msg-actions';
+
+            let actionsHtml = `
+                <button class="btn-copy" onclick="copyText(this)">
+                    <i class="bi bi-clipboard"></i> Copy
+                </button>
+            `;
+
+            if (hasTable) {
+                // Tabular data: highlight Excel (.xlsx) first, followed by Word (.docx) and PDF (.pdf)
+                actionsHtml += `
+                    <button class="btn-export-item excel" onclick="exportMessageExcel(this)" title="Export Table to Excel (.xlsx)">
+                        <i class="bi bi-file-earmark-excel-fill text-success"></i> Excel (.xlsx)
+                    </button>
+                    <button class="btn-export-item docx" onclick="exportMessageDocx(this)" title="Export to Word (.docx)">
+                        <i class="bi bi-file-earmark-word-fill text-primary"></i> Word (.docx)
+                    </button>
+                    <button class="btn-export-item pdf" onclick="exportMessagePdf(this)" title="Export to PDF (.pdf)">
+                        <i class="bi bi-file-earmark-pdf-fill text-danger"></i> PDF (.pdf)
+                    </button>
+                `;
+            } else {
+                // Document / narrative report: highlight Word (.docx) and PDF (.pdf)
+                actionsHtml += `
+                    <button class="btn-export-item docx" onclick="exportMessageDocx(this)" title="Export to Word (.docx)">
+                        <i class="bi bi-file-earmark-word-fill text-primary"></i> Word (.docx)
+                    </button>
+                    <button class="btn-export-item pdf" onclick="exportMessagePdf(this)" title="Export to PDF (.pdf)">
+                        <i class="bi bi-file-earmark-pdf-fill text-danger"></i> PDF (.pdf)
+                    </button>
+                `;
+            }
+
+            actions.innerHTML = actionsHtml;
+
+            wrapper.appendChild(bubble);
+            wrapper.appendChild(actions);
+
+            item.appendChild(avatar);
+            item.appendChild(wrapper);
+
+            chatContainer.appendChild(item);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function appendAgentText(text) {
+            appendAgentAnswer(text);
+        }
+
+        function renderMarkdown(text) {
+            if (!text) return '';
+            if (typeof marked !== 'undefined') {
+                return marked.parse(text);
+            }
+            return escapeHtml(text).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        }
+
+        function copyText(button) {
+            const bubble = button.closest('.msg-body-wrapper').querySelector('.msg-bubble');
+            if (bubble) {
+                navigator.clipboard.writeText(bubble.innerText).then(() => {
+                    const originalHtml = button.innerHTML;
+                    button.innerHTML = '<i class="bi bi-check2 text-success"></i> Copied!';
+                    setTimeout(() => {
+                        button.innerHTML = originalHtml;
+                    }, 2000);
+                });
+            }
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
+        // ==========================================
+        // EXPORT ENGINE: LATEST .DOCX & .XLSX & .PDF
+        // ==========================================
+
+        function downloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toastNotification');
+            if (!toast) return;
+            let icon = 'bi-info-circle-fill text-info';
+            if (type === 'success') icon = 'bi-check-circle-fill text-success';
+            if (type === 'warning') icon = 'bi-exclamation-triangle-fill text-warning';
+
+            toast.innerHTML = `<i class="bi ${icon}"></i> <span>${message}</span>`;
+            toast.style.display = 'flex';
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3200);
+        }
+
+        function getTimestampString() {
+            const now = new Date();
+            return now.getFullYear() +
+                String(now.getMonth() + 1).padStart(2, '0') +
+                String(now.getDate()).padStart(2, '0') + '_' +
+                String(now.getHours()).padStart(2, '0') +
+                String(now.getMinutes()).padStart(2, '0') +
+                String(now.getSeconds()).padStart(2, '0');
+        }
+
+        // 1. SMART AUTO EXPORT (BASED ON DATA TYPE)
+        function exportChatSmart() {
+            const tables = chatContainer.querySelectorAll('.msg-bubble table');
+            if (tables.length > 0) {
+                showToast('Detected Tabular Data → Exporting to Excel (.xlsx)...', 'info');
+                exportChatExcel();
+            } else {
+                showToast('Detected Narrative Document → Exporting to Word (.docx)...', 'info');
+                exportChatDocx();
+            }
+        }
+
+        // 2. EXCEL EXPORT (.xlsx format)
+        function exportMessageExcel(button) {
+            const bubble = button.closest('.msg-body-wrapper').querySelector('.msg-bubble');
+            if (!bubble) return;
+            const table = bubble.querySelector('table');
+            if (!table) {
+                showToast('No tabular data found in this message.', 'warning');
+                return;
+            }
+
+            const filename = `inventory_table_${getTimestampString()}.xlsx`;
+
+            if (typeof XLSX !== 'undefined') {
+                const wb = XLSX.utils.table_to_book(table, { sheet: "Inventory Data" });
+                // Auto-fit column widths
+                const ws = wb.Sheets["Inventory Data"];
+                if (ws) {
+                    const colWidths = [];
+                    table.querySelectorAll('tr').forEach(tr => {
+                        tr.querySelectorAll('th, td').forEach((cell, idx) => {
+                            const len = (cell.innerText || '').trim().length;
+                            colWidths[idx] = Math.max(colWidths[idx] || 10, len + 3);
+                        });
+                    });
+                    ws['!cols'] = colWidths.map(w => ({ wch: w }));
+                }
+                XLSX.writeFile(wb, filename);
+                showToast('Exported table to Excel (.xlsx) successfully', 'success');
+            } else {
+                showToast('Excel library not loaded.', 'warning');
+            }
+        }
+
+        function exportChatExcel() {
+            const tables = chatContainer.querySelectorAll('.msg-bubble table');
+            const filename = `inventory_data_${getTimestampString()}.xlsx`;
+
+            if (typeof XLSX !== 'undefined') {
+                const wb = XLSX.utils.book_new();
+
+                // Sheet 1: Conversation Overview
+                const summaryRows = [["Role", "Timestamp", "Message Content"]];
+                const messages = chatContainer.querySelectorAll('.message-item');
+                messages.forEach(msg => {
+                    const role = msg.classList.contains('user') ? 'User' : 'Smart Inventory Agent';
+                    const bubble = msg.querySelector('.msg-bubble');
+                    const text = bubble ? bubble.innerText.trim() : '';
+                    summaryRows.push([role, new Date().toLocaleTimeString(), text]);
+                });
+                const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
+                wsSummary['!cols'] = [{ wch: 15 }, { wch: 15 }, { wch: 80 }];
+                XLSX.utils.book_append_sheet(wb, wsSummary, "Overview");
+
+                // Dedicated Sheets for Each Table
+                if (tables.length > 0) {
+                    tables.forEach((table, index) => {
+                        const ws = XLSX.utils.table_to_sheet(table);
+                        const colWidths = [];
+                        table.querySelectorAll('tr').forEach(tr => {
+                            tr.querySelectorAll('th, td').forEach((cell, idx) => {
+                                const len = (cell.innerText || '').trim().length;
+                                colWidths[idx] = Math.max(colWidths[idx] || 10, len + 3);
+                            });
+                        });
+                        ws['!cols'] = colWidths.map(w => ({ wch: w }));
+                        XLSX.utils.book_append_sheet(wb, ws, `Table_${index + 1}`);
+                    });
+                }
+                XLSX.writeFile(wb, filename);
+                showToast(`Exported ${tables.length} table(s) to Excel (.xlsx)`, 'success');
+            } else {
+                showToast('Excel library not ready.', 'warning');
+            }
+        }
+
+        // 3. WORD EXPORT (.docx latest OpenXML format)
+        async function exportMessageDocx(button) {
+            const bubble = button.closest('.msg-body-wrapper').querySelector('.msg-bubble');
+            if (!bubble) return;
+            const filename = `inventory_record_${getTimestampString()}.docx`;
+
+            if (typeof docx !== 'undefined') {
+                try {
+                    showToast('Building Word (.docx) document...', 'info');
+                    const blob = await buildDocxBlobFromHtml(bubble.innerHTML, "Smart Inventory Operational Ledger");
+                    downloadBlob(blob, filename);
+                    showToast('Exported to Word (.docx) successfully', 'success');
+                } catch (e) {
+                    console.error('Docx generation error:', e);
+                    exportDocxHtmlFallback(bubble.innerHTML, filename);
+                }
+            } else {
+                exportDocxHtmlFallback(bubble.innerHTML, filename);
+            }
+        }
+
+        async function exportChatDocx() {
+            const filename = `smart_inventory_transcript_${getTimestampString()}.docx`;
+            if (typeof docx !== 'undefined') {
+                try {
+                    showToast('Building full Word (.docx) document...', 'info');
+                    let combinedHtml = "";
+                    const messages = chatContainer.querySelectorAll('.message-item');
+                    messages.forEach(msg => {
+                        const isUser = msg.classList.contains('user');
+                        const bubble = msg.querySelector('.msg-bubble');
+                        if (!bubble) return;
+                        if (isUser) {
+                            combinedHtml += `<div class="user-turn"><strong>User Query:</strong> ${escapeHtml(bubble.innerText.trim())}</div>`;
+                        } else {
+                            combinedHtml += `<div class="agent-turn">${bubble.innerHTML}</div><hr/>`;
+                        }
+                    });
+                    const blob = await buildDocxBlobFromHtml(combinedHtml, "Smart Inventory AI Operational Transcript");
+                    downloadBlob(blob, filename);
+                    showToast('Exported conversation to Word (.docx) successfully', 'success');
+                } catch (e) {
+                    console.error('Docx chat error:', e);
+                    exportDocxChatFallback(filename);
+                }
+            } else {
+                exportDocxChatFallback(filename);
+            }
+        }
+
+        async function buildDocxBlobFromHtml(htmlContent, titleText) {
+            const { Document, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, Packer, HeadingLevel, AlignmentType } = docx;
+
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+
+            const children = [];
+
+            // Title & Header Bar
+            children.push(new Paragraph({
+                children: [new TextRun({ text: titleText, bold: true, size: 32, color: "0284C7" })],
+                spacing: { after: 120 }
+            }));
+            children.push(new Paragraph({
+                children: [new TextRun({ text: `Generated on ${new Date().toLocaleString()} | Smart Inventory Platform`, italics: true, size: 18, color: "64748B" })],
+                spacing: { after: 240 }
+            }));
+
+            // Traverse child elements of tempDiv
+            for (let node of tempDiv.children) {
+                if (node.tagName === 'TABLE') {
+                    const docxTable = buildDocxTable(node, docx);
+                    if (docxTable) {
+                        children.push(docxTable);
+                        children.push(new Paragraph({ text: "", spacing: { after: 120 } }));
+                    }
+                } else if (/^H[1-6]$/.test(node.tagName)) {
+                    children.push(new Paragraph({
+                        children: [new TextRun({ text: node.innerText.trim(), bold: true, size: 24, color: "0F172A" })],
+                        spacing: { before: 180, after: 80 }
+                    }));
+                } else if (node.tagName === 'UL' || node.tagName === 'OL') {
+                    node.querySelectorAll('li').forEach(li => {
+                        children.push(new Paragraph({
+                            children: [new TextRun({ text: "• " + li.innerText.trim(), size: 20, color: "334155" })],
+                            indent: { left: 360 },
+                            spacing: { after: 40 }
+                        }));
+                    });
+                } else if (node.classList && node.classList.contains('user-turn')) {
+                    children.push(new Paragraph({
+                        children: [new TextRun({ text: node.innerText.trim(), bold: true, size: 22, color: "1E3A8A" })],
+                        shading: { fill: "F1F5F9" },
+                        spacing: { before: 140, after: 100 }
+                    }));
+                } else {
+                    const text = node.innerText ? node.innerText.trim() : '';
+                    if (text) {
+                        children.push(new Paragraph({
+                            children: [new TextRun({ text: text, size: 20, color: "1E293B" })],
+                            spacing: { after: 80 }
+                        }));
+                    }
+                }
+            }
+
+            // Footer
+            children.push(new Paragraph({
+                children: [new TextRun({ text: "Confidential • Generated by Smart Inventory AI Operations Platform", size: 16, color: "94A3B8" })],
+                alignment: AlignmentType.CENTER,
+                spacing: { before: 360 }
+            }));
+
+            const doc = new Document({
+                sections: [{
+                    properties: {
+                        page: {
+                            margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 }
+                        }
+                    },
+                    children: children
+                }]
+            });
+
+            return await Packer.toBlob(doc);
+        }
+
+        function buildDocxTable(tableNode, docx) {
+            const { Table, TableRow, TableCell, Paragraph, TextRun, WidthType } = docx;
+            const rows = [];
+            const trs = tableNode.querySelectorAll('tr');
+
+            trs.forEach((tr, rowIndex) => {
+                const isHeader = (rowIndex === 0) || tr.querySelector('th') !== null;
+                const cells = [];
+                tr.querySelectorAll('th, td').forEach(td => {
+                    cells.push(new TableCell({
+                        children: [new Paragraph({
+                            children: [new TextRun({
+                                text: td.innerText.trim(),
+                                bold: isHeader,
+                                color: isHeader ? "FFFFFF" : "1E293B",
+                                size: isHeader ? 19 : 18
+                            })]
+                        })],
+                        shading: {
+                            fill: isHeader ? "0284C7" : (rowIndex % 2 === 0 ? "F8FAFC" : "FFFFFF")
+                        },
+                        margins: { top: 100, bottom: 100, left: 120, right: 120 }
+                    }));
+                });
+                if (cells.length > 0) {
+                    rows.push(new TableRow({ children: cells }));
+                }
+            });
+
+            if (rows.length === 0) return null;
+
+            return new Table({
+                rows: rows,
+                width: { size: 100, type: WidthType.PERCENTAGE }
+            });
+        }
+
+        function exportDocxHtmlFallback(htmlBody, filename) {
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><style>body{font-family:Calibri,sans-serif;font-size:11pt;}table{border-collapse:collapse;width:100%;}th{background-color:#0284c7;color:#fff;padding:6px;border:1px solid #0284c7;}td{border:1px solid #ddd;padding:6px;}</style></head><body>";
+            const footer = "</body></html>";
+            const blob = new Blob(['\ufeff' + header + htmlBody + footer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            downloadBlob(blob, filename.replace('.doc', '.docx'));
+            showToast('Exported to Word (.docx)', 'success');
+        }
+
+        function exportDocxChatFallback(filename) {
+            let body = "";
+            const messages = chatContainer.querySelectorAll('.message-item');
+            messages.forEach(msg => {
+                const isUser = msg.classList.contains('user');
+                const bubble = msg.querySelector('.msg-bubble');
+                if (!bubble) return;
+                body += isUser ? `<p><strong>User:</strong> ${escapeHtml(bubble.innerText)}</p>` : `<div>${bubble.innerHTML}</div><hr/>`;
+            });
+            exportDocxHtmlFallback(body, filename);
+        }
+
+        // 4. PDF EXPORT (.pdf format)
+        function exportMessagePdf(button) {
+            const bubble = button.closest('.msg-body-wrapper').querySelector('.msg-bubble');
+            if (!bubble) return;
+            const filename = `inventory_record_${getTimestampString()}.pdf`;
+
+            const container = document.createElement('div');
+            container.style.padding = '20px';
+            container.style.color = '#1e293b';
+            container.style.backgroundColor = '#ffffff';
+            container.style.fontFamily = 'Arial, sans-serif';
+            container.innerHTML = `
+                <div style="border-bottom: 2px solid #0284c7; padding-bottom: 8px; margin-bottom: 16px;">
+                    <h2 style="color: #0369a1; margin: 0; font-size: 16pt;">Smart Inventory AI Report</h2>
+                    <small style="color: #64748b;">Generated: ${new Date().toLocaleString()}</small>
+                </div>
+                ${bubble.innerHTML}
+            `;
+
+            container.querySelectorAll('table').forEach(tbl => {
+                tbl.style.width = '100%';
+                tbl.style.borderCollapse = 'collapse';
+                tbl.style.margin = '10px 0';
+                tbl.querySelectorAll('th').forEach(th => {
+                    th.style.backgroundColor = '#0284c7';
+                    th.style.color = '#ffffff';
+                    th.style.padding = '6px 8px';
+                    th.style.border = '1px solid #0284c7';
+                    th.style.fontSize = '9pt';
+                });
+                tbl.querySelectorAll('td').forEach(td => {
+                    td.style.padding = '6px 8px';
+                    td.style.border = '1px solid #cbd5e1';
+                    td.style.fontSize = '9pt';
+                    td.style.color = '#334155';
+                });
+            });
+
+            if (typeof html2pdf !== 'undefined') {
+                showToast('Generating PDF document...', 'info');
+                const opt = {
+                    margin: [10, 10, 10, 10],
+                    filename: filename,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, logging: false },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                html2pdf().set(opt).from(container).save().then(() => {
+                    showToast('PDF exported successfully', 'success');
+                }).catch(err => {
+                    console.error('PDF generation error:', err);
+                    printFallback(container.innerHTML);
+                });
+            } else {
+                printFallback(container.innerHTML);
+            }
+        }
+
+        function exportChatPdf() {
+            const filename = `smart_inventory_chat_${getTimestampString()}.pdf`;
+            const container = document.createElement('div');
+            container.style.padding = '20px';
+            container.style.color = '#1e293b';
+            container.style.backgroundColor = '#ffffff';
+            container.style.fontFamily = 'Arial, sans-serif';
+
+            let content = `
+                <div style="border-bottom: 2px solid #0284c7; padding-bottom: 8px; margin-bottom: 16px;">
+                    <h2 style="color: #0369a1; margin: 0; font-size: 16pt;">Smart Inventory AI — Conversation Transcript</h2>
+                    <small style="color: #64748b;">Exported: ${new Date().toLocaleString()}</small>
+                </div>
+            `;
+
+            const messages = chatContainer.querySelectorAll('.message-item');
+            messages.forEach(msg => {
+                const isUser = msg.classList.contains('user');
+                const bubble = msg.querySelector('.msg-bubble');
+                if (!bubble) return;
+                if (isUser) {
+                    content += `
+                        <div style="background-color: #f1f5f9; border-left: 4px solid #2563eb; padding: 8px 12px; margin: 12px 0; font-weight: bold; color: #1e3a8a; font-size: 10pt;">
+                            User: ${escapeHtml(bubble.innerText)}
+                        </div>
+                    `;
+                } else {
+                    content += `
+                        <div style="margin: 8px 0 16px 0; font-size: 9.5pt; color: #334155;">
+                            ${bubble.innerHTML}
+                        </div>
+                    `;
+                }
+            });
+
+            container.innerHTML = content;
+
+            container.querySelectorAll('table').forEach(tbl => {
+                tbl.style.width = '100%';
+                tbl.style.borderCollapse = 'collapse';
+                tbl.style.margin = '10px 0';
+                tbl.querySelectorAll('th').forEach(th => {
+                    th.style.backgroundColor = '#0284c7';
+                    th.style.color = '#ffffff';
+                    th.style.padding = '5px 8px';
+                    th.style.border = '1px solid #0284c7';
+                    th.style.fontSize = '8.5pt';
+                });
+                tbl.querySelectorAll('td').forEach(td => {
+                    td.style.padding = '5px 8px';
+                    td.style.border = '1px solid #cbd5e1';
+                    td.style.fontSize = '8.5pt';
+                    td.style.color = '#334155';
+                });
+            });
+
+            if (typeof html2pdf !== 'undefined') {
+                showToast('Generating PDF transcript...', 'info');
+                const opt = {
+                    margin: [10, 10, 10, 10],
+                    filename: filename,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, logging: false },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                html2pdf().set(opt).from(container).save().then(() => {
+                    showToast('PDF transcript exported successfully', 'success');
+                }).catch(err => {
+                    console.error('PDF error:', err);
+                    printFallback(container.innerHTML);
+                });
+            } else {
+                printFallback(container.innerHTML);
+            }
+        }
+
+        function printFallback(htmlContent) {
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                showToast('Popup blocked. Please allow popups to export printable report.', 'warning');
+                return;
+            }
+            printWindow.document.write(`
+                <html><head><title>Print Export</title>
+                <style>body { font-family: Arial, sans-serif; padding: 20px; color: #111; } table { border-collapse: collapse; width: 100%; } th, td { border: 1px solid #ccc; padding: 6px; } th { background-color: #eee; }</style>
+                </head><body>${htmlContent}</body></html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+            printWindow.close();
+        }
+    </script>
+</body>
+</html>
