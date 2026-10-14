@@ -20,12 +20,113 @@ set -e
 COMPOSE_FILE="infra/docker-compose.dev.yml"
 ENV_FILE=".env"
 
-# Detect docker-compose CLI command
-if command -v docker-compose &> /dev/null; then
-    DOCKER_COMPOSE="docker-compose"
-else
-    DOCKER_COMPOSE="docker compose"
-fi
+# Detect container engine and compose CLI command (Podman is default)
+detect_container_engine() {
+    # Ensure Podman has unqualified-search-registries configured for docker.io
+    if [ ! -f "$HOME/.config/containers/registries.conf" ]; then
+        mkdir -p "$HOME/.config/containers"
+        cat <<'REG_EOF' > "$HOME/.config/containers/registries.conf"
+unqualified-search-registries = ["docker.io"]
+REG_EOF
+    fi
+
+    if [ -n "$COMPOSE_CMD" ]; then
+        DOCKER_COMPOSE="$COMPOSE_CMD"
+        echo "📦 Using custom container compose command: $DOCKER_COMPOSE"
+        return
+    fi
+
+    # Explicit engine override
+    if [ "$CONTAINER_ENGINE" = "docker" ]; then
+        if command -v docker-compose &> /dev/null; then
+            DOCKER_COMPOSE="docker-compose"
+        elif command -v docker &> /dev/null; then
+            DOCKER_COMPOSE="docker compose"
+        else
+            echo "❌ Error: CONTAINER_ENGINE=docker was specified, but Docker was not found on this system."
+            exit 1
+        fi
+        echo "📦 Using container engine: $DOCKER_COMPOSE (explicitly selected)"
+        return
+    fi
+
+    if [ "$CONTAINER_ENGINE" = "podman" ]; then
+        if command -v podman &> /dev/null && podman compose version &> /dev/null 2>&1; then
+            DOCKER_COMPOSE="podman compose"
+        elif command -v podman-compose &> /dev/null; then
+            DOCKER_COMPOSE="podman-compose"
+        else
+            echo "❌ Error: CONTAINER_ENGINE=podman was specified, but Podman was not found."
+            echo "   Please install Podman:"
+            echo "     - Ubuntu/Debian: sudo apt update && sudo apt install -y podman podman-compose"
+            echo "     - Fedora/RHEL:   sudo dnf install -y podman podman-compose"
+            echo "     - macOS:         brew install podman podman-compose"
+            exit 1
+        fi
+        echo "📦 Using container engine: $DOCKER_COMPOSE"
+        if command -v systemctl &> /dev/null; then
+            systemctl --user start podman.socket &> /dev/null || true
+        fi
+        return
+    fi
+
+    # Default is Podman
+    if command -v podman &> /dev/null && podman compose version &> /dev/null 2>&1; then
+        DOCKER_COMPOSE="podman compose"
+        echo "📦 Using default container engine: $DOCKER_COMPOSE"
+        if command -v systemctl &> /dev/null; then
+            systemctl --user start podman.socket &> /dev/null || true
+        fi
+    elif command -v podman-compose &> /dev/null; then
+        DOCKER_COMPOSE="podman-compose"
+        echo "📦 Using default container engine: $DOCKER_COMPOSE"
+        if command -v systemctl &> /dev/null; then
+            systemctl --user start podman.socket &> /dev/null || true
+        fi
+    else
+        # Podman is not detected. Check for Docker fallback.
+        local has_docker=false
+        local docker_cmd=""
+
+        if command -v docker-compose &> /dev/null; then
+            has_docker=true
+            docker_cmd="docker-compose"
+        elif command -v docker &> /dev/null; then
+            has_docker=true
+            docker_cmd="docker compose"
+        fi
+
+        if [ "$has_docker" = true ]; then
+            echo "=========================================================================="
+            echo "⚠️  Notice: Podman is the default container engine for this project, but"
+            echo "   Podman was not detected on your system."
+            echo ""
+            echo "   👉 Recommended: Install Podman for daemonless, rootless containers:"
+            echo "      - Ubuntu/Debian: sudo apt update && sudo apt install -y podman podman-compose"
+            echo "      - Fedora/RHEL:   sudo dnf install -y podman podman-compose"
+            echo "      - macOS:         brew install podman podman-compose && podman machine init && podman machine start"
+            echo ""
+            echo "   🐳 Docker detected ($docker_cmd). Continuing with Docker..."
+            echo "=========================================================================="
+            DOCKER_COMPOSE="$docker_cmd"
+        else
+            echo "=========================================================================="
+            echo "❌ Error: No container engine found!"
+            echo "   Podman is the default container engine for this project."
+            echo ""
+            echo "   Please install Podman:"
+            echo "     - Ubuntu/Debian: sudo apt update && sudo apt install -y podman podman-compose"
+            echo "     - Fedora/RHEL:   sudo dnf install -y podman podman-compose"
+            echo "     - macOS:         brew install podman podman-compose && podman machine init && podman machine start"
+            echo ""
+            echo "   Alternatively, install Docker or set COMPOSE_CMD=\"...\""
+            echo "=========================================================================="
+            exit 1
+        fi
+    fi
+}
+
+detect_container_engine
 
 usage() {
     echo "=================================================="
@@ -44,8 +145,12 @@ usage() {
     echo "Supported DB Types:"
     echo "  postgres (default), mssql, mysql, oracle, db2"
     echo ""
+    echo "Supported Container Engines:"
+    echo "  Podman (default). Falls back to Docker with notification if Podman is not found."
+    echo "  Override with CONTAINER_ENGINE=podman|docker or COMPOSE_CMD=\"...\""
+    echo ""
     echo "Custom Environment Variables (optional):"
-    echo "  DB_PORT, DB_USER, DB_PASSWORD"
+    echo "  DB_PORT, DB_USER, DB_PASSWORD, CONTAINER_ENGINE, COMPOSE_CMD"
     echo ""
     echo "Examples:"
     echo "  ./scripts/setup.sh fresh postgres"
@@ -163,11 +268,11 @@ case "$COMMAND" in
         fi
         echo "🔄 Destroying existing environment (including volumes) and creating fresh [DB: $DB_TYPE]..."
         configure_env "$DB_TYPE"
-        $DOCKER_COMPOSE --profile "*" --env-file $ENV_FILE -f $COMPOSE_FILE down -v --remove-orphans
+        $DOCKER_COMPOSE --profile "*" --env-file $ENV_FILE -f $COMPOSE_FILE down -v --remove-orphans 2>/dev/null || true
         echo "🔨 Building Java microservices..."
         ./gradlew :inventory-service:build :catalog-service:build -x test
         echo "🚀 Starting containers..."
-        $DOCKER_COMPOSE --env-file $ENV_FILE -f $COMPOSE_FILE up --build -d
+        $DOCKER_COMPOSE --profile "$DB_TYPE" --env-file $ENV_FILE -f $COMPOSE_FILE up --build -d
         echo "🌱 Seeding initial sample data for new environment..."
         python3 scripts/seed_data.py
         echo "🎉 Fresh environment setup completed successfully!"
@@ -187,7 +292,7 @@ case "$COMMAND" in
         fi
 
         echo "🚀 Starting environment..."
-        $DOCKER_COMPOSE "$ENV_ARG" -f $COMPOSE_FILE up --build -d
+        $DOCKER_COMPOSE --profile "${DB_TYPE:-postgres}" "$ENV_ARG" -f $COMPOSE_FILE up --build -d
 
         # Check if user passed --seed
         if [[ "$*" == *"--seed"* ]]; then
@@ -206,7 +311,7 @@ case "$COMMAND" in
         ;;
     clean)
         echo "🧹 Cleaning all containers, volumes, networks, and images related to project..."
-        $DOCKER_COMPOSE --profile "*" -f $COMPOSE_FILE down -v --rmi local --remove-orphans
+        $DOCKER_COMPOSE --profile "*" -f $COMPOSE_FILE down -v --rmi local --remove-orphans 2>/dev/null || true
         if [ -f "$ENV_FILE" ]; then
             rm -f "$ENV_FILE"
         fi

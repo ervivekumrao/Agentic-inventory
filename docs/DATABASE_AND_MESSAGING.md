@@ -137,10 +137,10 @@ Stores fine-grained system action permissions.
 
 ## 📡 4. Apache Kafka Event Streaming Specifications
 
-- **Broker**: `localhost:9092` (Docker service `kafka:9092`)
+- **Broker**: `localhost:9092` (Container service `kafka:9092`)
 - **Topic Name**: `inventory-stock-events`
 - **Partitions**: Configured with partition key = `sku` to guarantee FIFO ordering per SKU.
-- **Producer Class**: [`KafkaProducerService.java`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/kafka/KafkaProducerService.java) in `inventory-service`.
+- **Producer Class**: [`KafkaProducerService.java`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/kafka/KafkaProducerService.java) in `inventory-service``.
 
 ### Event Payload Schema (`StockUpdateEvent`):
 ```json

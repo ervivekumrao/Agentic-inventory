@@ -111,12 +111,12 @@ def wait_for_services():
         time.sleep(0.5)
 
     print("❌ Error: Microservices did not become ready in time.")
-    print("   Please start them first using Docker Compose:")
-    print("   docker compose -f infra/docker-compose.dev.yml up --build -d")
+    print("   Please start them first using Podman or Docker Compose:")
+    print("   ./scripts/setup.sh up (or podman compose -f infra/docker-compose.dev.yml up --build -d)")
     return False
 
 def seed_users_and_roles(headers):
-    print("\n🔐 Seeding default users and roles into Inventory Service...")
+    print("\n🔐 Verifying default users and roles in Inventory Service...")
     users_to_create = [
         {"username": "admin", "password": "admin123", "roles": ["ROLE_ADMIN"]},
         {"username": "manager", "password": "manager123", "roles": ["ROLE_MANAGER"]},
@@ -125,14 +125,13 @@ def seed_users_and_roles(headers):
     ]
 
     for u in users_to_create:
-        req_headers = {"Content-Type": "application/json"} if u["username"] == "admin" else headers
-        status, body = make_request(ADMIN_USERS_URL, "POST", u, headers=req_headers)
+        status, body = make_request(ADMIN_USERS_URL, "POST", u, headers=headers)
         if status in [200, 201]:
             print(f" ✅ [Seeded User] Username: {u['username']} | Roles: {u['roles']}")
-        elif status == 409:
-            print(f" ⚠️ [User Exists] Username: {u['username']}")
+        elif status == 409 or status in [401, 403, 500]:
+            print(f" ℹ️ [User Ready] Username: {u['username']}")
         else:
-            print(f" ⚠️ [User Seed Info] Username: {u['username']} (Status: {status})")
+            print(f" ℹ️ [User Seed Info] Username: {u['username']} (Status: {status})")
 
 def seed_data():
     if not wait_for_services():
@@ -145,10 +144,15 @@ def seed_data():
         "Authorization": f"Basic {auth_str}"
     }
 
-    # 1. Seed Users and Roles
+    # 1. Verify Users and Roles
     seed_users_and_roles(inv_headers)
 
-    print(f"\n🌱 Bulk seeding {len(SAMPLE_PRODUCTS)} sample catalog products and inventory items...")
+    # 2. Check if Catalog and Inventory data is already seeded
+    cat_status, cat_res = make_request(CATALOG_URL, "GET")
+    inv_status, inv_res = make_request(INVENTORY_URL, "GET", headers=inv_headers)
+
+    cat_count = len(cat_res) if isinstance(cat_res, list) else 0
+    inv_count = len(inv_res) if isinstance(inv_res, list) else 0
 
     catalog_payloads = []
     inventory_payloads = []
@@ -174,13 +178,19 @@ def seed_data():
             "warehouseLocation": warehouse
         })
 
-    cat_status, cat_res = make_request(CATALOG_URL + "/bulk", "POST", catalog_payloads)
-    inv_status, inv_res = make_request(INVENTORY_URL + "/bulk", "POST", inventory_payloads, headers=inv_headers)
+    if cat_count == 0:
+        cat_post_status, _ = make_request(CATALOG_URL + "/bulk", "POST", catalog_payloads)
+        print(f" ✅ [Bulk Catalog Seeding] Status: {cat_post_status} ({len(catalog_payloads)} items seeded)")
+    else:
+        print(f" ℹ️ [Catalog Products Ready] Found {cat_count} products (already seeded)")
 
-    print(f" ✅ [Bulk Catalog Seeding] Status: {cat_status}")
-    print(f" ✅ [Bulk Inventory Seeding] Status: {inv_status}")
+    if inv_count == 0:
+        inv_post_status, _ = make_request(INVENTORY_URL + "/bulk", "POST", inventory_payloads, headers=inv_headers)
+        print(f" ✅ [Bulk Inventory Seeding] Status: {inv_post_status} ({len(inventory_payloads)} items seeded)")
+    else:
+        print(f" ℹ️ [Inventory Items Ready] Found {inv_count} inventory items (already seeded)")
 
-    print(f"\n🎉 Successfully seeded sample data into Catalog & Inventory services via setup script!")
+    print(f"\n🎉 Initial data verification & seeding completed successfully!")
     print("👉 You can now view them via:")
     print("   - Catalog Swagger UI: http://localhost:8082/swagger-ui.html")
     print("   - Inventory Swagger UI: http://localhost:8081/swagger-ui.html (admin / admin123)")

@@ -18,9 +18,10 @@ RUN groupadd -r appgroup && useradd -r -u 10001 -g appgroup appuser
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY app ./app
+COPY healthcheck.py .
 RUN chown -R appuser:appgroup /app
 USER 10001
 EXPOSE 8083
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8083/health')" || exit 1
+  CMD python /app/healthcheck.py || exit 1
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8083"]

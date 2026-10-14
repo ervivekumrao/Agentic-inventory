@@ -16,7 +16,7 @@
 
 # Testing Strategy, JaCoCo Coverage & DevOps Guide
 
-This document outlines the testing architecture, code coverage verification, Docker container builds, and DevOps workflows for the Smart Inventory Management System.
+This document outlines the testing architecture, code coverage verification, Podman & Docker container builds, and DevOps workflows for the Smart Inventory Management System.
 
 ---
 
@@ -82,40 +82,52 @@ Reports are output to:
 
 ---
 
-## 🐳 3. Containerization & Production Dockerfiles
+## 🦭 3. Containerization: Podman & Docker Support
 
-All microservices utilize production-hardened Dockerfiles with non-root security contexts:
+All microservices utilize production-hardened, OCI-compliant container images with non-root security contexts.
+
+For comprehensive Podman setup and migration details, refer to **[docs/PODMAN_MIGRATION.md](PODMAN_MIGRATION.md)**.
+
 - **Base Images**:
   - Java: `eclipse-temurin:17-jre-jammy`
   - Python: `python:3.11-slim`
 - **Security Hardening**:
   - Runs as unprivileged user `appuser` (UID `10001`, GID `appgroup`).
-  - No secrets baked into layers.
+  - Native support for rootless Podman execution and user namespaces.
   - Multi-stage dependency caching.
-- **Docker Compose Profiles**:
+- **Container Healthchecks**:
+  - Dedicated standalone scripts ([`forecasting-service/healthcheck.py`](../forecasting-service/healthcheck.py)) and Spring Boot Actuator `/actuator/health` endpoints eliminate shell whitespace-tokenization syntax errors across container engines.
+- **Compose Profiles** ([`infra/docker-compose.dev.yml`](../infra/docker-compose.dev.yml)):
   - `postgres` (default)
   - `mysql`
   - `mssql`
   - `oracle`
   - `db2`
+- **Testcontainers with Podman**:
+  - Testcontainers connects to Podman via the user socket:
+    ```bash
+    systemctl --user enable --now podman.socket
+    export DOCKER_HOST="unix:///run/user/$UID/podman/podman.sock"
+    export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE="/run/user/$UID/podman/podman.sock"
+    ```
 
 ---
 
 ## 🛠️ 4. Unified DevOps Scripts
 
-The project includes pre-built DevOps management scripts:
-- [`scripts/setup.sh`](file:///home/user/work/Agentic-inventory/scripts/setup.sh):
+The project includes pre-built DevOps management scripts supporting both **Podman** and **Docker**:
+- [`scripts/setup.sh`](../scripts/setup.sh):
   - `./scripts/setup.sh fresh [db_type]` — Tear down, reconfigure DB, compile, start containers, and seed data.
   - `./scripts/setup.sh up [db_type]` — Start existing environment.
   - `./scripts/setup.sh destroy` — Stop and remove containers (preserves DB volumes).
   - `./scripts/setup.sh clean` — Wipe all containers, networks, volumes, local images, and `.env`.
   - `./scripts/setup.sh reload [service|all]` — Hot-reload code into containers without stopping databases.
-  - `./scripts/setup.sh seed` — Seed sample catalog and inventory data.
-- [`scripts/reload_service.sh`](file:///home/user/work/Agentic-inventory/scripts/reload_service.sh):
-  - Fast single-service container rebuilder.
-- [`scripts/seed_data.py`](file:///home/user/work/Agentic-inventory/scripts/seed_data.py):
+  - `./scripts/setup.sh seed` — Seed sample catalog and inventory data idempotently.
+- [`scripts/reload_service.sh`](../scripts/reload_service.sh):
+  - Fast single-service container rebuilder supporting `CONTAINER_ENGINE=podman|docker`.
+- [`scripts/seed_data.py`](../scripts/seed_data.py):
   - Procedural database seeder populating users, roles, 10 catalog items, and 10 inventory items.
-- [`scripts/generate_training_data.py`](file:///home/user/work/Agentic-inventory/scripts/generate_training_data.py):
+- [`scripts/generate_training_data.py`](../scripts/generate_training_data.py):
   - Generates 1,700+ balanced intent classification samples and 350+ instruction-tuning dialogues.
 
 ---

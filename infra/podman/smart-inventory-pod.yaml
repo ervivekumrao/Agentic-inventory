@@ -1,0 +1,97 @@
+# Copyright (c) 2026 Vivek Umrao.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smart-inventory-pod
+  labels:
+    app: smart-inventory
+spec:
+  containers:
+    - name: postgres
+      image: postgres:15
+      env:
+        - name: POSTGRES_DB
+          value: inventory
+        - name: POSTGRES_USER
+          value: inventory
+        - name: POSTGRES_PASSWORD
+          value: inventory
+      ports:
+        - containerPort: 5432
+          hostPort: 5432
+
+    - name: mongo
+      image: mongo:6
+      ports:
+        - containerPort: 27017
+          hostPort: 27017
+
+    - name: redis
+      image: redis:7.2-alpine
+      command: ["redis-server", "--requirepass", "redispassword", "--appendonly", "yes"]
+      ports:
+        - containerPort: 6379
+          hostPort: 6379
+
+    - name: inventory-service
+      image: localhost/inventory-service:latest
+      env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://127.0.0.1:5432/inventory
+        - name: SPRING_DATASOURCE_USERNAME
+          value: inventory
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: inventory
+        - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+          value: org.postgresql.Driver
+        - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+          value: org.hibernate.dialect.PostgreSQLDialect
+        - name: INVENTORY_DB_TYPE
+          value: POSTGRESQL
+        - name: SPRING_DATA_REDIS_HOST
+          value: 127.0.0.1
+        - name: SPRING_DATA_REDIS_PORT
+          value: "6379"
+        - name: SPRING_DATA_REDIS_PASSWORD
+          value: redispassword
+        - name: FORECASTING_SERVICE_URL
+          value: http://127.0.0.1:8083
+        - name: CATALOG_SERVICE_URL
+          value: http://127.0.0.1:8082
+      ports:
+        - containerPort: 8081
+          hostPort: 8081
+
+    - name: catalog-service
+      image: localhost/catalog-service:latest
+      env:
+        - name: SPRING_DATA_MONGODB_URI
+          value: mongodb://127.0.0.1:27017/catalog
+        - name: SPRING_DATA_REDIS_HOST
+          value: 127.0.0.1
+        - name: SPRING_DATA_REDIS_PORT
+          value: "6379"
+        - name: SPRING_DATA_REDIS_PASSWORD
+          value: redispassword
+      ports:
+        - containerPort: 8082
+          hostPort: 8082
+
+    - name: forecasting-service
+      image: localhost/forecasting-service:latest
+      ports:
+        - containerPort: 8083
+          hostPort: 8083

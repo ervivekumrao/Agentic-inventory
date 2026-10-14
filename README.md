@@ -20,13 +20,14 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.1-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Python%203.11-teal.svg)](https://fastapi.tiangolo.com/)
 [![Gradle](https://img.shields.io/badge/Gradle-8.12-blue.svg)](https://gradle.org/)
+[![Podman](https://img.shields.io/badge/Podman-Ready-892CA0.svg)](docs/PODMAN_MIGRATION.md)
 [![Docker Compose](https://img.shields.io/badge/Docker%20Compose-Ready-blueviolet.svg)](https://docs.docker.com/compose/)
 [![Kubernetes / Helm](https://img.shields.io/badge/Helm%20Chart-v1.0.0-326CE5.svg)](infra/helm/smart-inventory)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 A production-grade, polyglot microservices platform engineered for real-time stock management, dynamic product catalogs, statistical demand forecasting, and **agentic AI-driven inventory intelligence**. 
 
-Built with **Java 17/21**, **Spring Boot 3.4.1**, **FastAPI (Python 3.11)**, **MongoDB**, **HikariCP**, **Hibernate JPA**, **Spring Security (RBAC)**, **Apache Kafka**, **Docker**, and **Helm**.
+Built with **Java 17/21**, **Spring Boot 3.4.1**, **FastAPI (Python 3.11)**, **MongoDB**, **HikariCP**, **Hibernate JPA**, **Spring Security (RBAC)**, **Apache Kafka**, **Podman & Docker**, and **Helm**.
 
 Supports pluggable enterprise relational databases through runtime dialect abstraction: **PostgreSQL, Microsoft SQL Server, MySQL, Oracle, and IBM DB2**.
 
@@ -74,8 +75,9 @@ Supports pluggable enterprise relational databases through runtime dialect abstr
    - **Web Logging Admin Console** at **[`http://localhost:8081/logging-admin.html`](http://localhost:8081/logging-admin.html)** allowing real-time inspection and runtime log level modifications without restarting containers.
 
 7. **☸️ Cloud-Native Deployment & Orchestration**:
-   - **Unified Management Utility**: [`scripts/setup.sh`](file:///home/user/work/Agentic-inventory/scripts/setup.sh) for one-command environment lifecycle management (`fresh`, `up`, `destroy`, `clean`, `reload`, `seed`).
-   - **Docker Compose**: [`infra/docker-compose.dev.yml`](file:///home/user/work/Agentic-inventory/infra/docker-compose.dev.yml) orchestrating all polyglot microservices, brokers, and multi-DB profiles.
+   - **Unified Management Utility**: [`scripts/setup.sh`](file:///home/user/work/Agentic-inventory/scripts/setup.sh) for one-command environment lifecycle management (`fresh`, `up`, `destroy`, `clean`, `reload`, `seed`). Automatically detects and supports **Podman** and **Docker**.
+   - **Podman / Docker Compose**: [`infra/docker-compose.dev.yml`](file:///home/user/work/Agentic-inventory/infra/docker-compose.dev.yml) orchestrating all polyglot microservices, brokers, and multi-DB profiles.
+   - **Native Podman Pods**: Kubernetes-compatible Pod manifest at [`infra/podman/smart-inventory-pod.yaml`](file:///home/user/work/Agentic-inventory/infra/podman/smart-inventory-pod.yaml) runnable via `podman play kube`.
    - **Helm Chart**: Production-ready Kubernetes chart at [`infra/helm/smart-inventory`](file:///home/user/work/Agentic-inventory/infra/helm/smart-inventory) with ingress, configurable endpoints, resources, and health probes.
 
 ---
@@ -114,7 +116,7 @@ graph TD
 
 ## ⚡ Quick Start Guide
 
-The project provides an all-in-one management script [`scripts/setup.sh`](file:///home/user/work/Agentic-inventory/scripts/setup.sh) that configures Docker containers, networking, and seed data automatically.
+The project provides an all-in-one management script [`scripts/setup.sh`](file:///home/user/work/Agentic-inventory/scripts/setup.sh) that configures Podman or Docker containers, networking, and seed data automatically.
 
 ### 1. Start Fresh Environment (One Command)
 Tears down existing containers/volumes, sets up the database engine, compiles services, starts all containers, and seeds sample data:
@@ -173,6 +175,7 @@ Rebuilds and reloads microservice containers without restarting databases or Kaf
 
 Comprehensive engineering specifications, designs, and guides are located in the [`docs/`](docs/README.md) directory:
 
+- 🦭 **[Podman Migration & Execution Guide](docs/PODMAN_MIGRATION.md)**: Daemonless rootless containerization, `podman compose`, `podman play kube`, and Testcontainers setup.
 - 🏗️ **[System Architecture & Engineering Guide](docs/ARCHITECTURE.md)**: Deep dive into microservice contexts, clean architecture, SOLID compliance, sequence diagrams, and resilience.
 - 🤖 **[AI Agent Architecture & Pipeline Specs](docs/AI_AGENT_ARCHITECTURE.md)**: Machine learning intent classifier, NER slot filling, synthesis engine, and inventory science formulas.
 - 🔬 **[AI Agent Investigation & Training Report](docs/AI_AGENT_INVESTIGATION_AND_TRAINING.md)**: Detailed report on root cause fixes, training data schemas, and ML training pipelines.

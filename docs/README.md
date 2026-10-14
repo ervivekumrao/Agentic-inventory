@@ -32,7 +32,7 @@ Welcome to the **Smart Inventory Management System** developer guide and technic
 9. [Web Chat Workspace & Multi-Format Export Engine](#9-web-chat-workspace--multi-format-export-engine)
 10. [Complete REST API Reference](#10-complete-rest-api-reference)
 11. [Testing Strategy, Testcontainers & JaCoCo Coverage](#11-testing-strategy-testcontainers--jacoco-coverage)
-12. [Docker & Kubernetes Helm Deployment](#12-docker--kubernetes-helm-deployment)
+12. [Podman, Docker & Kubernetes Helm Deployment](#12-podman-docker--kubernetes-helm-deployment)
 13. [Troubleshooting & Developer FAQ](#13-troubleshooting--developer-faq)
 14. [License & Copyright](#14-license--copyright)
 
@@ -43,8 +43,7 @@ Welcome to the **Smart Inventory Management System** developer guide and technic
 The system adopts a **polyglot microservices architecture** built on solid object-oriented design and enterprise SOLID principles:
 - **Single Responsibility Principle (SRP)**: Controllers strictly route HTTP requests; Services encapsulate domain business rules; Repositories manage data persistence; Dialect classes generate vendor-specific SQL queries.
 - **Open/Closed Principle (OCP)**: Microservice components, DTO mappings, and database dialect strategies are open for extension without modifying existing core logic.
-- **Liskov Substitution Principle (LSP)**: All dialect strategies extend [`AbstractQueryDialect`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/db/dialect/AbstractQueryDialect.java) and implement [`QueryDialect`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/db/dialect/QueryDialect.java) consistently. JPA repositories extend `JpaRepository` and Mongo repositories extend `MongoRepository`.
-- **Interface Segregation Principle (ISP)**: Focused domain repositories ([`InventoryRepository`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/repository/InventoryRepository.java), [`StockTransactionRepository`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/repository/StockTransactionRepository.java), [`ProductRepository`](file:///home/user/work/Agentic-inventory/catalog-service/src/main/java/com/smartinventory/catalog/repository/ProductRepository.java)).
+- **Liskov Substitution Principle (LSP)**: All dialect strategies extend [`AbstractQueryDialect`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/db/dialect/AbstractQueryDialect.java) and implement [`QueryDialect`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/db/dialect/QueryDialect.java) consistently. JPA repositories extend `JpaRepository` and Mongo repositories extend `MongoRepository`.\n- **Interface Segregation Principle (ISP)**: Focused domain repositories ([`InventoryRepository`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/repository/InventoryRepository.java), [`StockTransactionRepository`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/repository/StockTransactionRepository.java), [`ProductRepository`](file:///home/user/work/Agentic-inventory/catalog-service/src/main/java/com/smartinventory/catalog/repository/ProductRepository.java)).
 - **Dependency Inversion Principle (DIP)**: Strict Spring Constructor Dependency Injection across all services, controllers, and dialect factories.
 - **Twelve-Factor App Configuration**: Externalized configuration via `application.yml` and environment variable overrides (`DB_HOST`, `DB_PORT`, `FORECASTING_SERVICE_URL`, `CATALOG_SERVICE_URL`, `KAFKA_HOST`).
 
@@ -163,7 +162,7 @@ The system includes a dedicated web-based logging control center at **[`http://l
 ## 7. Event-Driven Messaging with Apache Kafka
 
 Stock adjustment events are published asynchronously to Apache Kafka for downstream consumers:
-- **Broker**: `localhost:9092` (Docker service `kafka:9092`)
+- **Broker**: `localhost:9092` (Container service `kafka:9092`)
 - **Topic**: `inventory-stock-events`
 - **Producer Class**: [`KafkaProducerService.java`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/kafka/KafkaProducerService.java)
 - **Event Schema ([`StockUpdateEvent`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/kafka/StockUpdateEvent.java))**:
@@ -262,19 +261,35 @@ Run all tests:
 
 ---
 
-## 12. Docker & Kubernetes Helm Deployment
+## 12. Podman, Docker & Kubernetes Helm Deployment
 
-### Docker Compose
+### Podman (Default Container Engine)
+Podman is the default container engine. Automation scripts ([`scripts/setup.sh`](file:///home/user/work/Agentic-inventory/scripts/setup.sh) and [`scripts/reload_service.sh`](file:///home/user/work/Agentic-inventory/scripts/reload_service.sh)) auto-detect `podman compose`, activate the rootless socket (`podman.socket`), and fall back gracefully to Docker if Podman is not found.
+
+For in-depth details on rootless setup, Testcontainers socket bridging, and Kubernetes YAML generation, see **[Podman Migration Guide](PODMAN_MIGRATION.md)**.
+
 Run the multi-service stack with a specific database:
 ```bash
-# PostgreSQL
-./scripts/setup.sh up postgres
+# PostgreSQL (Default)
+./scripts/setup.sh fresh postgres
 
 # MySQL
-./scripts/setup.sh up mysql
+./scripts/setup.sh fresh mysql
 
 # Microsoft SQL Server
-./scripts/setup.sh up mssql
+./scripts/setup.sh fresh mssql
+
+# Oracle
+./scripts/setup.sh fresh oracle
+
+# IBM DB2
+./scripts/setup.sh fresh db2
+```
+
+### Native Kubernetes Pods via Podman (`podman play kube`)
+Deploy the multi-service pod directly to Podman's native Kubernetes engine:
+```bash
+podman play kube infra/podman/smart-inventory-pod.yaml
 ```
 
 ### Kubernetes via Helm (`infra/helm/smart-inventory`)
@@ -302,6 +317,10 @@ Check that your chosen database engine container is fully initialized and health
 
 ### 3. AI Agent Returns Offline Mock Data
 Verify that `forecasting-service` is running on port `8083`. If `inventory-service` cannot reach `forecasting-service`, it falls back gracefully to local Java analytics synthesis without interrupting user workflows.
+
+### 4. Podman Registry Resolution & Health Checks
+- **Short Name Resolution**: Podman resolves short image names using `~/.config/containers/registries.conf` (`unqualified-search-registries = ["docker.io"]`), which is automatically created by `./scripts/setup.sh`.
+- **Health Checks**: Microservices implement clean standalone healthcheck commands (e.g. [`forecasting-service/healthcheck.py`](file:///home/user/work/Agentic-inventory/forecasting-service/healthcheck.py) and Spring Actuator curl endpoints) preventing whitespace-tokenization syntax errors in container runtimes.
 
 ---
 
