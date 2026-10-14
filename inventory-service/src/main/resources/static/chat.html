@@ -1,19 +1,35 @@
+<!--
+  Copyright (c) 2026 Vivek Umrao.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Inventory AI Assistant</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="/vendor/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/vendor/bootstrap-icons.css">
+    <script src="/vendor/marked.min.js"></script>
     <!-- SheetJS for modern Excel (.xlsx) OpenXML Spreadsheets -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="/vendor/xlsx.full.min.js"></script>
     <!-- docx.js for modern Microsoft Word (.docx) OpenXML Documents -->
-    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+    <script src="/vendor/docx.umd.js"></script>
     <!-- html2pdf for modern PDF (.pdf) Documents -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/html2pdf.bundle.min.js"></script>
+    <script src="/vendor/bootstrap.bundle.min.js"></script>
     <style>
         :root {
             --bg-body: #0b0f19;
@@ -163,6 +179,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /*noinspection CssUnusedSymbol*/
         .message-item.user {
             align-self: flex-end;
             flex-direction: row-reverse;
@@ -533,10 +550,10 @@
                     <li>
                         <button class="dropdown-item d-flex align-items-center gap-2 py-2" onclick="exportChatSmart()">
                             <i class="bi bi-magic text-warning fs-5"></i>
-                            <div>
+                            <span class="d-block">
                                 <span class="fw-semibold">Auto by Data Type</span><br>
                                 <small class="text-muted" style="font-size: 0.72rem;">Tables &rarr; .xlsx, Reports &rarr; .docx/.pdf</small>
-                            </div>
+                            </span>
                         </button>
                     </li>
                     <li><hr class="dropdown-divider" style="border-color: var(--border-subtle);"></li>
@@ -544,28 +561,28 @@
                     <li>
                         <button class="dropdown-item d-flex align-items-center gap-2 py-2" onclick="exportChatExcel()">
                             <i class="bi bi-file-earmark-excel-fill text-success fs-5"></i>
-                            <div>
+                            <span class="d-block">
                                 <span class="fw-semibold">Excel Spreadsheet (.xlsx)</span><br>
                                 <small class="text-muted" style="font-size: 0.72rem;">Native OpenXML Workbook</small>
-                            </div>
+                            </span>
                         </button>
                     </li>
                     <li>
                         <button class="dropdown-item d-flex align-items-center gap-2 py-2" onclick="exportChatDocx()">
                             <i class="bi bi-file-earmark-word-fill text-primary fs-5"></i>
-                            <div>
+                            <span class="d-block">
                                 <span class="fw-semibold">Word Document (.docx)</span><br>
                                 <small class="text-muted" style="font-size: 0.72rem;">Modern OpenXML Document</small>
-                            </div>
+                            </span>
                         </button>
                     </li>
                     <li>
                         <button class="dropdown-item d-flex align-items-center gap-2 py-2" onclick="exportChatPdf()">
                             <i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>
-                            <div>
+                            <span class="d-block">
                                 <span class="fw-semibold">PDF Document (.pdf)</span><br>
                                 <small class="text-muted" style="font-size: 0.72rem;">Printable A4 Report</small>
-                            </div>
+                            </span>
                         </button>
                     </li>
                 </ul>
@@ -577,6 +594,7 @@
             <a href="/logging-admin.html" class="btn-header" title="Log Level Controller">
                 <i class="bi bi-sliders"></i> Logger Admin
             </a>
+            <!--suppress HtmlUnknownTarget -->
             <a href="/swagger-ui.html" target="_blank" class="btn-header" title="API Docs">
                 <i class="bi bi-terminal"></i> Swagger
             </a>
@@ -1055,7 +1073,7 @@
         }
 
         async function buildDocxBlobFromHtml(htmlContent, titleText) {
-            const { Document, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, Packer, HeadingLevel, AlignmentType } = docx;
+            const { Document, Paragraph, TextRun, Packer, AlignmentType } = docx;
 
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlContent;
@@ -1169,7 +1187,7 @@
         }
 
         function exportDocxHtmlFallback(htmlBody, filename) {
-            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><style>body{font-family:Calibri,sans-serif;font-size:11pt;}table{border-collapse:collapse;width:100%;}th{background-color:#0284c7;color:#fff;padding:6px;border:1px solid #0284c7;}td{border:1px solid #ddd;padding:6px;}</style></head><body>";
+            const header = "<html lang='en'><head><meta charset='utf-8'><style>body{font-family:Calibri,sans-serif;font-size:11pt;}table{border-collapse:collapse;width:100%;}th{background-color:#0284c7;color:#fff;padding:6px;border:1px solid #0284c7;}td{border:1px solid #ddd;padding:6px;}</style></head><body>";
             const footer = "</body></html>";
             const blob = new Blob(['\ufeff' + header + htmlBody + footer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
             downloadBlob(blob, filename.replace('.doc', '.docx'));
@@ -1329,7 +1347,7 @@
                 return;
             }
             printWindow.document.write(`
-                <html><head><title>Print Export</title>
+                <html lang="en"><head><title>Print Export</title>
                 <style>body { font-family: Arial, sans-serif; padding: 20px; color: #111; } table { border-collapse: collapse; width: 100%; } th, td { border: 1px solid #ccc; padding: 6px; } th { background-color: #eee; }</style>
                 </head><body>${htmlContent}</body></html>
             `);

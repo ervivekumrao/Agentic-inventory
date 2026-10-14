@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2026 Vivek Umrao.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.smartinventory.inventory.db.dialect;
 
 import com.querydsl.core.Tuple;
@@ -8,6 +24,7 @@ import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.sql.Configuration;
 import com.querydsl.sql.SQLQuery;
 import com.querydsl.sql.SQLTemplates;
+import com.smartinventory.inventory.security.sqli.SqlInjectionDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -68,6 +85,7 @@ public abstract class AbstractQueryDialect implements QueryDialect {
 
     @Override
     public List<Map<String, Object>> executeCustomQuery(String sql, Object... params) {
+        SqlInjectionDetector.validateQuery(sql);
         if (jdbcTemplate == null) {
             log.warn("Cannot execute custom query; JdbcTemplate is not configured.");
             return Collections.emptyList();
@@ -78,6 +96,7 @@ public abstract class AbstractQueryDialect implements QueryDialect {
 
     @Override
     public int executeCustomUpdate(String sql, Object... params) {
+        SqlInjectionDetector.validateQuery(sql);
         if (jdbcTemplate == null) {
             log.warn("Cannot execute custom update; JdbcTemplate is not configured.");
             return 0;

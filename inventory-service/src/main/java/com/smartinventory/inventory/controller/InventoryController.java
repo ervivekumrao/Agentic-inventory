@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2026 Vivek Umrao.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.smartinventory.inventory.controller;
 
 import com.smartinventory.inventory.db.dialect.QueryDialect;
@@ -8,6 +24,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/inventory")
+@RequestMapping(value = "/api/inventory", produces = MediaType.APPLICATION_JSON_VALUE)
 public class InventoryController {
 
     private static final Logger log = LoggerFactory.getLogger(InventoryController.class);
@@ -55,7 +72,7 @@ public class InventoryController {
                 });
     }
 
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<InventoryItem> createInventoryItem(@Valid @RequestBody InventoryItem item) {
         log.info("POST /api/inventory requested for SKU: {}, Quantity: {}", item.getSku(), item.getQuantity());
         InventoryItem created = inventoryService.createInventoryItem(item);
@@ -63,7 +80,7 @@ public class InventoryController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PostMapping("/bulk")
+    @PostMapping(value = "/bulk", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<InventoryItem>> createInventoryBulk(@RequestBody List<InventoryItem> items) {
         log.info("POST /api/inventory/bulk requested with {} items", items.size());
         List<InventoryItem> created = inventoryService.createInventoryItemsBulk(items);
@@ -75,9 +92,17 @@ public class InventoryController {
             @PathVariable String sku,
             @RequestBody Map<String, Object> adjustmentRequest) {
         
-        int quantityChange = (Integer) adjustmentRequest.getOrDefault("quantityChange", 0);
-        String transactionType = (String) adjustmentRequest.getOrDefault("transactionType", "ADJUSTMENT");
-        String referenceId = (String) adjustmentRequest.getOrDefault("referenceId", "SYSTEM");
+        int quantityChange = 0;
+        Object qtyObj = adjustmentRequest.get("quantityChange");
+        if (qtyObj instanceof Number num) {
+            quantityChange = num.intValue();
+        } else if (qtyObj instanceof String str) {
+            try {
+                quantityChange = Integer.parseInt(str);
+            } catch (NumberFormatException ignored) {}
+        }
+        String transactionType = adjustmentRequest.get("transactionType") != null ? String.valueOf(adjustmentRequest.get("transactionType")) : "ADJUSTMENT";
+        String referenceId = adjustmentRequest.get("referenceId") != null ? String.valueOf(adjustmentRequest.get("referenceId")) : "SYSTEM";
 
         log.info("POST /api/inventory/{}/adjust requested: qtyChange={}, type={}, ref={}",
                 sku, quantityChange, transactionType, referenceId);

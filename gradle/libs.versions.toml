@@ -1,0 +1,79 @@
+[versions]
+spring-boot = "3.4.7"
+spring-dependency-management = "1.1.7"
+springdoc = "2.9.1"
+querydsl = "5.1.0"
+testcontainers = "1.20.5"
+
+# Database Drivers
+postgresql = "42.7.14"
+mysql = "26.7.0"
+oracle = "23.26.3.0.0"
+mssql = "13.6.0.jre11"
+db2 = "12.1.5.0"
+
+# Common Utilities & Transitive Security Hardening
+commons-lang3 = "3.18.0"
+commons-compress = "1.27.1"
+commons-io = "2.18.0"
+commons-beanutils = "1.10.1"
+json-smart = "2.5.2"
+jose4j = "0.9.6"
+zookeeper = "3.9.3"
+zstd-jni = "1.5.7-1"
+snappy-java = "1.1.10.7"
+assertj = "3.27.3"
+
+[libraries]
+# Spring Boot Starters
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring-boot-starter-data-mongodb = { module = "org.springframework.boot:spring-boot-starter-data-mongodb" }
+spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+
+# OpenAPI / Swagger
+springdoc-openapi = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
+
+# QueryDSL
+querydsl-sql = { module = "com.querydsl:querydsl-sql", version.ref = "querydsl" }
+
+# Database Drivers & Connection Pooling
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+mysql = { module = "com.mysql:mysql-connector-j", version.ref = "mysql" }
+oracle = { module = "com.oracle.database.jdbc:ojdbc11", version.ref = "oracle" }
+mssql = { module = "com.microsoft.sqlserver:mssql-jdbc", version.ref = "mssql" }
+db2 = { module = "com.ibm.db2:jcc", version.ref = "db2" }
+h2 = { module = "com.h2database:h2" }
+hikaricp = { module = "com.zaxxer:HikariCP" }
+
+# Kafka & Metrics
+spring-kafka = { module = "org.springframework.kafka:spring-kafka" }
+spring-kafka-test = { module = "org.springframework.kafka:spring-kafka-test" }
+spring-security-test = { module = "org.springframework.security:spring-security-test" }
+micrometer-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
+
+# Testcontainers BOM
+testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter" }
+testcontainers-postgresql = { module = "org.testcontainers:postgresql" }
+testcontainers-mongodb = { module = "org.testcontainers:mongodb" }
+testcontainers-kafka = { module = "org.testcontainers:kafka" }
+
+# Security Hardening & Utilities
+commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons-lang3" }
+commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commons-compress" }
+commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
+commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "commons-beanutils" }
+json-smart = { module = "net.minidev:json-smart", version.ref = "json-smart" }
+jose4j = { module = "org.bitbucket.b_c:jose4j", version.ref = "jose4j" }
+zookeeper = { module = "org.apache.zookeeper:zookeeper", version.ref = "zookeeper" }
+zookeeper-jute = { module = "org.apache.zookeeper:zookeeper-jute", version.ref = "zookeeper" }
+zstd-jni = { module = "com.github.luben:zstd-jni", version.ref = "zstd-jni" }
+snappy-java = { module = "org.xerial.snappy:snappy-java", version.ref = "snappy-java" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }

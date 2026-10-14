@@ -1,4 +1,17 @@
-{{- if .Values.ingress.enabled -}}
+# Copyright (c) 2026 Vivek Umrao.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -6,22 +19,29 @@ metadata:
   labels:
     app.kubernetes.io/name: smart-inventory
 spec:
-  {{- if .Values.ingress.className }}
-  ingressClassName: {{ .Values.ingress.className }}
-  {{- end }}
+  ingressClassName: {{ .Values.ingress.className | default "nginx" | quote }}
   rules:
-    {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
+    - host: smart-inventory.local
       http:
         paths:
-          {{- range .paths }}
-          - path: {{ .path }}
-            pathType: {{ .pathType }}
+          - path: /
+            pathType: Prefix
             backend:
               service:
-                name: {{ .service }}
+                name: inventory-service
                 port:
-                  number: {{ .port }}
-          {{- end }}
-    {{- end }}
-{{- end }}
+                  number: 8081
+          - path: /api/catalog
+            pathType: Prefix
+            backend:
+              service:
+                name: catalog-service
+                port:
+                  number: 8082
+          - path: /docs
+            pathType: Prefix
+            backend:
+              service:
+                name: forecasting-service
+                port:
+                  number: 8083

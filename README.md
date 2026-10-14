@@ -1,3 +1,19 @@
+<!--
+  Copyright (c) 2026 Vivek Umrao.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
 # Smart Inventory Management System
 
 [![Java Version](https://img.shields.io/badge/Java-17%20%7C%2021-orange.svg)](https://openjdk.org/)
@@ -5,161 +21,182 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-Python%203.11-teal.svg)](https://fastapi.tiangolo.com/)
 [![Gradle](https://img.shields.io/badge/Gradle-8.12-blue.svg)](https://gradle.org/)
 [![Docker Compose](https://img.shields.io/badge/Docker%20Compose-Ready-blueviolet.svg)](https://docs.docker.com/compose/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Kubernetes / Helm](https://img.shields.io/badge/Helm%20Chart-v1.0.0-326CE5.svg)](infra/helm/smart-inventory)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-A production-grade, polyglot microservices architecture designed for modern inventory management, real-time stock tracking, dynamic product catalogs, demand forecasting, and **agentic AI-driven inventory insights**. Built with **Spring Boot 3.4.1**, **FastAPI**, **MongoDB**, **HikariCP**, **Hibernate JPA**, **Spring Security**, **Apache Kafka**, and **Docker**.
+A production-grade, polyglot microservices platform engineered for real-time stock management, dynamic product catalogs, statistical demand forecasting, and **agentic AI-driven inventory intelligence**. 
 
-Supports multiple relational databases through dynamic setup configurations including **PostgreSQL, Microsoft SQL Server, MySQL, Oracle, and IBM DB2**.
+Built with **Java 17/21**, **Spring Boot 3.4.1**, **FastAPI (Python 3.11)**, **MongoDB**, **HikariCP**, **Hibernate JPA**, **Spring Security (RBAC)**, **Apache Kafka**, **Docker**, and **Helm**.
+
+Supports pluggable enterprise relational databases through runtime dialect abstraction: **PostgreSQL, Microsoft SQL Server, MySQL, Oracle, and IBM DB2**.
 
 ---
 
-## 🏗️ System Architecture & SOLID Principles
+## 🌟 Key Capabilities & Feature Highlights
+
+1. **📦 Transactional Inventory Service (`inventory-service`)**:
+   - Thread-safe stock tracking, batch adjustments, and immutable transaction audit logs ([`StockTransaction`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/model/StockTransaction.java)).
+   - Multi-database dialect persistence framework ([`QueryDialect`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/db/dialect/QueryDialect.java)) supporting PostgreSQL, MySQL, Oracle, SQL Server, and DB2 with zero proprietary lock-in.
+   - Programmatic transaction boundaries and custom isolation levels ([`DatabaseTransactionManager`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/db/DatabaseTransactionManager.java)).
+   - Event-driven stock update publishing to **Apache Kafka** ([`KafkaProducerService`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/kafka/KafkaProducerService.java)).
+
+2. **🍃 Dynamic Product Catalog Service (`catalog-service`)**:
+   - Flexible document-based product management powered by **MongoDB**.
+   - Dynamic key-value technical specifications, categories, brands, tags, and pricing ([`Product`](file:///home/user/work/Agentic-inventory/catalog-service/src/main/java/com/smartinventory/catalog/model/Product.java)).
+   - Automated bootstrap seeders ([`CatalogDataInitializer`](file:///home/user/work/Agentic-inventory/catalog-service/src/main/java/com/smartinventory/catalog/config/CatalogDataInitializer.java)).
+
+3. **🤖 Agentic AI Assistant & Forecasting Service (`forecasting-service`)**:
+   - **Trained Machine Learning Intent Classifier**: Scikit-Learn TF-IDF vectorizer + Calibrated Logistic Regression trained on 1,700+ balanced queries covering 15 operational intents ([`train_classifier.py`](file:///home/user/work/Agentic-inventory/forecasting-service/train_classifier.py)).
+   - **Named Entity Recognition (NER) & Slot Extraction**: Dynamic extraction of SKUs, warehouse locations, product categories, and top-N numeric filters.
+   - **Human-like Synthesis Engine**: Generates formatted markdown tables, operational metrics, stock deficit audits, capital valuations, and prioritized supply chain recommendations.
+   - **Dual-Mode AI Architecture**: Seamless routing to external LLMs (Google Gemini / OpenAI) when API keys are configured, with automatic fallback to offline local ML and statistical synthesis.
+   - **Inventory Science & Demand Forecasting**: Multi-period exponential smoothing, linear trend regression, anomaly detection, statistical safety stock ($Z=1.65$, 95% service level), and dynamic Reorder Points (ROP).
+   - **Instruction-Tuning Dataset**: 350+ conversational dialogues in OpenAI Chat / Alpaca SFT format ([`instruction_tuning_dataset.jsonl`](file:///home/user/work/Agentic-inventory/forecasting-service/data/instruction_tuning_dataset.jsonl)).
+
+4. **💻 Interactive Web Chat UI & Multi-Format Export Engine**:
+   - Web-based AI workspace served directly at **[`http://localhost:8081/`](http://localhost:8081/)** or **[`http://localhost:8081/chat.html`](http://localhost:8081/chat.html)**.
+   - Real-time conversational streaming and `marked.js` markdown table rendering.
+   - **Multi-Format Export Suite**:
+     - 📊 **Excel Spreadsheet (`.xlsx`)** via SheetJS (xlsx.js).
+     - 📄 **Word Document (`.docx`)** via docx.js (true Microsoft OpenXML standard).
+     - 📑 **PDF Document (`.pdf`)** via html2pdf.js.
+     - ⚡ **Smart Export**: Auto-detects tabular matrices vs narrative reports and exports to optimal format.
+   - Quick prompt suggestion chips (Tabular SKU Matrix, Low Stock Audit, Valuation, Executive Brief, etc.).
+
+5. **🔐 Enterprise Security & Role-Based Access Control (RBAC)**:
+   - Spring Security HTTP Basic authentication with BCrypt password hashing.
+   - Database-backed domain entities: [`UserEntity`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/model/UserEntity.java), [`RoleEntity`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/model/RoleEntity.java), and [`PermissionEntity`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/model/PermissionEntity.java).
+   - Pre-seeded system accounts: `admin` (`ROLE_ADMIN`), `manager` (`ROLE_MANAGER`), `operator` (`ROLE_ENTRY_OPERATOR`), `viewer` (`ROLE_USER`).
+   - Administrative User Management API ([`UserManagementController`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/controller/UserManagementController.java)).
+
+6. **🔍 Distributed Observability & Dynamic Logging Administration**:
+   - Distributed **Correlation ID Tracing** (`X-Correlation-ID`) across Java microservices via [`CorrelationIdFilter`](file:///home/user/work/Agentic-inventory/inventory-service/src/main/java/com/smartinventory/inventory/config/CorrelationIdFilter.java) and SLF4J MDC.
+   - **Web Logging Admin Console** at **[`http://localhost:8081/logging-admin.html`](http://localhost:8081/logging-admin.html)** allowing real-time inspection and runtime log level modifications without restarting containers.
+
+7. **☸️ Cloud-Native Deployment & Orchestration**:
+   - **Unified Management Utility**: [`scripts/setup.sh`](file:///home/user/work/Agentic-inventory/scripts/setup.sh) for one-command environment lifecycle management (`fresh`, `up`, `destroy`, `clean`, `reload`, `seed`).
+   - **Docker Compose**: [`infra/docker-compose.dev.yml`](file:///home/user/work/Agentic-inventory/infra/docker-compose.dev.yml) orchestrating all polyglot microservices, brokers, and multi-DB profiles.
+   - **Helm Chart**: Production-ready Kubernetes chart at [`infra/helm/smart-inventory`](file:///home/user/work/Agentic-inventory/infra/helm/smart-inventory) with ingress, configurable endpoints, resources, and health probes.
+
+---
+
+## 🏛️ System Architecture
 
 ```mermaid
 graph TD
-    Client[Client / Web Chat UI] -->|HTTP 8081| Inventory[inventory-service<br/>Spring Boot + PostgreSQL + HikariCP + Kafka]
-    Client -->|HTTP 8082| Catalog[catalog-service<br/>Spring Boot + MongoDB]
-    Client -->|HTTP 8083| Forecasting[forecasting-service<br/>Python FastAPI + NumPy + AI Agent RAG]
+    Client[Client / Web Browser / Chat UI] -->|HTTP 8081| Inventory[inventory-service<br/>Spring Boot 3.4.1 + Security + Multi-RDBMS]
+    Client -->|HTTP 8082| Catalog[catalog-service<br/>Spring Boot 3.4.1 + MongoDB]
+    Client -->|HTTP 8083| Forecasting[forecasting-service<br/>FastAPI + ML Agent + Analytics]
     
-    Inventory -->|JPA / SQL| DB[(PostgreSQL)]
-    Catalog -->|Spring Data| Mongo[(MongoDB)]
-    Inventory -->|Kafka Stock Events| Kafka[Apache Kafka]
-    Inventory -->|HTTP Chat Delegation| Forecasting
+    Inventory -->|JPA / QueryDSL / JDBC| RDBMS[(Pluggable RDBMS<br/>Postgres / MSSQL / MySQL / Oracle / DB2)]
+    Catalog -->|Spring Data Mongo| Mongo[(MongoDB 6.0)]
+    Inventory -->|Kafka Stock Events| Kafka[Apache Kafka Broker]
+    Inventory -->|HTTP Context Chat Delegation| Forecasting
+    
+    subgraph Observability_Admin ["Observability & Admin"]
+        Inventory --- LogAdmin[logging-admin.html<br/>Actuator Logger Admin]
+        Inventory --- CorrelationFilter[CorrelationIdFilter<br/>X-Correlation-ID MDC]
+    end
 ```
 
-### Key Design & Architectural Principles
-- **SOLID Principles**: Single Responsibility (layered Controller-Service-Repository), Open/Closed (extensible DTO mappings), Liskov Substitution, Interface Segregation, and Dependency Inversion (Spring Constructor Injection).
-- **Twelve-Factor App Configuration**: Fully externalized application properties and environment variable bindings.
-- **Resilient Fallback Design**: Circuit-breaker style fallback mechanisms in microservice inter-service communication.
-- **High Code Quality & Test Coverage**: JaCoCo integration testing suite across all Java and Python modules.
-
 ---
 
-## 💬 Interactive Web Chat UI
+## 🚀 Microservices & Port Map
 
-You can open the web-based chat interface in any browser:
-👉 **[`http://localhost:8081/`](http://localhost:8081/)** or **[`http://localhost:8081/chat.html`](http://localhost:8081/chat.html)**
-
-Features include:
-- **Real-time conversation stream** with the AI Agent.
-- **Markdown Table Matrix Rendering** (renders clean HTML tables for SKU list requests).
-- **Quick Query Suggestion Chips** (Tabular SKU Matrix, SKU Count, Stock Type Breakdown, Low Stock Audit, Total Valuation, Executive Brief).
-- **Formatted Markdown outputs**, risk indicators (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`), and actionable recommendations list.
-
----
-
-## 🚀 Microservices & Modules Overview
-
-| Service / Module | Technology | Port | Database / Broker | Primary Responsibility |
+| Service / Component | Technology Stack | Port | Persistence / Messaging | Primary Responsibilities |
 | :--- | :--- | :--- | :--- | :--- |
-| **`inventory-service`** | Java 17, Spring Boot 3.4.1, HikariCP | `8081` | Pluggable RDBMS (Postgres, MSSQL, etc.) | Manages inventory items, stock adjustments, audit transactions, Kafka event publishing, Spring Security, and **Web Chat UI & AI Chat API**. |
-| **`catalog-service`** | Java 17, Spring Boot 3.4.1 | `8082` | MongoDB | Manages flexible product catalog metadata, categories, pricing, and dynamic attributes. |
-| **`forecasting-service`** | Python 3.11, FastAPI, NumPy, Pandas | `8083` | In-memory / Numpy | Provides predictive SKU demand forecasting and an **Agentic AI Assistant** with Human Synthesis Engine for natural language operational intelligence. |
-| **`integration-tests`** | JUnit 5, Spring Boot Test, Testcontainers | N/A | Embedded H2 / Mongo | Dedicated integration and end-to-end testing suite validating cross-service workflows. |
+| **`inventory-service`** | Java 17/21, Spring Boot 3.4.1, Spring Security | `8081` | PostgreSQL (or MSSQL, MySQL, Oracle, DB2) | Inventory stock items, transactions, multi-dialect SQL engine, Kafka producer, RBAC user management, Chat UI host, Logging Admin. |
+| **`catalog-service`** | Java 17/21, Spring Boot 3.4.1 | `8082` | MongoDB | Product catalog, dynamic attributes, categories, pricing, tag filtering. |
+| **`forecasting-service`** | Python 3.11, FastAPI, Scikit-Learn | `8083` | In-Memory / Joblib | ML Intent Classifier, NER entity extractor, human synthesis engine, demand forecasting, statistical safety stock. |
+| **`integration-tests`** | JUnit 5, Spring Boot Test, Testcontainers | N/A | Embedded H2 & Mongo | Cross-service end-to-end integration tests and AI agent context hydration tests. |
 
 ---
 
-## 📋 Prerequisites
+## ⚡ Quick Start Guide
 
-Before running the project, ensure you have installed:
-- **Java Development Kit (JDK) 17+**
-- **Python 3.11+** (for forecasting & AI service)
-- **Docker & Docker Compose** (for containerized execution)
-- **Gradle 8.x** (included via `./gradlew` wrapper)
+The project provides an all-in-one management script [`scripts/setup.sh`](file:///home/user/work/Agentic-inventory/scripts/setup.sh) that configures Docker containers, networking, and seed data automatically.
 
----
-
-## ⚡ Quick Start Guide & Unified Environment Management
-
-The project provides a robust unified setup utility (`./scripts/setup.sh`) to manage the entire environment lifecycle with single commands.
-
-Available databases: `postgres` (default), `mssql`, `mysql`, `oracle`, `db2`.
-Custom variables (such as `DB_PORT`, `DB_USER`, `DB_PASSWORD`) can also be passed via environment variables.
-
-### 1. Start Fresh Environment (Single Command)
-Destroys any existing containers and volumes, configures the database, builds and starts all microservices, and automatically seeds sample data:
+### 1. Start Fresh Environment (One Command)
+Tears down existing containers/volumes, sets up the database engine, compiles services, starts all containers, and seeds sample data:
 ```bash
 # Default (PostgreSQL)
 ./scripts/setup.sh fresh
 
-# Or choose a specific database engine
-./scripts/setup.sh fresh postgres
+# Or choose any enterprise relational database:
 ./scripts/setup.sh fresh mysql
 ./scripts/setup.sh fresh mssql
+./scripts/setup.sh fresh oracle
+./scripts/setup.sh fresh db2
 ```
 
 ### 2. Start Existing Environment
-Starts containers without resetting volumes or re-seeding data:
 ```bash
 ./scripts/setup.sh up postgres
 ```
 
-### 3. Destroy Environment (Keep Volumes)
-Stops and removes containers while preserving database volumes:
+### 3. Hot-Reload Microservices After Code Changes
+Rebuilds and reloads microservice containers without restarting databases or Kafka brokers:
 ```bash
-./scripts/setup.sh destroy
-```
-
-### 4. Clean Project Completely
-Stops and removes all containers, volumes, networks, local images, and `.env` configuration:
-```bash
-./scripts/setup.sh clean
-```
-
-### 5. Reload Services with New Code
-Rebuilds and reloads microservices without bringing down databases or brokers:
-```bash
-# Reload Python AI Forecasting Service
 ./scripts/setup.sh reload forecasting-service
-
-# Reload Spring Boot Inventory Service
 ./scripts/setup.sh reload inventory-service
-
-# Reload Spring Boot Catalog Service
 ./scripts/setup.sh reload catalog-service
-
-# Reload all microservices at once
 ./scripts/setup.sh reload all
 ```
 
-### 6. Manually Seed Sample Data
+### 4. Seed or Re-seed Sample Data
 ```bash
 ./scripts/setup.sh seed
 ```
 
----
+### 5. Stop or Destroy Environment
+```bash
+# Stop containers (preserves database volumes)
+./scripts/setup.sh destroy
 
-## 📚 API Endpoints & Swagger Documentation
-
-### 1. Inventory Service (`http://localhost:8081`)
-- **Web Chat UI**: [`http://localhost:8081/`](http://localhost:8081/) or [`http://localhost:8081/chat.html`](http://localhost:8081/chat.html)
-- **Swagger UI**: [`http://localhost:8081/swagger-ui.html`](http://localhost:8081/swagger-ui.html) *(Authentication: Username `admin`, Password `password`)*
-- **Key Endpoints**:
-  - `POST /api/ai/agent/chat` - **AI Agent Interactive Chat Endpoint**
-  - `GET /api/inventory` - List inventory (supports `?lowStock=true`)
-  - `GET /api/inventory/{sku}` - Get inventory item by SKU
-  - `POST /api/inventory` - Create inventory item *(Authenticated)*
-  - `POST /api/inventory/{sku}/adjust` - Adjust stock quantities *(Authenticated)*
-  - `GET /api/inventory/{sku}/transactions` - Get stock audit transaction log
-
-### 2. Catalog Service (`http://localhost:8082`)
-- **Swagger UI**: [`http://localhost:8082/swagger-ui.html`](http://localhost:8082/swagger-ui.html)
-- **Key Endpoints**:
-  - `GET /api/catalog` - List all products (supports `?category=...`)
-  - `GET /api/catalog/{id}` - Get product by ID
-  - `GET /api/catalog/sku/{sku}` - Get product by SKU
-  - `POST /api/catalog` - Create product
-  - `PUT /api/catalog/{id}` - Update product
-  - `DELETE /api/catalog/{id}` - Delete product
-
-### 3. AI & Forecasting Service (`http://localhost:8083`)
-- **Interactive Docs**: [`http://localhost:8083/docs`](http://localhost:8083/docs)
-- **Key Endpoints**:
-  - `POST /api/ai/agent/chat` - **AI Agent Assistant Endpoint**
-  - `POST /forecast` - Calculate time-series demand projections using exponential smoothing.
+# Clean everything (wipes containers, networks, volumes, local images, and .env)
+./scripts/setup.sh clean
+```
 
 ---
 
-## 📜 License
+## 🌐 Web Interfaces & Dashboards
 
-Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
+- **🤖 AI Agent Web Chat UI**: [`http://localhost:8081/`](http://localhost:8081/) or [`http://localhost:8081/chat.html`](http://localhost:8081/chat.html)
+- **📋 Dynamic Logging Admin Console**: [`http://localhost:8081/logging-admin.html`](http://localhost:8081/logging-admin.html) *(Requires `admin` credentials)*
+- **📚 Inventory Swagger UI**: [`http://localhost:8081/swagger-ui.html`](http://localhost:8081/swagger-ui.html) *(Basic Auth: `admin` / `password`)*
+- **📚 Catalog Swagger UI**: [`http://localhost:8082/swagger-ui.html`](http://localhost:8082/swagger-ui.html)
+- **⚡ Forecasting OpenAPI / Docs**: [`http://localhost:8083/docs`](http://localhost:8083/docs)
+
+---
+
+## 📖 Complete Documentation Suite
+
+Comprehensive engineering specifications, designs, and guides are located in the [`docs/`](docs/README.md) directory:
+
+- 🏗️ **[System Architecture & Engineering Guide](docs/ARCHITECTURE.md)**: Deep dive into microservice contexts, clean architecture, SOLID compliance, sequence diagrams, and resilience.
+- 🤖 **[AI Agent Architecture & Pipeline Specs](docs/AI_AGENT_ARCHITECTURE.md)**: Machine learning intent classifier, NER slot filling, synthesis engine, and inventory science formulas.
+- 🔬 **[AI Agent Investigation & Training Report](docs/AI_AGENT_INVESTIGATION_AND_TRAINING.md)**: Detailed report on root cause fixes, training data schemas, and ML training pipelines.
+- 🗄️ **[Database Schemas & Kafka Messaging Guide](docs/DATABASE_AND_MESSAGING.md)**: Relational tables (Postgres, MSSQL, MySQL, Oracle, DB2), MongoDB document schemas, and Kafka event specifications.
+- ⛵ **[Helm Chart Deployment Guide](docs/HELM_DEPLOYMENT.md)**: Distributed Kubernetes deployment, parameterizable Helm values, ingress routing, and multi-cloud setup.
+- 🧪 **[Testing Strategy, JaCoCo & DevOps Guide](docs/TESTING_AND_DEVOPS.md)**: Multi-layered testing strategy, Testcontainers integration, JaCoCo reports, and CI/CD best practices.
+- 📘 **[Developer Guide & System Manual](docs/README.md)**: Complete developer handbook, security configurations, and REST API reference.
+
+---
+
+## 📜 License & Copyright
+
+```text
+Copyright (c) 2026 Vivek Umrao.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```

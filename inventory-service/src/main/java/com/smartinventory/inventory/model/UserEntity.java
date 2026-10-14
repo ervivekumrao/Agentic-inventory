@@ -1,5 +1,26 @@
+/*
+ * Copyright (c) 2026 Vivek Umrao.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.smartinventory.inventory.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.smartinventory.inventory.security.pii.MaskStrategy;
+import com.smartinventory.inventory.security.pii.PiiData;
+import com.smartinventory.inventory.security.pii.PiiType;
+import com.smartinventory.inventory.security.sqli.NoSqlInjection;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
@@ -7,6 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@SuppressWarnings("unused")
 @Table(name = "users")
 public class UserEntity {
 
@@ -16,10 +38,14 @@ public class UserEntity {
 
     @Column(nullable = false, unique = true)
     @NotBlank(message = "Username is mandatory")
+    @NoSqlInjection
+    @PiiData(type = PiiType.EMAIL, strategy = MaskStrategy.PARTIAL)
     private String username;
 
     @Column(nullable = false)
     @NotBlank(message = "Password is mandatory")
+    @JsonIgnore
+    @PiiData(type = PiiType.SECRET, strategy = MaskStrategy.FULL_REDACT)
     private String password;
 
     @Column(nullable = false)

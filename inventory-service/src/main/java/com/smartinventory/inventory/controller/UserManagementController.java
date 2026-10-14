@@ -1,25 +1,48 @@
+/*
+ * Copyright (c) 2026 Vivek Umrao.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.smartinventory.inventory.controller;
 
 import com.smartinventory.inventory.model.RoleEntity;
 import com.smartinventory.inventory.model.UserEntity;
 import com.smartinventory.inventory.repository.RoleRepository;
 import com.smartinventory.inventory.repository.UserRepository;
+import com.smartinventory.inventory.security.pii.MaskStrategy;
+import com.smartinventory.inventory.security.pii.PiiData;
+import com.smartinventory.inventory.security.pii.PiiLogSanitizer;
+import com.smartinventory.inventory.security.pii.PiiType;
+import com.smartinventory.inventory.security.sqli.NoSqlInjection;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.HtmlUtils;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping(value = "/api/admin", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserManagementController {
 
     private static final Logger log = LoggerFactory.getLogger(UserManagementController.class);
@@ -44,15 +67,16 @@ public class UserManagementController {
         return ResponseEntity.ok(users);
     }
 
-    @PostMapping("/users")
+    @PostMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN') or @userRepository.count() == 0")
     public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody CreateUserRequest request) {
-        log.debug("POST /api/admin/users requested for username: {}", request.username());
-        if (userRepository.existsByUsername(request.username())) {
+        String cleanUsername = HtmlUtils.htmlEscape(request.username().trim());
+        log.debug("POST /api/admin/users requested for username: {}", PiiLogSanitizer.mask(cleanUsername));
+        if (userRepository.existsByUsername(cleanUsername)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
-        UserEntity user = new UserEntity(request.username(), passwordEncoder.encode(request.password()));
+        UserEntity user = new UserEntity(cleanUsername, passwordEncoder.encode(request.password()));
         if (request.roles() != null && !request.roles().isEmpty()) {
             Set<RoleEntity> roles = request.roles().stream()
                     .map(roleName -> roleRepository.findByName(roleName)
@@ -62,7 +86,7 @@ public class UserManagementController {
         }
 
         UserEntity savedUser = userRepository.save(user);
-        log.info("User created successfully: {}", savedUser.getUsername());
+        log.info("User created successfully: {}", PiiLogSanitizer.mask(savedUser.getUsername()));
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(savedUser));
     }
 
@@ -82,7 +106,7 @@ public class UserManagementController {
 
         user.setRoles(roles);
         UserEntity updatedUser = userRepository.save(user);
-        log.info("Roles updated successfully for user: {}", updatedUser.getUsername());
+        log.info("Roles updated successfully for user: {}", PiiLogSanitizer.mask(updatedUser.getUsername()));
         return ResponseEntity.ok(toDto(updatedUser));
     }
 
@@ -97,7 +121,7 @@ public class UserManagementController {
 
         user.setEnabled(enabled);
         UserEntity updatedUser = userRepository.save(user);
-        log.info("User status updated for {}: enabled={}", updatedUser.getUsername(), enabled);
+        log.info("User status updated for {}: enabled={}", PiiLogSanitizer.mask(updatedUser.getUsername()), enabled);
         return ResponseEntity.ok(toDto(updatedUser));
     }
 
@@ -112,17 +136,21 @@ public class UserManagementController {
         Set<String> roleNames = user.getRoles().stream()
                 .map(RoleEntity::getName)
                 .collect(Collectors.toSet());
-        return new UserResponseDto(user.getId(), user.getUsername(), user.isEnabled(), roleNames, user.getCreatedAt().toString());
+        return new UserResponseDto(user.getId(), HtmlUtils.htmlEscape(user.getUsername()), user.isEnabled(), roleNames, user.getCreatedAt().toString());
     }
 
     public record CreateUserRequest(
-            @NotBlank(message = "Username is mandatory") String username,
-            @NotBlank(message = "Password is mandatory") String password,
+            @NotBlank(message = "Username is mandatory")
+            @NoSqlInjection
+            String username,
+            @NotBlank(message = "Password is mandatory")
+            String password,
             Set<String> roles
     ) {}
 
     public record UserResponseDto(
             Long id,
+            @PiiData(type = PiiType.EMAIL, strategy = MaskStrategy.PARTIAL)
             String username,
             boolean enabled,
             Set<String> roles,

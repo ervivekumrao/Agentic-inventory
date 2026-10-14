@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2026 Vivek Umrao.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.smartinventory.catalog.controller;
 
 import com.smartinventory.catalog.model.Product;
@@ -6,13 +22,14 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/catalog")
+@RequestMapping(value = "/api/catalog", produces = MediaType.APPLICATION_JSON_VALUE)
 public class CatalogController {
 
     private static final Logger log = LoggerFactory.getLogger(CatalogController.class);
@@ -64,7 +81,7 @@ public class CatalogController {
                 });
     }
 
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
         log.info("POST /api/catalog requested for SKU: {}, Name: {}", product.getSku(), product.getName());
         Product created = catalogService.createProduct(product);
@@ -72,7 +89,7 @@ public class CatalogController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PostMapping("/bulk")
+    @PostMapping(value = "/bulk", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Product>> createProductsBulk(@RequestBody List<Product> products) {
         log.info("POST /api/catalog/bulk requested with {} products", products.size());
         List<Product> created = catalogService.createProductsBulk(products);
