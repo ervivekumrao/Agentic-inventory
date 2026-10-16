@@ -16,6 +16,7 @@
 
 package com.smartinventory.catalog.exception;
 
+import com.smartinventory.catalog.security.xss.XssException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -34,6 +36,18 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(XssException.class)
+    public ResponseEntity<Map<String, Object>> handleXssException(XssException ex) {
+        log.warn("XSS security violation intercepted: {}", ex.getMessage());
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", Instant.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "Security violation: Potential Cross-Site Scripting (XSS) detected.");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -64,6 +78,18 @@ public class GlobalExceptionHandler {
         body.put("error", ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNoResourceFoundException(NoResourceFoundException ex) {
+        log.debug("Resource not found: {}", ex.getMessage());
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", Instant.now());
+        body.put("status", HttpStatus.NOT_FOUND.value());
+        body.put("error", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
     @ExceptionHandler(Exception.class)

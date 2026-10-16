@@ -16,6 +16,7 @@
 
 package com.smartinventory.catalog.model;
 
+import com.smartinventory.catalog.security.xss.NoXss;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -35,14 +36,18 @@ public class Product {
 
     @Indexed(unique = true)
     @NotBlank(message = "SKU is mandatory")
+    @NoXss
     private String sku;
 
     @NotBlank(message = "Name is mandatory")
+    @NoXss
     private String name;
 
+    @NoXss
     private String description;
 
     @NotBlank(message = "Category is mandatory")
+    @NoXss
     private String category;
 
     @NotNull(message = "Price is mandatory")

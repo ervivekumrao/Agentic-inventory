@@ -16,6 +16,7 @@
 
 package com.smartinventory.catalog.exception;
 
+import com.smartinventory.catalog.security.xss.XssException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,17 @@ import static org.junit.jupiter.api.Assertions.*;
 class GlobalExceptionHandlerTest {
 
     private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
+
+    @Test
+    void handleXssException_shouldReturnBadRequest() {
+        XssException ex = new XssException("Potential XSS detected", "sku", "<script>");
+        ResponseEntity<Map<String, Object>> response = handler.handleXssException(ex);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Security violation: Potential Cross-Site Scripting (XSS) detected.", response.getBody().get("error"));
+        assertEquals(400, response.getBody().get("status"));
+    }
 
     @Test
     void handleIllegalArgumentException_shouldReturnBadRequest() {

@@ -71,6 +71,13 @@ class CatalogControllerTest {
     }
 
     @Test
+    void getAllProducts_withXssCategory_shouldReturnBadRequest() throws Exception {
+        mockMvc.perform(get("/api/catalog").param("category", "<script>alert('XSS')</script>"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Security violation: Potential Cross-Site Scripting (XSS) detected."));
+    }
+
+    @Test
     void getProductById_shouldReturnProduct_whenExists() throws Exception {
         Product p = new Product("SKU-001", "Phone", "Smartphone", "Electronics", BigDecimal.valueOf(500.00), null);
         p.setId("1");
@@ -87,6 +94,13 @@ class CatalogControllerTest {
 
         mockMvc.perform(get("/api/catalog/999"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getProductById_withXssId_shouldReturnBadRequest() throws Exception {
+        mockMvc.perform(get("/api/catalog/<script>"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Security violation: Potential Cross-Site Scripting (XSS) detected."));
     }
 
     @Test
@@ -108,6 +122,13 @@ class CatalogControllerTest {
     }
 
     @Test
+    void getProductBySku_withXssSku_shouldReturnBadRequest() throws Exception {
+        mockMvc.perform(get("/api/catalog/sku/<script>"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Security violation: Potential Cross-Site Scripting (XSS) detected."));
+    }
+
+    @Test
     void createProduct_shouldReturnCreated() throws Exception {
         Product p = new Product("SKU-002", "Tablet", "Tab desc", "Electronics", BigDecimal.valueOf(300.00), null);
         p.setId("2");
@@ -118,6 +139,39 @@ class CatalogControllerTest {
                 .content(objectMapper.writeValueAsString(p)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.sku").value("SKU-002"));
+    }
+
+    @Test
+    void createProduct_withXssPayload_shouldReturnBadRequest() throws Exception {
+        Product p = new Product("<script>alert(1)</script>", "Tablet", "Tab desc", "Electronics", BigDecimal.valueOf(300.00), null);
+
+        mockMvc.perform(post("/api/catalog")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(p)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void createProductsBulk_shouldReturnCreated() throws Exception {
+        Product p = new Product("SKU-BULK-1", "Tablet", "Tab desc", "Electronics", BigDecimal.valueOf(300.00), null);
+        when(catalogService.createProductsBulk(any())).thenReturn(List.of(p));
+
+        mockMvc.perform(post("/api/catalog/bulk")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(List.of(p))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$[0].sku").value("SKU-BULK-1"));
+    }
+
+    @Test
+    void createProductsBulk_withXssPayload_shouldReturnBadRequest() throws Exception {
+        Product p = new Product("SKU-001", "<img src=x onerror=alert(1)>", "Desc", "Electronics", BigDecimal.valueOf(100.00), null);
+
+        mockMvc.perform(post("/api/catalog/bulk")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(List.of(p))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Security violation: Potential Cross-Site Scripting (XSS) detected."));
     }
 
     @Test
@@ -145,6 +199,17 @@ class CatalogControllerTest {
     }
 
     @Test
+    void updateProduct_withXssId_shouldReturnBadRequest() throws Exception {
+        Product p = new Product("SKU-002", "Tablet", "Tab desc", "Electronics", BigDecimal.valueOf(350.00), null);
+
+        mockMvc.perform(put("/api/catalog/<script>")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(p)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Security violation: Potential Cross-Site Scripting (XSS) detected."));
+    }
+
+    @Test
     void deleteProduct_shouldReturnNoContent_whenExists() throws Exception {
         doNothing().when(catalogService).deleteProduct("1");
 
@@ -158,5 +223,12 @@ class CatalogControllerTest {
 
         mockMvc.perform(delete("/api/catalog/999"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteProduct_withXssId_shouldReturnBadRequest() throws Exception {
+        mockMvc.perform(delete("/api/catalog/<script>"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Security violation: Potential Cross-Site Scripting (XSS) detected."));
     }
 }
