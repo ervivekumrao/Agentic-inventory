@@ -21,6 +21,7 @@ import com.smartinventory.inventory.kafka.StockUpdateEvent;
 import com.smartinventory.inventory.model.InventoryItem;
 import com.smartinventory.inventory.model.StockTransaction;
 import com.smartinventory.inventory.repository.InventoryRepository;
+import com.smartinventory.inventory.repository.InventoryReservationUnitRepository;
 import com.smartinventory.inventory.repository.StockTransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,9 @@ class InventoryServiceTest {
 
     @Mock
     private KafkaProducerService kafkaProducerService;
+
+    @Mock
+    private InventoryReservationUnitRepository unitRepository;
 
     @InjectMocks
     private InventoryService inventoryService;
@@ -77,7 +81,7 @@ class InventoryServiceTest {
     @Test
     void getLowStockItems_shouldReturnFilteredList() {
         InventoryItem lowItem = new InventoryItem("SKU-002", 5, 10, "Warehouse-A");
-        when(inventoryRepository.findAll()).thenReturn(List.of(item, lowItem));
+        when(inventoryRepository.findLowStockItems()).thenReturn(List.of(lowItem));
 
         List<InventoryItem> lowStock = inventoryService.getLowStockItems();
         assertEquals(1, lowStock.size());
@@ -124,6 +128,25 @@ class InventoryServiceTest {
         when(inventoryRepository.findBySku("UNKNOWN")).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> inventoryService.adjustStock("UNKNOWN", 10, "IN", "PO-1"));
+    }
+
+    @Test
+    void deleteInventoryItem_shouldDeleteAndPublish_whenExists() {
+        when(inventoryRepository.existsBySku("SKU-001")).thenReturn(true);
+
+        inventoryService.deleteInventoryItem("SKU-001");
+
+        verify(unitRepository, times(1)).deleteBySku("SKU-001");
+        verify(inventoryRepository, times(1)).deleteBySku("SKU-001");
+        verify(transactionRepository, times(1)).save(any(StockTransaction.class));
+        verify(kafkaProducerService, times(1)).sendStockUpdateEvent(any(StockUpdateEvent.class));
+    }
+
+    @Test
+    void deleteInventoryItem_shouldThrowException_whenNotFound() {
+        when(inventoryRepository.existsBySku("UNKNOWN")).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () -> inventoryService.deleteInventoryItem("UNKNOWN"));
     }
 
     @Test

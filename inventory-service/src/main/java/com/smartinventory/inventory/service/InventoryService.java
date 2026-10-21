@@ -21,9 +21,11 @@ import com.smartinventory.inventory.kafka.StockUpdateEvent;
 import com.smartinventory.inventory.model.InventoryItem;
 import com.smartinventory.inventory.model.StockTransaction;
 import com.smartinventory.inventory.repository.InventoryRepository;
+import com.smartinventory.inventory.repository.InventoryReservationUnitRepository;
 import com.smartinventory.inventory.repository.StockTransactionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,13 +40,17 @@ public class InventoryService {
     private final InventoryRepository inventoryRepository;
     private final StockTransactionRepository transactionRepository;
     private final KafkaProducerService kafkaProducerService;
+    private final InventoryReservationUnitRepository unitRepository;
 
+    @Autowired
     public InventoryService(InventoryRepository inventoryRepository,
                             StockTransactionRepository transactionRepository,
-                            KafkaProducerService kafkaProducerService) {
+                            KafkaProducerService kafkaProducerService,
+                            @Autowired(required = false) InventoryReservationUnitRepository unitRepository) {
         this.inventoryRepository = inventoryRepository;
         this.transactionRepository = transactionRepository;
         this.kafkaProducerService = kafkaProducerService;
+        this.unitRepository = unitRepository;
     }
 
     public List<InventoryItem> getAllInventory() {
@@ -58,11 +64,9 @@ public class InventoryService {
     }
 
     public List<InventoryItem> getLowStockItems() {
-        log.trace("Evaluating low stock items against reorder thresholds");
-        List<InventoryItem> lowStockItems = inventoryRepository.findAll().stream()
-                .filter(item -> item.getQuantity() <= item.getReorderThreshold())
-                .toList();
-        log.debug("Identified {} low stock items", lowStockItems.size());
+        log.trace("Evaluating low stock items against reorder thresholds via database index");
+        List<InventoryItem> lowStockItems = inventoryRepository.findLowStockItems();
+        log.debug("Identified {} low stock items from database query", lowStockItems.size());
         return lowStockItems;
     }
 
@@ -119,6 +123,23 @@ public class InventoryService {
 
         log.debug("Updated stock for SKU: {} to new quantity: {}", sku, newQuantity);
         return updated;
+    }
+
+    @Transactional
+    public void deleteInventoryItem(String sku) {
+        log.info("Deleting inventory item for SKU: {}", sku);
+        if (!inventoryRepository.existsBySku(sku)) {
+            log.warn("Delete failed, SKU not found: {}", sku);
+            throw new IllegalArgumentException("Inventory item not found for SKU: " + sku);
+        }
+
+        inventoryRepository.deleteBySku(sku);
+        if (unitRepository != null) {
+            unitRepository.deleteBySku(sku);
+        }
+        transactionRepository.save(new StockTransaction(sku, 0, "DELETED", "MANUAL"));
+        kafkaProducerService.sendStockUpdateEvent(new StockUpdateEvent(sku, 0, "DELETED"));
+        log.info("Successfully deleted inventory item and associated units for SKU: {}", sku);
     }
 
     public List<StockTransaction> getTransactionsForSku(String sku) {

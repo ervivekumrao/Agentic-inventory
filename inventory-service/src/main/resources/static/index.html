@@ -15,877 +15,1093 @@
 -->
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Inventory AI Assistant</title>
+    <title>Smart Inventory - Operations & High-Scale Reservation Hub</title>
     <link href="/vendor/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/vendor/bootstrap-icons.css">
-    <script src="/vendor/marked.min.js"></script>
-    <!-- SheetJS for modern Excel (.xlsx) OpenXML Spreadsheets -->
-    <script src="/vendor/xlsx.full.min.js"></script>
-    <!-- docx.js for modern Microsoft Word (.docx) OpenXML Documents -->
-    <script src="/vendor/docx.umd.js"></script>
-    <!-- html2pdf for modern PDF (.pdf) Documents -->
-    <script src="/vendor/html2pdf.bundle.min.js"></script>
     <script src="/vendor/bootstrap.bundle.min.js"></script>
     <style>
-        :root {
+        :root, [data-theme="dark"] {
             --bg-body: #0b0f19;
             --bg-surface: #111827;
-            --bg-surface-elevated: #1f2937;
-            --bubble-agent: #151e2e;
-            --bubble-user: #2563eb;
-            --border-subtle: #243044;
-            --border-hover: #3b82f6;
+            --bg-card: #151d30;
+            --bg-card-hover: #1c263d;
+            --bg-card-nested: #0d1424;
+            --border-subtle: #233148;
+            --border-hover: #38bdf8;
             --primary: #38bdf8;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
+            --primary-gradient: linear-gradient(135deg, #0284c7, #2563eb);
+            --accent-green: #22c55e;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --text-heading: #f8fafc;
+            --text-body: #cbd5e1;
+            --text-muted: #94a3b8;
+            --input-bg: #0b1120;
+            --input-border: #2b3d5b;
+            --input-text: #f8fafc;
+            --input-placeholder: #64748b;
+            --modal-bg: #151d30;
+            --modal-header-bg: #111827;
+            --modal-border: #2b3d5b;
+            --table-th-bg: rgba(255, 255, 255, 0.03);
+            --table-hover: rgba(56, 189, 248, 0.05);
+            --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.35);
+            --shadow-modal: 0 20px 48px rgba(0, 0, 0, 0.6);
+            --tech-callout-bg: rgba(56, 189, 248, 0.07);
+            --tech-callout-border: rgba(56, 189, 248, 0.25);
+            --badge-wh-bg: rgba(255, 255, 255, 0.08);
+            --badge-wh-text: #cbd5e1;
         }
 
-        * {
-            box-sizing: border-box;
+        [data-theme="light"] {
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f1f5f9;
+            --bg-card-nested: #f8fafc;
+            --border-subtle: #e2e8f0;
+            --border-hover: #0284c7;
+            --primary: #0284c7;
+            --primary-gradient: linear-gradient(135deg, #0284c7, #1d4ed8);
+            --accent-green: #16a34a;
+            --accent-amber: #d97706;
+            --accent-red: #dc2626;
+            --text-heading: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+            --input-text: #0f172a;
+            --input-placeholder: #94a3b8;
+            --modal-bg: #ffffff;
+            --modal-header-bg: #f8fafc;
+            --modal-border: #e2e8f0;
+            --table-th-bg: #f8fafc;
+            --table-hover: #f1f5f9;
+            --shadow-card: 0 4px 12px rgba(15, 23, 42, 0.06);
+            --shadow-modal: 0 20px 48px rgba(15, 23, 42, 0.18);
+            --tech-callout-bg: rgba(2, 132, 199, 0.06);
+            --tech-callout-border: rgba(2, 132, 199, 0.2);
+            --badge-wh-bg: rgba(15, 23, 42, 0.06);
+            --badge-wh-text: #334155;
         }
 
         body {
             background-color: var(--bg-body);
-            color: var(--text-primary);
+            color: var(--text-body);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, Helvetica, Arial, sans-serif;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             margin: 0;
-            overflow: hidden;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
-        /* Top Header */
-        .app-header {
+        /* Top Header Navigation */
+        .navbar-custom {
             background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-subtle);
-            padding: 0.85rem 1.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            z-index: 20;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            padding: 0.85rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .header-brand {
+        .brand-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text-heading);
             display: flex;
             align-items: center;
             gap: 0.75rem;
         }
 
-        .header-brand-icon {
-            width: 38px;
-            height: 38px;
-            background: linear-gradient(135deg, #0284c7, #6366f1);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.25rem;
-            box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35);
-        }
-
-        .header-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: -0.01em;
-            color: var(--text-primary);
-            margin: 0;
-            line-height: 1.2;
-        }
-
-        .header-subtitle {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin: 0;
-        }
-
-        .live-tag {
-            font-size: 0.725rem;
-            background-color: rgba(34, 197, 94, 0.12);
-            color: #4ade80;
-            border: 1px solid rgba(34, 197, 94, 0.25);
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            font-weight: 500;
-        }
-
-        .live-tag::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            background-color: #22c55e;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 6px #22c55e;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .btn-header {
-            background-color: transparent;
-            border: 1px solid var(--border-subtle);
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            padding: 0.4rem 0.8rem;
-            border-radius: 8px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            transition: all 0.15s ease;
-            cursor: pointer;
-        }
-
-        .btn-header:hover {
-            background-color: var(--bg-surface-elevated);
-            color: var(--text-primary);
-            border-color: var(--border-hover);
-        }
-
-        /* Message Stream */
-        .chat-scroll-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1.5rem 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-            scroll-behavior: smooth;
-        }
-
-        .message-item {
-            display: flex;
-            gap: 0.85rem;
-            max-width: 90%;
-            animation: fadeIn 0.2s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /*noinspection CssUnusedSymbol*/
-        .message-item.user {
-            align-self: flex-end;
-            flex-direction: row-reverse;
-        }
-
-        .message-item.agent {
-            align-self: flex-start;
-        }
-
-        .msg-avatar {
+        .brand-icon {
             width: 36px;
             height: 36px;
-            border-radius: 10px;
+            background: linear-gradient(135deg, #0284c7, #6366f1);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
-            flex-shrink: 0;
-        }
-
-        .message-item.agent .msg-avatar {
-            background: linear-gradient(135deg, #0284c7, #3b82f6);
             color: white;
-            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+            font-size: 1.15rem;
         }
 
-        .message-item.user .msg-avatar {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            color: white;
-            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+        .main-container {
+            padding: 1.75rem 2rem;
+            flex: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
         }
 
-        .msg-body-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 0.35rem;
-            max-width: 100%;
-        }
-
-        .msg-bubble {
-            padding: 0.85rem 1.15rem;
-            border-radius: 12px;
-            font-size: 0.925rem;
-            line-height: 1.55;
-            word-break: break-word;
-        }
-
-        .message-item.user .msg-bubble {
-            background-color: var(--bubble-user);
-            color: #ffffff;
-            border-bottom-right-radius: 3px;
-            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
-        }
-
-        .message-item.agent .msg-bubble {
-            background-color: var(--bubble-agent);
+        /* Stat Cards */
+        .kpi-card {
+            background-color: var(--bg-card);
             border: 1px solid var(--border-subtle);
-            color: var(--text-primary);
-            border-bottom-left-radius: 3px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: var(--shadow-card);
+            transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.2s ease;
         }
 
-        .msg-actions {
-            display: flex;
-            align-items: center;
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-hover);
+        }
+
+        .kpi-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .kpi-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            line-height: 1.1;
+        }
+
+        /* Main Container Cards */
+        .content-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 1.5rem;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .inner-card {
+            background-color: var(--bg-card-nested);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1.25rem;
+            height: 100%;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .nav-tabs-custom {
+            border-bottom: 1px solid var(--border-subtle);
             gap: 0.5rem;
-            padding-left: 0.25rem;
-            margin-top: 0.2rem;
-            flex-wrap: wrap;
         }
 
-        .btn-copy, .btn-export-item {
-            background: transparent;
+        .nav-tabs-custom .nav-link {
+            background-color: transparent;
             border: 1px solid transparent;
             color: var(--text-muted);
-            font-size: 0.75rem;
-            cursor: pointer;
-            padding: 0.15rem 0.45rem;
-            border-radius: 5px;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            transition: all 0.15s ease;
-        }
-
-        .btn-copy:hover {
-            color: var(--primary);
-            background-color: rgba(56, 189, 248, 0.1);
-            border-color: rgba(56, 189, 248, 0.25);
-        }
-
-        .btn-export-item:hover {
-            background-color: rgba(255, 255, 255, 0.06);
-            border-color: var(--border-subtle);
-        }
-
-        .btn-export-item.excel:hover {
-            color: #4ade80 !important;
-            background-color: rgba(34, 197, 94, 0.12);
-            border-color: rgba(34, 197, 94, 0.3);
-        }
-
-        .btn-export-item.docx:hover {
-            color: #60a5fa !important;
-            background-color: rgba(37, 99, 235, 0.12);
-            border-color: rgba(37, 99, 235, 0.3);
-        }
-
-        .btn-export-item.pdf:hover {
-            color: #f87171 !important;
-            background-color: rgba(239, 68, 68, 0.12);
-            border-color: rgba(239, 68, 68, 0.3);
-        }
-
-        /* Direct & Clean Markdown Styles */
-        .msg-bubble p {
-            margin-bottom: 0.65rem;
-        }
-
-        .msg-bubble p:last-child {
-            margin-bottom: 0;
-        }
-
-        .msg-bubble h1, .msg-bubble h2, .msg-bubble h3, .msg-bubble h4 {
-            color: #f1f5f9;
-            font-weight: 700;
-            margin-top: 0.25rem;
-            margin-bottom: 0.65rem;
-            font-size: 1.05rem;
-        }
-
-        .msg-bubble ul, .msg-bubble ol {
-            margin-bottom: 0.65rem;
-            padding-left: 1.25rem;
-        }
-
-        .msg-bubble li {
-            margin-bottom: 0.25rem;
-        }
-
-        .msg-bubble code {
-            background-color: #0d131f;
-            color: #38bdf8;
-            padding: 0.15rem 0.4rem;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        }
-
-        /* Clean Table Presentation */
-        .msg-bubble table {
-            width: 100%;
-            margin: 0.85rem 0;
-            border-collapse: separate;
-            border-spacing: 0;
-            background-color: #0b1120;
-            border: 1px solid var(--border-subtle);
-            border-radius: 8px;
-            overflow: hidden;
-            font-size: 0.85rem;
-        }
-
-        .msg-bubble th {
-            background-color: #1a2436;
-            color: #38bdf8;
-            padding: 0.6rem 0.8rem;
             font-weight: 600;
-            text-align: left;
-            border-bottom: 1px solid var(--border-subtle);
-            letter-spacing: 0.02em;
-        }
-
-        .msg-bubble td {
-            padding: 0.55rem 0.8rem;
-            border-bottom: 1px solid rgba(36, 48, 68, 0.6);
-            color: #cbd5e1;
-        }
-
-        .msg-bubble tr:last-child td {
-            border-bottom: none;
-        }
-
-        .msg-bubble tr:hover td {
-            background-color: rgba(56, 189, 248, 0.06);
-        }
-
-        .msg-bubble hr {
-            border: 0;
-            height: 1px;
-            background: var(--border-subtle);
-            margin: 0.75rem 0;
-        }
-
-        /* Typing Indicator */
-        .typing-row {
-            display: none;
-            align-items: center;
-            gap: 0.6rem;
-            padding-left: 3.25rem;
-            font-size: 0.825rem;
-            color: var(--text-muted);
-        }
-
-        .typing-pulse {
+            padding: 0.65rem 1.25rem;
+            border-radius: 8px 8px 0 0;
             display: inline-flex;
-            gap: 4px;
+            align-items: center;
+            gap: 0.45rem;
+            transition: color 0.15s ease;
         }
 
-        .typing-dot {
-            width: 6px;
-            height: 6px;
-            background-color: var(--primary);
-            border-radius: 50%;
-            animation: pulseDot 1.2s infinite ease-in-out;
+        .nav-tabs-custom .nav-link.active {
+            background-color: var(--bg-card);
+            border-color: var(--border-subtle) var(--border-subtle) transparent;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
         }
 
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes pulseDot {
-            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-            40% { transform: scale(1); opacity: 1; }
+        /* Form Inputs & Controls */
+        .form-control-custom, .form-select-custom {
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--input-text);
+            border-radius: 8px;
+            padding: 0.55rem 0.85rem;
+            font-size: 0.9rem;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
-        /* Redesigned Interaction Panel */
-        .interaction-panel {
-            background-color: var(--bg-surface);
-            border-top: 1px solid var(--border-subtle);
-            padding: 0.85rem 2rem 1.25rem 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.65rem;
-            z-index: 20;
+        .form-control-custom:focus, .form-select-custom:focus {
+            background-color: var(--input-bg);
+            border-color: var(--border-hover);
+            color: var(--input-text);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+            outline: none;
         }
 
-        /* Action Chips */
-        .chips-bar {
-            display: flex;
-            gap: 0.5rem;
-            overflow-x: auto;
-            scrollbar-width: none;
-            padding-bottom: 0.15rem;
+        .form-control-custom::placeholder {
+            color: var(--input-placeholder);
         }
 
-        .chips-bar::-webkit-scrollbar {
-            display: none;
+        /* High-contrast, crystal-clear labels for all modals and forms */
+        .form-label, label {
+            color: var(--text-heading) !important;
+            font-weight: 600 !important;
+            font-size: 0.825rem !important;
+            letter-spacing: 0.015em;
+            margin-bottom: 0.4rem !important;
+            display: block;
         }
 
-        .chip-button {
-            background-color: #172033;
-            color: #94a3b8;
-            border: 1px solid var(--border-subtle);
-            border-radius: 18px;
-            padding: 0.35rem 0.85rem;
-            font-size: 0.8rem;
-            font-weight: 500;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.15s ease;
+        /* Table Styling */
+        .table-custom {
+            color: var(--text-body);
+            vertical-align: middle;
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+
+        .table-custom th {
+            background-color: var(--table-th-bg);
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.04em;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .table-custom td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .table-custom tbody tr:hover {
+            background-color: var(--table-hover);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.65rem;
+            border-radius: 6px;
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
         }
 
-        .chip-button:hover {
-            background-color: #1e293b;
-            color: #f8fafc;
-            border-color: var(--border-hover);
-            transform: translateY(-1px);
+        .badge-healthy {
+            background: rgba(34, 197, 94, 0.12);
+            color: var(--accent-green);
+            border: 1px solid rgba(34, 197, 94, 0.3);
         }
 
-        /* Input Controls */
-        .input-bar {
-            display: flex;
-            align-items: center;
-            background-color: #0b1120;
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 0.35rem 0.5rem 0.35rem 1rem;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+        .badge-low {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--accent-amber);
+            border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
-        .input-bar:focus-within {
-            border-color: var(--border-hover);
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+        .badge-out {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
-        .chat-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            outline: none;
-            padding: 0.5rem 0.25rem;
+        .badge-wh {
+            background-color: var(--badge-wh-bg);
+            color: var(--badge-wh-text);
+            font-weight: 500;
         }
 
-        .chat-input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .btn-send {
-            background: linear-gradient(135deg, #0284c7, #2563eb);
+        /* Action Buttons */
+        .btn-action-primary {
+            background: var(--primary-gradient);
             color: white;
             border: none;
             border-radius: 8px;
-            padding: 0.55rem 1.15rem;
-            font-size: 0.875rem;
             font-weight: 600;
-            cursor: pointer;
+            padding: 0.5rem 1rem;
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
             transition: all 0.15s ease;
         }
 
-        .btn-send:hover {
-            opacity: 0.92;
+        .btn-action-primary:hover {
+            opacity: 0.94;
+            color: white;
             transform: translateY(-1px);
         }
 
-        .btn-send:active {
-            transform: translateY(0);
-        }
-
-        /* Toast Notification */
-        .toast-notification {
-            position: fixed;
-            bottom: 86px;
-            right: 28px;
-            background-color: #1e293b;
-            color: #f8fafc;
-            border: 1px solid #38bdf8;
-            padding: 0.65rem 1.15rem;
+        .btn-theme-toggle {
+            background-color: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-heading);
+            padding: 0.4rem 0.75rem;
             border-radius: 8px;
             font-size: 0.85rem;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-            z-index: 9999;
-            display: none;
+            font-weight: 600;
+            display: inline-flex;
             align-items: center;
-            gap: 0.55rem;
-            animation: fadeIn 0.15s ease-in-out;
+            gap: 0.4rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-theme-toggle:hover {
+            border-color: var(--border-hover);
+            color: var(--primary);
+        }
+
+        /* Tech Callout Banner */
+        .tech-callout {
+            background: var(--tech-callout-bg);
+            border: 1px solid var(--tech-callout-border);
+            border-radius: 10px;
+            padding: 1.15rem 1.35rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* Custom Modern Modal Styling */
+        .modal-content-custom {
+            background-color: var(--modal-bg);
+            border: 1px solid var(--modal-border);
+            color: var(--text-body);
+            border-radius: 16px;
+            box-shadow: var(--shadow-modal);
+            overflow: hidden;
+        }
+
+        .modal-header-custom {
+            background-color: var(--modal-header-bg);
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-heading);
+            padding: 1.15rem 1.5rem;
+        }
+
+        .modal-footer-custom {
+            background-color: var(--modal-header-bg);
+            border-top: 1px solid var(--border-subtle);
+            padding: 1rem 1.5rem;
+        }
+
+        /* Pool Status Metric Boxes */
+        .metric-box {
+            background-color: var(--bg-card-nested);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 0.75rem 0.5rem;
+            transition: border-color 0.15s ease;
+        }
+
+        .metric-box:hover {
+            border-color: var(--border-hover);
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        .metric-val {
+            font-size: 1.4rem;
+            font-weight: 700;
+            line-height: 1.2;
         }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
-    <header class="app-header">
-        <div class="header-brand">
-            <div class="header-brand-icon">
+    <!-- Header Navigation -->
+    <header class="navbar navbar-custom">
+        <div class="brand-title">
+            <div class="brand-icon">
                 <i class="bi bi-box-seam-fill"></i>
             </div>
             <div>
-                <h1 class="header-title">Smart Inventory Agent</h1>
-                <p class="header-subtitle"><span class="live-tag">Online</span> Database Connected</p>
+                <span>Smart Inventory Platform</span>
+                <span class="badge bg-primary bg-opacity-25 text-primary ms-2 px-2 py-1 fs-7">High-Scale Architecture</span>
             </div>
         </div>
-        <div class="header-actions">
-            <!-- Export Dropdown -->
-            <div class="dropdown">
-                <button class="btn-header dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Export Chat Data">
-                    <i class="bi bi-box-arrow-up"></i> Export
-                </button>
-                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow-lg" aria-labelledby="exportDropdown" style="background-color: #111827; border: 1px solid var(--border-subtle); font-size: 0.85rem; min-width: 230px;">
-                    <li><h6 class="dropdown-header text-uppercase text-muted" style="font-size: 0.7rem; letter-spacing: 0.05em;">Smart Auto-Export</h6></li>
-                    <li>
-                        <button class="dropdown-item d-flex align-items-center gap-2 py-2" onclick="exportChatSmart()">
-                            <i class="bi bi-magic text-warning fs-5"></i>
-                            <span class="d-block">
-                                <span class="fw-semibold">Auto by Data Type</span><br>
-                                <small class="text-muted" style="font-size: 0.72rem;">Tables &rarr; .xlsx, Reports &rarr; .docx/.pdf</small>
-                            </span>
-                        </button>
-                    </li>
-                    <li><hr class="dropdown-divider" style="border-color: var(--border-subtle);"></li>
-                    <li><h6 class="dropdown-header text-uppercase text-muted" style="font-size: 0.7rem; letter-spacing: 0.05em;">Latest Formats</h6></li>
-                    <li>
-                        <button class="dropdown-item d-flex align-items-center gap-2 py-2" onclick="exportChatExcel()">
-                            <i class="bi bi-file-earmark-excel-fill text-success fs-5"></i>
-                            <span class="d-block">
-                                <span class="fw-semibold">Excel Spreadsheet (.xlsx)</span><br>
-                                <small class="text-muted" style="font-size: 0.72rem;">Native OpenXML Workbook</small>
-                            </span>
-                        </button>
-                    </li>
-                    <li>
-                        <button class="dropdown-item d-flex align-items-center gap-2 py-2" onclick="exportChatDocx()">
-                            <i class="bi bi-file-earmark-word-fill text-primary fs-5"></i>
-                            <span class="d-block">
-                                <span class="fw-semibold">Word Document (.docx)</span><br>
-                                <small class="text-muted" style="font-size: 0.72rem;">Modern OpenXML Document</small>
-                            </span>
-                        </button>
-                    </li>
-                    <li>
-                        <button class="dropdown-item d-flex align-items-center gap-2 py-2" onclick="exportChatPdf()">
-                            <i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>
-                            <span class="d-block">
-                                <span class="fw-semibold">PDF Document (.pdf)</span><br>
-                                <small class="text-muted" style="font-size: 0.72rem;">Printable A4 Report</small>
-                            </span>
-                        </button>
-                    </li>
-                </ul>
-            </div>
-
-            <button class="btn-header" onclick="clearConversation()" title="Clear Chat History">
-                <i class="bi bi-arrow-counterclockwise"></i> Clear
+        <div class="d-flex align-items-center gap-2">
+            <!-- Light/Dark Theme Switcher -->
+            <button class="btn-theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Light / Dark Mode">
+                <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+                <span id="themeLabel">Dark</span>
             </button>
-            <a href="/logging-admin.html" class="btn-header" title="Log Level Controller">
-                <i class="bi bi-sliders"></i> Logger Admin
+            <a href="/chat.html" class="btn btn-outline-info btn-sm px-3">
+                <i class="bi bi-robot me-1"></i> AI Assistant
             </a>
-            <!--suppress HtmlUnknownTarget -->
-            <a href="/swagger-ui.html" target="_blank" class="btn-header" title="API Docs">
-                <i class="bi bi-terminal"></i> Swagger
+            <a href="/logging-admin.html" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="bi bi-sliders me-1"></i> Logger Admin
+            </a>
+            <a href="/swagger-ui.html" target="_blank" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="bi bi-terminal me-1"></i> Swagger API
             </a>
         </div>
     </header>
 
-    <!-- Chat Messages Scroll Area -->
-    <main class="chat-scroll-area" id="chatContainer">
-        <div class="message-item agent">
-            <div class="msg-avatar">
-                <i class="bi bi-robot"></i>
-            </div>
-            <div class="msg-body-wrapper">
-                <div class="msg-bubble">
-                    Hello! I am your <strong>Smart Inventory Assistant</strong>.<br><br>
-                    Ask any direct operational query to inspect inventory stock, find extremes, or analyze forecasts:
-                    <ul class="mt-2 mb-0">
-                        <li><strong>Item Extremes</strong>: <em>"which item has highest value"</em>, <em>"which product is the most expensive"</em></li>
-                        <li><strong>Sorted Rankings</strong>: <em>"can you show top 10 inventory data sorted by quantity"</em></li>
-                        <li><strong>Replenishment</strong>: <em>"which items are low in stock"</em></li>
-                        <li><strong>Portfolio Scale</strong>: <em>"how many different skus stock has"</em></li>
-                    </ul>
-                </div>
-                <div class="msg-actions">
-                    <button class="btn-copy" onclick="copyText(this)">
-                        <i class="bi bi-clipboard"></i> Copy
-                    </button>
-                    <button class="btn-export-item docx" onclick="exportMessageDocx(this)" title="Export to Word (.docx)">
-                        <i class="bi bi-file-earmark-word-fill text-primary"></i> Word (.docx)
-                    </button>
-                    <button class="btn-export-item pdf" onclick="exportMessagePdf(this)" title="Export to PDF (.pdf)">
-                        <i class="bi bi-file-earmark-pdf-fill text-danger"></i> PDF (.pdf)
-                    </button>
+    <main class="main-container">
+        <!-- KPI Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="kpi-card">
+                    <div class="kpi-title">Tracked Inventory SKUs</div>
+                    <div class="kpi-value text-info" id="kpiTotalSkus">0</div>
+                    <small class="text-muted"><i class="bi bi-layers me-1"></i> Distinct SKU catalog items</small>
                 </div>
             </div>
-        </div>
-    </main>
-
-    <!-- Typing Indicator -->
-    <div class="typing-row" id="typingIndicator">
-        <span>Processing query...</span>
-        <div class="typing-pulse">
-            <span class="typing-dot"></span>
-            <span class="typing-dot"></span>
-            <span class="typing-dot"></span>
-        </div>
-    </div>
-
-    <!-- Interaction Panel -->
-    <footer class="interaction-panel">
-        <!-- Quick Action Chips -->
-        <div class="chips-bar">
-            <button class="chip-button" onclick="exportChatSmart()" title="Auto-detect data type and export">
-                <i class="bi bi-box-arrow-up-right text-warning"></i> Export (Auto Format)
-            </button>
-            <button class="chip-button" onclick="sendQuickQuery('which item has highest value')">
-                <i class="bi bi-trophy-fill text-warning"></i> Highest Value Item
-            </button>
-            <button class="chip-button" onclick="sendQuickQuery('can you show top 10 inventory data sorted by quantity')">
-                <i class="bi bi-sort-numeric-down text-info"></i> Top 10 by Quantity
-            </button>
-            <button class="chip-button" onclick="sendQuickQuery('Which items are low in stock and need reordering?')">
-                <i class="bi bi-exclamation-triangle-fill text-danger"></i> Low Stock Items
-            </button>
-            <button class="chip-button" onclick="sendQuickQuery('can you share this data in more details in tabular form?')">
-                <i class="bi bi-table text-primary"></i> Tabular Matrix
-            </button>
-            <button class="chip-button" onclick="sendQuickQuery('What is our total inventory valuation and warehouse breakdown?')">
-                <i class="bi bi-currency-dollar text-success"></i> Portfolio Valuation
-            </button>
-            <button class="chip-button" onclick="sendQuickQuery('how many different skus stock has?')">
-                <i class="bi bi-hash text-light"></i> SKU Count
-            </button>
+            <div class="col-lg-3 col-md-6">
+                <div class="kpi-card">
+                    <div class="kpi-title">Total Units In Stock</div>
+                    <div class="kpi-value text-success" id="kpiTotalQuantity">0</div>
+                    <small class="text-muted"><i class="bi bi-boxes me-1"></i> Master physical ledger</small>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="kpi-card">
+                    <div class="kpi-title">Low Stock Reorder Alerts</div>
+                    <div class="kpi-value text-warning" id="kpiLowStockCount">0</div>
+                    <small class="text-muted"><i class="bi bi-bell-fill me-1"></i> At or below safety threshold</small>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="kpi-card">
+                    <div class="kpi-title">Locking Strategy</div>
+                    <div class="kpi-value text-primary" style="font-size: 1.25rem;">SKIP LOCKED</div>
+                    <small class="text-muted"><i class="bi bi-shield-check me-1"></i> Shopify Non-Blocking Pool</small>
+                </div>
+            </div>
         </div>
 
-        <!-- Input Bar -->
-        <div class="input-bar">
-            <input 
-                type="text" 
-                id="userInput" 
-                class="chat-input" 
-                placeholder="Ask a point-to-point question (e.g. which item has highest value)..." 
-                onkeydown="handleKeyPress(event)" 
-                autocomplete="off"
-                aria-label="Inventory query input"
-            >
-            <button class="btn-send" onclick="submitMessage()" id="sendBtn" title="Send Query">
-                <span>Send</span>
-                <i class="bi bi-arrow-up-right"></i>
-            </button>
-        </div>
-    </footer>
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs nav-tabs-custom mb-3" id="hubTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="inventory-tab" data-bs-toggle="tab" data-bs-target="#inventoryPanel" type="button" role="tab">
+                    <i class="bi bi-table"></i> Inventory Ledger (Add / Delete / Adjust)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reservations-tab" data-bs-toggle="tab" data-bs-target="#reservationsPanel" type="button" role="tab">
+                    <i class="bi bi-lightning-charge-fill text-warning"></i> Shopify-Style Non-Blocking Reservations
+                </button>
+            </li>
+        </ul>
 
-    <!-- Toast Feedback -->
-    <div id="toastNotification" class="toast-notification"></div>
+        <!-- Tab Content -->
+        <div class="tab-content" id="hubTabContent">
 
-    <script>
-        const chatContainer = document.getElementById('chatContainer');
-        const userInput = document.getElementById('userInput');
-        const typingIndicator = document.getElementById('typingIndicator');
-
-        if (typeof marked !== 'undefined') {
-            marked.setOptions({
-                gfm: true,
-                breaks: true
-            });
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                submitMessage();
-            }
-        }
-
-        function sendQuickQuery(text) {
-            userInput.value = text;
-            submitMessage();
-        }
-
-        function clearConversation() {
-            chatContainer.innerHTML = `
-                <div class="message-item agent">
-                    <div class="msg-avatar"><i class="bi bi-robot"></i></div>
-                    <div class="msg-body-wrapper">
-                        <div class="msg-bubble">
-                            Conversation cleared. How can I assist you with your inventory today?
+            <!-- TAB 1: INVENTORY MANAGEMENT -->
+            <div class="tab-pane fade show active" id="inventoryPanel" role="tabpanel">
+                <div class="content-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-3 flex-wrap">
+                            <input type="text" id="inventorySearch" class="form-control-custom" placeholder="Filter by SKU or location..." oninput="filterInventoryTable()">
+                            <select id="warehouseFilter" class="form-select-custom" onchange="filterInventoryTable()">
+                                <option value="ALL">All Warehouses</option>
+                                <option value="Warehouse-North">Warehouse-North</option>
+                                <option value="Warehouse-South">Warehouse-South</option>
+                                <option value="Warehouse-East">Warehouse-East</option>
+                                <option value="Warehouse-West">Warehouse-West</option>
+                                <option value="Central-Hub">Central-Hub</option>
+                            </select>
+                            <div class="form-check form-switch ms-2">
+                                <input class="form-check-input" type="checkbox" id="lowStockOnlySwitch" onchange="filterInventoryTable()">
+                                <label class="form-check-label text-warning small fw-bold mb-0" for="lowStockOnlySwitch">Low Stock Only</label>
+                            </div>
                         </div>
-                        <div class="msg-actions">
-                            <button class="btn-copy" onclick="copyText(this)"><i class="bi bi-clipboard"></i> Copy</button>
-                            <button class="btn-export-item docx" onclick="exportMessageDocx(this)"><i class="bi bi-file-earmark-word-fill text-primary"></i> Word (.docx)</button>
-                            <button class="btn-export-item pdf" onclick="exportMessagePdf(this)"><i class="bi bi-file-earmark-pdf-fill text-danger"></i> PDF (.pdf)</button>
+
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="loadInventory()">
+                                <i class="bi bi-arrow-clockwise"></i> Refresh
+                            </button>
+                            <button class="btn-action-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                                <i class="bi bi-plus-circle-fill"></i> Add Inventory Item
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Quantity</th>
+                                    <th>Reorder Point</th>
+                                    <th>Warehouse Location</th>
+                                    <th>Status</th>
+                                    <th style="width: 230px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTableBody">
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">
+                                        <div class="spinner-border spinner-border-sm text-info me-2"></div> Loading inventory records...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: SHOPIFY-STYLE RESERVATIONS & BENCHMARK -->
+            <div class="tab-pane fade" id="reservationsPanel" role="tabpanel">
+                <div class="content-card">
+                    <div class="tech-callout">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <i class="bi bi-info-circle-fill text-info fs-5"></i>
+                            <strong style="color: var(--text-heading);">Shopify High-Scale Flash Sale Architecture (Millions of Requests/Minute)</strong>
+                        </div>
+                        <p class="mb-0" style="color: var(--text-body); font-size: 0.85rem; line-height: 1.5;">
+                            Traditional row updates (<code>UPDATE items SET qty = qty - 1 WHERE sku = 'HOT-SKU'</code>) fail under peak flash sales because thousands of concurrent checkouts block each other on a single database row lock, causing database connection exhaustion and lock wait timeouts.<br/>
+                            Inspired by <strong>Shopify's engineering breakthrough</strong>, this service represents available units as individual rows inside a bounded pool and selects units atomically using <strong><code>FOR UPDATE SKIP LOCKED</code></strong>.
+                            Concurrent checkouts skip locked units and lock free units in parallel with <strong>sub-millisecond hold times</strong>!
+                        </p>
+                    </div>
+
+                    <div class="row g-4">
+                        <!-- Left: Live Reservation Test -->
+                        <div class="col-lg-5">
+                            <div class="inner-card">
+                                <h6 class="text-primary fw-bold mb-3"><i class="bi bi-cart-check-fill me-1"></i> Interactive Checkout Reservation</h6>
+                                <div class="mb-3">
+                                    <label class="form-label" for="reserveSkuSelect">Target SKU</label>
+                                    <select id="reserveSkuSelect" class="form-select-custom w-100" onchange="refreshPoolStatus()">
+                                        <!-- Dynamically populated -->
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="reserveQtyInput">Quantity to Reserve</label>
+                                    <input type="number" id="reserveQtyInput" class="form-control-custom w-100" value="1" min="1" max="100">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="reserveIdInput">Cart / Order Token (Idempotency Key)</label>
+                                    <input type="text" id="reserveIdInput" class="form-control-custom w-100" placeholder="e.g. CART-994821">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="reserveTtlInput">Hold Time-To-Live (TTL in seconds)</label>
+                                    <input type="number" id="reserveTtlInput" class="form-control-custom w-100" value="600">
+                                </div>
+                                <button class="btn btn-action-primary w-100 mb-3" onclick="executeReservation()">
+                                    <i class="bi bi-lock-fill"></i> Reserve Units Non-Blocking (SKIP LOCKED)
+                                </button>
+                                <div id="reservationResultAlert"></div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Pool Observability & Flash Sale Simulation -->
+                        <div class="col-lg-7">
+                            <div class="inner-card mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="text-info fw-bold mb-0"><i class="bi bi-speedometer2 me-1"></i> Bounded Unit Pool Live Metrics</h6>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="refreshPoolStatus()"><i class="bi bi-arrow-clockwise"></i> Inspect</button>
+                                </div>
+                                <div class="row g-2 text-center" id="poolStatusRow">
+                                    <div class="col-3">
+                                        <div class="metric-box">
+                                            <div class="metric-label">Master Stock</div>
+                                            <div class="metric-val text-info" id="poolMasterStock">-</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="metric-box">
+                                            <div class="metric-label">Available</div>
+                                            <div class="metric-val text-success" id="poolAvailableUnits">-</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="metric-box">
+                                            <div class="metric-label">Reserved</div>
+                                            <div class="metric-val text-warning" id="poolReservedUnits">-</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="metric-box">
+                                            <div class="metric-label">Claimed</div>
+                                            <div class="metric-val text-danger" id="poolClaimedUnits">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Flash Sale Stress Simulator -->
+                            <div class="inner-card">
+                                <h6 class="text-warning fw-bold mb-2"><i class="bi bi-fire me-1"></i> Concurrency Flash Sale Stress Simulator</h6>
+                                <p class="small text-muted mb-3">
+                                    Launches parallel threads hitting the exact same SKU simultaneously to benchmark non-blocking locking throughput.
+                                </p>
+                                <div class="row g-2 align-items-center mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label" for="simThreadsInput">Concurrent Checkouts (Threads)</label>
+                                        <input type="number" id="simThreadsInput" class="form-control-custom w-100" value="30" min="5" max="100">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label" for="simQtyInput">Units per Checkout</label>
+                                        <input type="number" id="simQtyInput" class="form-control-custom w-100" value="1" min="1" max="10">
+                                    </div>
+                                </div>
+                                <button class="btn btn-warning w-100 fw-bold py-2" onclick="runFlashSaleSimulation()">
+                                    <i class="bi bi-rocket-takeoff-fill"></i> Simulate Peak Flash Sale Surge
+                                </button>
+                                <div id="simulationResult" class="mt-3"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            `;
-            userInput.value = '';
-            userInput.focus();
-            showToast('Conversation cleared', 'info');
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal: Add Inventory Item -->
+    <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header modal-header-custom">
+                    <h5 class="modal-title" id="addItemModalLabel"><i class="bi bi-plus-circle text-info me-2"></i>Add Inventory Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label" for="addSku">Product SKU</label>
+                        <input type="text" id="addSku" class="form-control-custom w-100" placeholder="e.g. SMART-WATCH-PRO" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="addQuantity">Initial Quantity</label>
+                        <input type="number" id="addQuantity" class="form-control-custom w-100" value="50" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="addThreshold">Reorder Threshold</label>
+                        <input type="number" id="addThreshold" class="form-control-custom w-100" value="10" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="addWarehouse">Warehouse Location</label>
+                        <select id="addWarehouse" class="form-select-custom w-100">
+                            <option value="Warehouse-North">Warehouse-North</option>
+                            <option value="Warehouse-South">Warehouse-South</option>
+                            <option value="Warehouse-East">Warehouse-East</option>
+                            <option value="Warehouse-West">Warehouse-West</option>
+                            <option value="Central-Hub">Central-Hub</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer modal-footer-custom">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-action-primary" onclick="submitCreateInventory()">Create Item</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Adjust Stock -->
+    <div class="modal fade" id="adjustStockModal" tabindex="-1" aria-labelledby="adjustStockModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header modal-header-custom">
+                    <h5 class="modal-title" id="adjustStockModalLabel"><i class="bi bi-sliders text-warning me-2"></i>Adjust Stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label" for="adjustSku">Target SKU</label>
+                        <input type="text" id="adjustSku" class="form-control-custom w-100" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="adjustDelta">Quantity Delta (+ to restock, - to deduct)</label>
+                        <input type="number" id="adjustDelta" class="form-control-custom w-100" placeholder="e.g. +20 or -5" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="adjustType">Transaction Type</label>
+                        <select id="adjustType" class="form-select-custom w-100">
+                            <option value="RESTOCK">RESTOCK (Warehouse Inbound)</option>
+                            <option value="ORDER_OUT">ORDER_OUT (Fulfillment / Sale)</option>
+                            <option value="AUDIT">AUDIT (Physical Count Correction)</option>
+                            <option value="SCRAP">SCRAP (Damaged / Return)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="adjustRef">Reference / Order ID</label>
+                        <input type="text" id="adjustRef" class="form-control-custom w-100" placeholder="e.g. PO-88912">
+                    </div>
+                </div>
+                <div class="modal-footer modal-footer-custom">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning fw-bold" onclick="submitAdjustStock()">Apply Adjustment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Feedback -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
+
+    <script>
+        let allInventoryItems = [];
+
+        // Theme Management: Light and Dark Theme Support
+        function initTheme() {
+            const saved = localStorage.getItem('smart_inventory_theme');
+            const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved || (systemDark ? 'dark' : 'light');
+            applyTheme(theme);
         }
 
-        async function submitMessage() {
-            const query = userInput.value.trim();
-            if (!query) return;
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('smart_inventory_theme', theme);
+            const icon = document.getElementById('themeIcon');
+            const label = document.getElementById('themeLabel');
+            if (icon) {
+                if (theme === 'dark') {
+                    icon.className = 'bi bi-moon-stars-fill text-warning';
+                    if (label) label.textContent = 'Dark';
+                } else {
+                    icon.className = 'bi bi-sun-fill text-warning';
+                    if (label) label.textContent = 'Light';
+                }
+            }
+        }
 
-            // 1. Render User Message
-            appendUserMessage(query);
-            userInput.value = '';
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            applyTheme(next);
+        }
 
-            // 2. Show Typing Indicator
-            typingIndicator.style.display = 'flex';
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            loadInventory();
+        });
+
+        async function loadInventory() {
+            try {
+                const response = await fetch('/api/inventory');
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                allInventoryItems = await response.json();
+                updateKpis();
+                populateReservationSkuDropdown();
+                filterInventoryTable();
+            } catch (err) {
+                showToast('Failed to load inventory: ' + err.message, 'danger');
+            }
+        }
+
+        function updateKpis() {
+            const totalSkus = allInventoryItems.length;
+            const totalQuantity = allInventoryItems.reduce((acc, item) => acc + (item.quantity || 0), 0);
+            const lowStockCount = allInventoryItems.filter(item => (item.quantity || 0) <= (item.reorderThreshold || 10)).length;
+
+            document.getElementById('kpiTotalSkus').textContent = totalSkus.toLocaleString();
+            document.getElementById('kpiTotalQuantity').textContent = totalQuantity.toLocaleString();
+            document.getElementById('kpiLowStockCount').textContent = lowStockCount.toLocaleString();
+        }
+
+        function populateReservationSkuDropdown() {
+            const select = document.getElementById('reserveSkuSelect');
+            if (!select) return;
+            const currentVal = select.value;
+            select.innerHTML = '';
+            allInventoryItems.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.sku;
+                opt.textContent = `${item.sku} (${item.quantity} units - ${item.warehouseLocation || 'Main'})`;
+                select.appendChild(opt);
+            });
+            if (currentVal && allInventoryItems.some(i => i.sku === currentVal)) {
+                select.value = currentVal;
+            }
+            refreshPoolStatus();
+        }
+
+        function filterInventoryTable() {
+            const search = document.getElementById('inventorySearch').value.toLowerCase().trim();
+            const warehouse = document.getElementById('warehouseFilter').value;
+            const lowStockOnly = document.getElementById('lowStockOnlySwitch').checked;
+
+            const filtered = allInventoryItems.filter(item => {
+                const matchSearch = !search || item.sku.toLowerCase().includes(search) || (item.warehouseLocation || '').toLowerCase().includes(search);
+                const matchWarehouse = (warehouse === 'ALL') || (item.warehouseLocation === warehouse);
+                const matchLow = !lowStockOnly || ((item.quantity || 0) <= (item.reorderThreshold || 10));
+                return matchSearch && matchWarehouse && matchLow;
+            });
+
+            renderInventoryTable(filtered);
+        }
+
+        function renderInventoryTable(items) {
+            const tbody = document.getElementById('inventoryTableBody');
+            if (items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No inventory records found matching filters.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            items.forEach(item => {
+                const tr = document.createElement('tr');
+
+                const qty = item.quantity || 0;
+                const thresh = item.reorderThreshold || 10;
+                let statusBadge;
+                if (qty === 0) {
+                    statusBadge = '<span class="status-badge badge-out"><i class="bi bi-x-circle-fill"></i> Out of Stock</span>';
+                } else if (qty <= thresh) {
+                    statusBadge = '<span class="status-badge badge-low"><i class="bi bi-exclamation-triangle-fill"></i> Low Stock</span>';
+                } else {
+                    statusBadge = '<span class="status-badge badge-healthy"><i class="bi bi-check-circle-fill"></i> In Stock</span>';
+                }
+
+                tr.innerHTML = `
+                    <td class="font-monospace fw-bold text-info">${escapeHtml(item.sku)}</td>
+                    <td class="fw-bold">${qty.toLocaleString()} units</td>
+                    <td>${thresh}</td>
+                    <td><span class="badge badge-wh">${escapeHtml(item.warehouseLocation || 'General')}</span></td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-warning" onclick="openAdjustModal('${escapeJs(item.sku)}')">
+                                <i class="bi bi-sliders"></i> Adjust
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="jumpToReservation('${escapeJs(item.sku)}')">
+                                <i class="bi bi-lightning-charge"></i> Pool
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="deleteInventoryItem('${escapeJs(item.sku)}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function submitCreateInventory() {
+            const sku = document.getElementById('addSku').value.trim();
+            const quantity = parseInt(document.getElementById('addQuantity').value, 10);
+            const reorderThreshold = parseInt(document.getElementById('addThreshold').value, 10);
+            const warehouseLocation = document.getElementById('addWarehouse').value;
+
+            if (!sku) {
+                alert('SKU is mandatory');
+                return;
+            }
 
             try {
-                // 3. Call Spring Boot AI Agent Service
-                const response = await fetch('/api/ai/agent/chat', {
+                const res = await fetch('/api/inventory', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query: query })
+                    body: JSON.stringify({ sku, quantity, reorderThreshold, warehouseLocation })
                 });
 
-                typingIndicator.style.display = 'none';
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                showToast(`Successfully created inventory item ${sku}!`, 'success');
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addItemModal'));
+                if (modal) modal.hide();
+                document.getElementById('addSku').value = '';
+                await loadInventory();
+            } catch (e) {
+                showToast('Failed to create item: ' + e.message, 'danger');
+            }
+        }
 
-                if (!response.ok) {
-                    appendAgentText('⚠️ Error: Unable to retrieve response from AI Agent service.');
+        function openAdjustModal(sku) {
+            document.getElementById('adjustSku').value = sku;
+            document.getElementById('adjustDelta').value = '';
+            document.getElementById('adjustRef').value = 'REF-' + Math.floor(Math.random() * 90000 + 10000);
+            new bootstrap.Modal(document.getElementById('adjustStockModal')).show();
+        }
+
+        async function submitAdjustStock() {
+            const sku = document.getElementById('adjustSku').value;
+            const quantityChange = parseInt(document.getElementById('adjustDelta').value, 10);
+            const transactionType = document.getElementById('adjustType').value;
+            const referenceId = document.getElementById('adjustRef').value;
+
+            if (isNaN(quantityChange) || quantityChange === 0) {
+                alert('Please enter a non-zero quantity change');
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/inventory/${encodeURIComponent(sku)}/adjust`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ quantityChange, transactionType, referenceId })
+                });
+
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                showToast(`Stock updated for ${sku}!`, 'success');
+                const modal = bootstrap.Modal.getInstance(document.getElementById('adjustStockModal'));
+                if (modal) modal.hide();
+                await loadInventory();
+            } catch (e) {
+                showToast('Failed to adjust stock: ' + e.message, 'danger');
+            }
+        }
+
+        async function deleteInventoryItem(sku) {
+            if (!confirm(`Are you sure you want to delete inventory item ${sku}? This action cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/inventory/${encodeURIComponent(sku)}`, {
+                    method: 'DELETE'
+                });
+
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                showToast(`Deleted inventory item ${sku} successfully!`, 'success');
+                await loadInventory();
+            } catch (e) {
+                showToast('Failed to delete item: ' + e.message, 'danger');
+            }
+        }
+
+        function jumpToReservation(sku) {
+            const resTabBtn = document.getElementById('reservations-tab');
+            bootstrap.Tab.getOrCreateInstance(resTabBtn).show();
+            const select = document.getElementById('reserveSkuSelect');
+            if (select) {
+                select.value = sku;
+                refreshPoolStatus();
+            }
+        }
+
+        async function refreshPoolStatus() {
+            const select = document.getElementById('reserveSkuSelect');
+            if (!select || !select.value) return;
+            const sku = select.value;
+
+            try {
+                const res = await fetch(`/api/inventory/reservations/pool/${encodeURIComponent(sku)}`);
+                if (!res.ok) return;
+                const data = await res.json();
+                document.getElementById('poolMasterStock').textContent = (data.masterStock || 0).toLocaleString();
+                document.getElementById('poolAvailableUnits').textContent = (data.availableUnits || 0).toLocaleString();
+                document.getElementById('poolReservedUnits').textContent = (data.reservedUnits || 0).toLocaleString();
+                document.getElementById('poolClaimedUnits').textContent = (data.claimedUnits || 0).toLocaleString();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function executeReservation() {
+            const sku = document.getElementById('reserveSkuSelect').value;
+            const quantity = parseInt(document.getElementById('reserveQtyInput').value, 10);
+            const reservationId = document.getElementById('reserveIdInput').value.trim() || ('CART-' + Date.now().toString().slice(-6));
+            const ttlSeconds = parseInt(document.getElementById('reserveTtlInput').value, 10) || 600;
+
+            const alertBox = document.getElementById('reservationResultAlert');
+            alertBox.innerHTML = '<div class=\"spinner-border spinner-border-sm text-info me-2\"></div> Reserving units non-blocking...';
+
+            try {
+                const res = await fetch('/api/inventory/reservations/reserve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sku, quantity, reservationId, ttlSeconds })
+                });
+
+                const data = await res.json();
+                if (!res.ok) {
+                    alertBox.innerHTML = `<div class=\"alert alert-danger py-2 small mb-0\"><i class=\"bi bi-x-circle me-1\"></i> ${escapeHtml(data.error || data.message || 'Reservation failed')}</div>`;
                     return;
                 }
 
-                const data = await response.json();
-                appendAgentAnswer(data.answer || 'No response returned.');
-
-            } catch (error) {
-                typingIndicator.style.display = 'none';
-                appendAgentText('⚠️ Network Error: Unable to reach the backend service.');
-            }
-        }
-
-        function appendUserMessage(text) {
-            const item = document.createElement('div');
-            item.className = 'message-item user';
-
-            const avatar = document.createElement('div');
-            avatar.className = 'msg-avatar';
-            avatar.innerHTML = '<i class="bi bi-person-fill"></i>';
-
-            const wrapper = document.createElement('div');
-            wrapper.className = 'msg-body-wrapper';
-
-            const bubble = document.createElement('div');
-            bubble.className = 'msg-bubble';
-            bubble.textContent = text;
-
-            wrapper.appendChild(bubble);
-            item.appendChild(avatar);
-            item.appendChild(wrapper);
-
-            chatContainer.appendChild(item);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        function appendAgentAnswer(markdownText) {
-            const item = document.createElement('div');
-            item.className = 'message-item agent';
-
-            const avatar = document.createElement('div');
-            avatar.className = 'msg-avatar';
-            avatar.innerHTML = '<i class="bi bi-robot"></i>';
-
-            const wrapper = document.createElement('div');
-            wrapper.className = 'msg-body-wrapper';
-
-            const bubble = document.createElement('div');
-            bubble.className = 'msg-bubble';
-            bubble.innerHTML = renderMarkdown(markdownText);
-
-            // Detect if this specific response contains tabular data
-            const hasTable = bubble.querySelector('table') !== null;
-
-            // Actions: Copy + Export based on data type
-            const actions = document.createElement('div');
-            actions.className = 'msg-actions';
-
-            let actionsHtml = `
-                <button class="btn-copy" onclick="copyText(this)">
-                    <i class="bi bi-clipboard"></i> Copy
-                </button>
-            `;
-
-            if (hasTable) {
-                // Tabular data: highlight Excel (.xlsx) first, followed by Word (.docx) and PDF (.pdf)
-                actionsHtml += `
-                    <button class="btn-export-item excel" onclick="exportMessageExcel(this)" title="Export Table to Excel (.xlsx)">
-                        <i class="bi bi-file-earmark-excel-fill text-success"></i> Excel (.xlsx)
-                    </button>
-                    <button class="btn-export-item docx" onclick="exportMessageDocx(this)" title="Export to Word (.docx)">
-                        <i class="bi bi-file-earmark-word-fill text-primary"></i> Word (.docx)
-                    </button>
-                    <button class="btn-export-item pdf" onclick="exportMessagePdf(this)" title="Export to PDF (.pdf)">
-                        <i class="bi bi-file-earmark-pdf-fill text-danger"></i> PDF (.pdf)
-                    </button>
+                alertBox.innerHTML = `
+                    <div class="alert alert-success py-2 small mb-0">
+                        <div class="fw-bold"><i class="bi bi-check-circle-fill me-1"></i> Reserved ${data.quantityReserved} units for ${escapeHtml(data.sku)}!</div>
+                        <div>ID: <code>${escapeHtml(data.reservationId)}</code></div>
+                        <div class="mt-2 d-flex gap-2">
+                            <button class="btn btn-sm btn-success py-0 px-2" onclick="claimReservation('${escapeJs(data.reservationId)}')">Claim (Pay)</button>
+                            <button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="releaseReservation('${escapeJs(data.reservationId)}')">Release (Cancel)</button>
+                        </div>
+                    </div>
                 `;
-            } else {
-                // Document / narrative report: highlight Word (.docx) and PDF (.pdf)
-                actionsHtml += `
-                    <button class="btn-export-item docx" onclick="exportMessageDocx(this)" title="Export to Word (.docx)">
-                        <i class="bi bi-file-earmark-word-fill text-primary"></i> Word (.docx)
-                    </button>
-                    <button class="btn-export-item pdf" onclick="exportMessagePdf(this)" title="Export to PDF (.pdf)">
-                        <i class="bi bi-file-earmark-pdf-fill text-danger"></i> PDF (.pdf)
-                    </button>
-                `;
+                showToast(`Reserved ${data.quantityReserved} units successfully!`, 'success');
+                await refreshPoolStatus();
+            } catch (e) {
+                alertBox.innerHTML = `<div class=\"alert alert-danger py-2 small mb-0\">${escapeHtml(e.message)}</div>`;
             }
-
-            actions.innerHTML = actionsHtml;
-
-            wrapper.appendChild(bubble);
-            wrapper.appendChild(actions);
-
-            item.appendChild(avatar);
-            item.appendChild(wrapper);
-
-            chatContainer.appendChild(item);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        function appendAgentText(text) {
-            appendAgentAnswer(text);
-        }
-
-        function renderMarkdown(text) {
-            if (!text) return '';
-            if (typeof marked !== 'undefined') {
-                return marked.parse(text);
+        async function claimReservation(reservationId) {
+            try {
+                const res = await fetch(`/api/inventory/reservations/claim/${encodeURIComponent(reservationId)}`, { method: 'POST' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                showToast(`Claimed reservation ${reservationId} (stock permanently deducted)!`, 'success');
+                await loadInventory();
+                await refreshPoolStatus();
+            } catch (e) {
+                showToast('Failed to claim: ' + e.message, 'danger');
             }
-            return escapeHtml(text).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         }
 
-        function copyText(button) {
-            const bubble = button.closest('.msg-body-wrapper').querySelector('.msg-bubble');
-            if (bubble) {
-                navigator.clipboard.writeText(bubble.innerText).then(() => {
-                    const originalHtml = button.innerHTML;
-                    button.innerHTML = '<i class="bi bi-check2 text-success"></i> Copied!';
-                    setTimeout(() => {
-                        button.innerHTML = originalHtml;
-                    }, 2000);
+        async function releaseReservation(reservationId) {
+            try {
+                const res = await fetch(`/api/inventory/reservations/release/${encodeURIComponent(reservationId)}`, { method: 'POST' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                showToast(`Released reservation ${reservationId} back to available pool!`, 'info');
+                await refreshPoolStatus();
+            } catch (e) {
+                showToast('Failed to release: ' + e.message, 'danger');
+            }
+        }
+
+        async function runFlashSaleSimulation() {
+            const sku = document.getElementById('reserveSkuSelect').value;
+            const concurrentCheckouts = parseInt(document.getElementById('simThreadsInput').value, 10);
+            const qtyPerCheckout = parseInt(document.getElementById('simQtyInput').value, 10);
+
+            const resultContainer = document.getElementById('simulationResult');
+            resultContainer.innerHTML = '<div class=\"alert alert-info py-2 small mb-0\"><div class=\"spinner-border spinner-border-sm text-info me-2\"></div> Running concurrent simulation threads...</div>';
+
+            try {
+                const res = await fetch('/api/inventory/reservations/simulate-flash-sale', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sku, concurrentCheckouts, qtyPerCheckout })
                 });
+
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+
+                resultContainer.innerHTML = `
+                    <div class="alert alert-secondary py-2 small mb-0" style="background-color: var(--bg-card-nested); border: 1px solid var(--border-subtle); color: var(--text-body);">
+                        <div class="fw-bold text-success mb-1"><i class="bi bi-check2-circle me-1"></i> Simulation Completed Successfully!</div>
+                        <div>• Concurrent Buyers: <strong>${data.concurrentCheckoutsAttempted} threads</strong></div>
+                        <div>• Successful Reservations: <strong class="text-success">${data.successfulReservations}</strong></div>
+                        <div>• Rejections (Insufficient Stock): <strong class="text-warning">${data.insufficientStockRejections}</strong></div>
+                        <div>• Total Time: <strong>${data.totalExecutionTimeMs} ms</strong> (Avg: <strong>${data.averageLatencyPerReservationMs.toFixed(2)} ms/req</strong>)</div>
+                        <div>• Strategy: <code>${data.lockingStrategy}</code></div>
+                    </div>
+                `;
+                await refreshPoolStatus();
+                showToast('Flash sale benchmark simulation finished!', 'success');
+            } catch (e) {
+                resultContainer.innerHTML = `<div class=\"alert alert-danger py-2 small mb-0\">${escapeHtml(e.message)}</div>`;
             }
+        }
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toastId = 'toast-' + Date.now();
+            const toastHtml = `
+                <div id="${toastId}" class="toast align-items-center text-white bg-${type === 'success' ? 'success' : (type === 'danger' ? 'danger' : 'info')} border-0 mb-2 shadow-lg" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">${escapeHtml(msg)}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', toastHtml);
+            const toastElement = document.getElementById(toastId);
+            const bsToast = new bootstrap.Toast(toastElement, { delay: 3500 });
+            bsToast.show();
         }
 
         function escapeHtml(unsafe) {
-            return unsafe
+            if (!unsafe) return '';
+            return String(unsafe)
                  .replace(/&/g, "&amp;")
                  .replace(/</g, "&lt;")
                  .replace(/>/g, "&gt;")
@@ -893,468 +1109,9 @@
                  .replace(/'/g, "&#039;");
         }
 
-        // ==========================================
-        // EXPORT ENGINE: LATEST .DOCX & .XLSX & .PDF
-        // ==========================================
-
-        function downloadBlob(blob, filename) {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }, 100);
-        }
-
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('toastNotification');
-            if (!toast) return;
-            let icon = 'bi-info-circle-fill text-info';
-            if (type === 'success') icon = 'bi-check-circle-fill text-success';
-            if (type === 'warning') icon = 'bi-exclamation-triangle-fill text-warning';
-
-            toast.innerHTML = `<i class="bi ${icon}"></i> <span>${message}</span>`;
-            toast.style.display = 'flex';
-            clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => {
-                toast.style.display = 'none';
-            }, 3200);
-        }
-
-        function getTimestampString() {
-            const now = new Date();
-            return now.getFullYear() +
-                String(now.getMonth() + 1).padStart(2, '0') +
-                String(now.getDate()).padStart(2, '0') + '_' +
-                String(now.getHours()).padStart(2, '0') +
-                String(now.getMinutes()).padStart(2, '0') +
-                String(now.getSeconds()).padStart(2, '0');
-        }
-
-        // 1. SMART AUTO EXPORT (BASED ON DATA TYPE)
-        function exportChatSmart() {
-            const tables = chatContainer.querySelectorAll('.msg-bubble table');
-            if (tables.length > 0) {
-                showToast('Detected Tabular Data → Exporting to Excel (.xlsx)...', 'info');
-                exportChatExcel();
-            } else {
-                showToast('Detected Narrative Document → Exporting to Word (.docx)...', 'info');
-                exportChatDocx();
-            }
-        }
-
-        // 2. EXCEL EXPORT (.xlsx format)
-        function exportMessageExcel(button) {
-            const bubble = button.closest('.msg-body-wrapper').querySelector('.msg-bubble');
-            if (!bubble) return;
-            const table = bubble.querySelector('table');
-            if (!table) {
-                showToast('No tabular data found in this message.', 'warning');
-                return;
-            }
-
-            const filename = `inventory_table_${getTimestampString()}.xlsx`;
-
-            if (typeof XLSX !== 'undefined') {
-                const wb = XLSX.utils.table_to_book(table, { sheet: "Inventory Data" });
-                // Auto-fit column widths
-                const ws = wb.Sheets["Inventory Data"];
-                if (ws) {
-                    const colWidths = [];
-                    table.querySelectorAll('tr').forEach(tr => {
-                        tr.querySelectorAll('th, td').forEach((cell, idx) => {
-                            const len = (cell.innerText || '').trim().length;
-                            colWidths[idx] = Math.max(colWidths[idx] || 10, len + 3);
-                        });
-                    });
-                    ws['!cols'] = colWidths.map(w => ({ wch: w }));
-                }
-                XLSX.writeFile(wb, filename);
-                showToast('Exported table to Excel (.xlsx) successfully', 'success');
-            } else {
-                showToast('Excel library not loaded.', 'warning');
-            }
-        }
-
-        function exportChatExcel() {
-            const tables = chatContainer.querySelectorAll('.msg-bubble table');
-            const filename = `inventory_data_${getTimestampString()}.xlsx`;
-
-            if (typeof XLSX !== 'undefined') {
-                const wb = XLSX.utils.book_new();
-
-                // Sheet 1: Conversation Overview
-                const summaryRows = [["Role", "Timestamp", "Message Content"]];
-                const messages = chatContainer.querySelectorAll('.message-item');
-                messages.forEach(msg => {
-                    const role = msg.classList.contains('user') ? 'User' : 'Smart Inventory Agent';
-                    const bubble = msg.querySelector('.msg-bubble');
-                    const text = bubble ? bubble.innerText.trim() : '';
-                    summaryRows.push([role, new Date().toLocaleTimeString(), text]);
-                });
-                const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
-                wsSummary['!cols'] = [{ wch: 15 }, { wch: 15 }, { wch: 80 }];
-                XLSX.utils.book_append_sheet(wb, wsSummary, "Overview");
-
-                // Dedicated Sheets for Each Table
-                if (tables.length > 0) {
-                    tables.forEach((table, index) => {
-                        const ws = XLSX.utils.table_to_sheet(table);
-                        const colWidths = [];
-                        table.querySelectorAll('tr').forEach(tr => {
-                            tr.querySelectorAll('th, td').forEach((cell, idx) => {
-                                const len = (cell.innerText || '').trim().length;
-                                colWidths[idx] = Math.max(colWidths[idx] || 10, len + 3);
-                            });
-                        });
-                        ws['!cols'] = colWidths.map(w => ({ wch: w }));
-                        XLSX.utils.book_append_sheet(wb, ws, `Table_${index + 1}`);
-                    });
-                }
-                XLSX.writeFile(wb, filename);
-                showToast(`Exported ${tables.length} table(s) to Excel (.xlsx)`, 'success');
-            } else {
-                showToast('Excel library not ready.', 'warning');
-            }
-        }
-
-        // 3. WORD EXPORT (.docx latest OpenXML format)
-        async function exportMessageDocx(button) {
-            const bubble = button.closest('.msg-body-wrapper').querySelector('.msg-bubble');
-            if (!bubble) return;
-            const filename = `inventory_record_${getTimestampString()}.docx`;
-
-            if (typeof docx !== 'undefined') {
-                try {
-                    showToast('Building Word (.docx) document...', 'info');
-                    const blob = await buildDocxBlobFromHtml(bubble.innerHTML, "Smart Inventory Operational Ledger");
-                    downloadBlob(blob, filename);
-                    showToast('Exported to Word (.docx) successfully', 'success');
-                } catch (e) {
-                    console.error('Docx generation error:', e);
-                    exportDocxHtmlFallback(bubble.innerHTML, filename);
-                }
-            } else {
-                exportDocxHtmlFallback(bubble.innerHTML, filename);
-            }
-        }
-
-        async function exportChatDocx() {
-            const filename = `smart_inventory_transcript_${getTimestampString()}.docx`;
-            if (typeof docx !== 'undefined') {
-                try {
-                    showToast('Building full Word (.docx) document...', 'info');
-                    let combinedHtml = "";
-                    const messages = chatContainer.querySelectorAll('.message-item');
-                    messages.forEach(msg => {
-                        const isUser = msg.classList.contains('user');
-                        const bubble = msg.querySelector('.msg-bubble');
-                        if (!bubble) return;
-                        if (isUser) {
-                            combinedHtml += `<div class="user-turn"><strong>User Query:</strong> ${escapeHtml(bubble.innerText.trim())}</div>`;
-                        } else {
-                            combinedHtml += `<div class="agent-turn">${bubble.innerHTML}</div><hr/>`;
-                        }
-                    });
-                    const blob = await buildDocxBlobFromHtml(combinedHtml, "Smart Inventory AI Operational Transcript");
-                    downloadBlob(blob, filename);
-                    showToast('Exported conversation to Word (.docx) successfully', 'success');
-                } catch (e) {
-                    console.error('Docx chat error:', e);
-                    exportDocxChatFallback(filename);
-                }
-            } else {
-                exportDocxChatFallback(filename);
-            }
-        }
-
-        async function buildDocxBlobFromHtml(htmlContent, titleText) {
-            const { Document, Paragraph, TextRun, Packer, AlignmentType } = docx;
-
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = htmlContent;
-
-            const children = [];
-
-            // Title & Header Bar
-            children.push(new Paragraph({
-                children: [new TextRun({ text: titleText, bold: true, size: 32, color: "0284C7" })],
-                spacing: { after: 120 }
-            }));
-            children.push(new Paragraph({
-                children: [new TextRun({ text: `Generated on ${new Date().toLocaleString()} | Smart Inventory Platform`, italics: true, size: 18, color: "64748B" })],
-                spacing: { after: 240 }
-            }));
-
-            // Traverse child elements of tempDiv
-            for (let node of tempDiv.children) {
-                if (node.tagName === 'TABLE') {
-                    const docxTable = buildDocxTable(node, docx);
-                    if (docxTable) {
-                        children.push(docxTable);
-                        children.push(new Paragraph({ text: "", spacing: { after: 120 } }));
-                    }
-                } else if (/^H[1-6]$/.test(node.tagName)) {
-                    children.push(new Paragraph({
-                        children: [new TextRun({ text: node.innerText.trim(), bold: true, size: 24, color: "0F172A" })],
-                        spacing: { before: 180, after: 80 }
-                    }));
-                } else if (node.tagName === 'UL' || node.tagName === 'OL') {
-                    node.querySelectorAll('li').forEach(li => {
-                        children.push(new Paragraph({
-                            children: [new TextRun({ text: "• " + li.innerText.trim(), size: 20, color: "334155" })],
-                            indent: { left: 360 },
-                            spacing: { after: 40 }
-                        }));
-                    });
-                } else if (node.classList && node.classList.contains('user-turn')) {
-                    children.push(new Paragraph({
-                        children: [new TextRun({ text: node.innerText.trim(), bold: true, size: 22, color: "1E3A8A" })],
-                        shading: { fill: "F1F5F9" },
-                        spacing: { before: 140, after: 100 }
-                    }));
-                } else {
-                    const text = node.innerText ? node.innerText.trim() : '';
-                    if (text) {
-                        children.push(new Paragraph({
-                            children: [new TextRun({ text: text, size: 20, color: "1E293B" })],
-                            spacing: { after: 80 }
-                        }));
-                    }
-                }
-            }
-
-            // Footer
-            children.push(new Paragraph({
-                children: [new TextRun({ text: "Confidential • Generated by Smart Inventory AI Operations Platform", size: 16, color: "94A3B8" })],
-                alignment: AlignmentType.CENTER,
-                spacing: { before: 360 }
-            }));
-
-            const doc = new Document({
-                sections: [{
-                    properties: {
-                        page: {
-                            margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 }
-                        }
-                    },
-                    children: children
-                }]
-            });
-
-            return await Packer.toBlob(doc);
-        }
-
-        function buildDocxTable(tableNode, docx) {
-            const { Table, TableRow, TableCell, Paragraph, TextRun, WidthType } = docx;
-            const rows = [];
-            const trs = tableNode.querySelectorAll('tr');
-
-            trs.forEach((tr, rowIndex) => {
-                const isHeader = (rowIndex === 0) || tr.querySelector('th') !== null;
-                const cells = [];
-                tr.querySelectorAll('th, td').forEach(td => {
-                    cells.push(new TableCell({
-                        children: [new Paragraph({
-                            children: [new TextRun({
-                                text: td.innerText.trim(),
-                                bold: isHeader,
-                                color: isHeader ? "FFFFFF" : "1E293B",
-                                size: isHeader ? 19 : 18
-                            })]
-                        })],
-                        shading: {
-                            fill: isHeader ? "0284C7" : (rowIndex % 2 === 0 ? "F8FAFC" : "FFFFFF")
-                        },
-                        margins: { top: 100, bottom: 100, left: 120, right: 120 }
-                    }));
-                });
-                if (cells.length > 0) {
-                    rows.push(new TableRow({ children: cells }));
-                }
-            });
-
-            if (rows.length === 0) return null;
-
-            return new Table({
-                rows: rows,
-                width: { size: 100, type: WidthType.PERCENTAGE }
-            });
-        }
-
-        function exportDocxHtmlFallback(htmlBody, filename) {
-            const header = "<html lang='en'><head><meta charset='utf-8'><style>body{font-family:Calibri,sans-serif;font-size:11pt;}table{border-collapse:collapse;width:100%;}th{background-color:#0284c7;color:#fff;padding:6px;border:1px solid #0284c7;}td{border:1px solid #ddd;padding:6px;}</style></head><body>";
-            const footer = "</body></html>";
-            const blob = new Blob(['\ufeff' + header + htmlBody + footer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-            downloadBlob(blob, filename.replace('.doc', '.docx'));
-            showToast('Exported to Word (.docx)', 'success');
-        }
-
-        function exportDocxChatFallback(filename) {
-            let body = "";
-            const messages = chatContainer.querySelectorAll('.message-item');
-            messages.forEach(msg => {
-                const isUser = msg.classList.contains('user');
-                const bubble = msg.querySelector('.msg-bubble');
-                if (!bubble) return;
-                body += isUser ? `<p><strong>User:</strong> ${escapeHtml(bubble.innerText)}</p>` : `<div>${bubble.innerHTML}</div><hr/>`;
-            });
-            exportDocxHtmlFallback(body, filename);
-        }
-
-        // 4. PDF EXPORT (.pdf format)
-        function exportMessagePdf(button) {
-            const bubble = button.closest('.msg-body-wrapper').querySelector('.msg-bubble');
-            if (!bubble) return;
-            const filename = `inventory_record_${getTimestampString()}.pdf`;
-
-            const container = document.createElement('div');
-            container.style.padding = '20px';
-            container.style.color = '#1e293b';
-            container.style.backgroundColor = '#ffffff';
-            container.style.fontFamily = 'Arial, sans-serif';
-            container.innerHTML = `
-                <div style="border-bottom: 2px solid #0284c7; padding-bottom: 8px; margin-bottom: 16px;">
-                    <h2 style="color: #0369a1; margin: 0; font-size: 16pt;">Smart Inventory AI Report</h2>
-                    <small style="color: #64748b;">Generated: ${new Date().toLocaleString()}</small>
-                </div>
-                ${bubble.innerHTML}
-            `;
-
-            container.querySelectorAll('table').forEach(tbl => {
-                tbl.style.width = '100%';
-                tbl.style.borderCollapse = 'collapse';
-                tbl.style.margin = '10px 0';
-                tbl.querySelectorAll('th').forEach(th => {
-                    th.style.backgroundColor = '#0284c7';
-                    th.style.color = '#ffffff';
-                    th.style.padding = '6px 8px';
-                    th.style.border = '1px solid #0284c7';
-                    th.style.fontSize = '9pt';
-                });
-                tbl.querySelectorAll('td').forEach(td => {
-                    td.style.padding = '6px 8px';
-                    td.style.border = '1px solid #cbd5e1';
-                    td.style.fontSize = '9pt';
-                    td.style.color = '#334155';
-                });
-            });
-
-            if (typeof html2pdf !== 'undefined') {
-                showToast('Generating PDF document...', 'info');
-                const opt = {
-                    margin: [10, 10, 10, 10],
-                    filename: filename,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, logging: false },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
-                html2pdf().set(opt).from(container).save().then(() => {
-                    showToast('PDF exported successfully', 'success');
-                }).catch(err => {
-                    console.error('PDF generation error:', err);
-                    printFallback(container.innerHTML);
-                });
-            } else {
-                printFallback(container.innerHTML);
-            }
-        }
-
-        function exportChatPdf() {
-            const filename = `smart_inventory_chat_${getTimestampString()}.pdf`;
-            const container = document.createElement('div');
-            container.style.padding = '20px';
-            container.style.color = '#1e293b';
-            container.style.backgroundColor = '#ffffff';
-            container.style.fontFamily = 'Arial, sans-serif';
-
-            let content = `
-                <div style="border-bottom: 2px solid #0284c7; padding-bottom: 8px; margin-bottom: 16px;">
-                    <h2 style="color: #0369a1; margin: 0; font-size: 16pt;">Smart Inventory AI — Conversation Transcript</h2>
-                    <small style="color: #64748b;">Exported: ${new Date().toLocaleString()}</small>
-                </div>
-            `;
-
-            const messages = chatContainer.querySelectorAll('.message-item');
-            messages.forEach(msg => {
-                const isUser = msg.classList.contains('user');
-                const bubble = msg.querySelector('.msg-bubble');
-                if (!bubble) return;
-                if (isUser) {
-                    content += `
-                        <div style="background-color: #f1f5f9; border-left: 4px solid #2563eb; padding: 8px 12px; margin: 12px 0; font-weight: bold; color: #1e3a8a; font-size: 10pt;">
-                            User: ${escapeHtml(bubble.innerText)}
-                        </div>
-                    `;
-                } else {
-                    content += `
-                        <div style="margin: 8px 0 16px 0; font-size: 9.5pt; color: #334155;">
-                            ${bubble.innerHTML}
-                        </div>
-                    `;
-                }
-            });
-
-            container.innerHTML = content;
-
-            container.querySelectorAll('table').forEach(tbl => {
-                tbl.style.width = '100%';
-                tbl.style.borderCollapse = 'collapse';
-                tbl.style.margin = '10px 0';
-                tbl.querySelectorAll('th').forEach(th => {
-                    th.style.backgroundColor = '#0284c7';
-                    th.style.color = '#ffffff';
-                    th.style.padding = '5px 8px';
-                    th.style.border = '1px solid #0284c7';
-                    th.style.fontSize = '8.5pt';
-                });
-                tbl.querySelectorAll('td').forEach(td => {
-                    td.style.padding = '5px 8px';
-                    td.style.border = '1px solid #cbd5e1';
-                    td.style.fontSize = '8.5pt';
-                    td.style.color = '#334155';
-                });
-            });
-
-            if (typeof html2pdf !== 'undefined') {
-                showToast('Generating PDF transcript...', 'info');
-                const opt = {
-                    margin: [10, 10, 10, 10],
-                    filename: filename,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, logging: false },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
-                html2pdf().set(opt).from(container).save().then(() => {
-                    showToast('PDF transcript exported successfully', 'success');
-                }).catch(err => {
-                    console.error('PDF error:', err);
-                    printFallback(container.innerHTML);
-                });
-            } else {
-                printFallback(container.innerHTML);
-            }
-        }
-
-        function printFallback(htmlContent) {
-            const printWindow = window.open('', '_blank');
-            if (!printWindow) {
-                showToast('Popup blocked. Please allow popups to export printable report.', 'warning');
-                return;
-            }
-            printWindow.document.write(`
-                <html lang="en"><head><title>Print Export</title>
-                <style>body { font-family: Arial, sans-serif; padding: 20px; color: #111; } table { border-collapse: collapse; width: 100%; } th, td { border: 1px solid #ccc; padding: 6px; } th { background-color: #eee; }</style>
-                </head><body>${htmlContent}</body></html>
-            `);
-            printWindow.document.close();
-            printWindow.focus();
-            printWindow.print();
-            printWindow.close();
+        function escapeJs(str) {
+            if (!str) return '';
+            return String(str).replace(/'/g, "\\'").replace(/"/g, '\\"');
         }
     </script>
 </body>

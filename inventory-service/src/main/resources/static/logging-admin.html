@@ -15,7 +15,7 @@
 -->
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,7 +23,7 @@
     <link href="/vendor/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/vendor/bootstrap-icons.css">
     <style>
-        :root {
+        :root, [data-theme="dark"] {
             --bg-dark: #0b0f19;
             --card-bg: #151d30;
             --card-border: #233148;
@@ -31,8 +31,30 @@
             --input-border: #2b3d5b;
             --primary-sky: #38bdf8;
             --text-heading: #f8fafc;
-            --text-body: #e2e8f0;
-            --text-label: #a0aec0;
+            --text-body: #cbd5e1;
+            --text-label: #94a3b8;
+            --table-th-bg: rgba(255, 255, 255, 0.03);
+            --table-hover: rgba(56, 189, 248, 0.06);
+            --shadow-card: 0 6px 18px rgba(0, 0, 0, 0.25);
+            --endpoint-bg: rgba(56, 189, 248, 0.08);
+            --endpoint-text: #7dd3fc;
+        }
+
+        [data-theme="light"] {
+            --bg-dark: #f8fafc;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+            --primary-sky: #0284c7;
+            --text-heading: #0f172a;
+            --text-body: #334155;
+            --text-label: #64748b;
+            --table-th-bg: #f8fafc;
+            --table-hover: #f1f5f9;
+            --shadow-card: 0 4px 16px rgba(15, 23, 42, 0.06);
+            --endpoint-bg: rgba(2, 132, 199, 0.08);
+            --endpoint-text: #0369a1;
         }
 
         body {
@@ -43,6 +65,7 @@
             display: flex;
             flex-direction: column;
             margin: 0;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
         /* Top Header Navigation */
@@ -50,7 +73,8 @@
             background-color: var(--card-bg);
             border-bottom: 1px solid var(--card-border);
             padding: 0.85rem 2rem;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s ease, border-color 0.2s ease;
         }
 
         .brand-title {
@@ -90,12 +114,13 @@
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow-card);
+            transition: background-color 0.2s ease, border-color 0.2s ease;
         }
 
         .field-label {
-            color: var(--text-label);
-            font-size: 0.75rem;
+            color: var(--text-heading) !important;
+            font-size: 0.775rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.6px;
@@ -111,6 +136,7 @@
             border-radius: 8px;
             padding: 0.55rem 0.9rem;
             font-size: 0.9rem;
+            transition: all 0.15s ease;
         }
 
         .form-control-custom::placeholder {
@@ -149,6 +175,7 @@
             border: none;
             border-radius: 8px;
             padding: 0.55rem 1.1rem;
+            transition: all 0.15s ease;
         }
 
         .btn-sky:hover {
@@ -163,6 +190,7 @@
             font-weight: 600;
             border-radius: 8px;
             padding: 0.55rem 1rem;
+            transition: all 0.15s ease;
         }
 
         .btn-amber:hover {
@@ -176,7 +204,8 @@
             border: 1px solid var(--card-border);
             border-radius: 12px;
             padding: 1.5rem;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow-card);
+            transition: background-color 0.2s ease, border-color 0.2s ease;
         }
 
         .table-header-title {
@@ -189,9 +218,9 @@
         .url-endpoint-badge {
             font-family: monospace;
             font-size: 0.8rem;
-            background: rgba(56, 189, 248, 0.08);
-            color: #7dd3fc;
-            border: 1px solid rgba(56, 189, 248, 0.2);
+            background: var(--endpoint-bg);
+            color: var(--endpoint-text);
+            border: 1px solid var(--card-border);
             padding: 0.35rem 0.75rem;
             border-radius: 6px;
         }
@@ -203,7 +232,7 @@
         }
 
         .table-custom th {
-            background-color: rgba(255, 255, 255, 0.03);
+            background-color: var(--table-th-bg);
             color: var(--text-label);
             border-bottom: 1px solid var(--card-border);
             font-weight: 700;
@@ -220,12 +249,10 @@
         }
 
         .table-custom tbody tr:hover {
-            background-color: rgba(56, 189, 248, 0.05) !important;
+            background-color: var(--table-hover) !important;
         }
 
-        /*noinspection CssUnusedSymbol*/
         .tr-app-logger {
-            background-color: rgba(56, 189, 248, 0.03);
             border-left: 3px solid var(--primary-sky);
         }
 
@@ -240,23 +267,16 @@
             letter-spacing: 0.5px;
         }
 
-        /*noinspection CssUnusedSymbol*/
-        .level-TRACE { background-color: #334155; color: #f1f5f9; }
-        /*noinspection CssUnusedSymbol*/
+        .level-TRACE { background-color: #475569; color: #f8fafc; }
         .level-DEBUG { background-color: #1d4ed8; color: #dbeafe; }
-        /*noinspection CssUnusedSymbol*/
         .level-INFO { background-color: #047857; color: #d1fae5; }
-        /*noinspection CssUnusedSymbol*/
         .level-WARN, .level-WARNING { background-color: #b45309; color: #fef3c7; }
-        /*noinspection CssUnusedSymbol*/
         .level-ERROR, .level-CRITICAL { background-color: #b91c1c; color: #ffe4e6; }
-        /*noinspection CssUnusedSymbol*/
         .level-OFF { background-color: #374151; color: #9ca3af; }
-        /*noinspection CssUnusedSymbol*/
         .level-NOTSET, .level-NOT-CONFIGURED {
             background-color: transparent;
-            color: #64748b;
-            border: 1px dashed #475569;
+            color: var(--text-label);
+            border: 1px dashed var(--input-border);
         }
 
         .toast-container {
@@ -279,12 +299,19 @@
             </span>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <a href="/index.html" class="btn btn-outline-light btn-sm px-3">
-                <i class="bi bi-chat-dots me-1"></i> Operations Workspace
+            <!-- Theme Toggle -->
+            <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Light / Dark Mode">
+                <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+                <span id="themeLabel">Dark</span>
+            </button>
+            <a href="/index.html" class="btn btn-outline-light btn-sm px-3" style="color: var(--text-heading); border-color: var(--card-border);">
+                <i class="bi bi-grid-1x2 me-1"></i> Dashboard
             </a>
-            <!--suppress HtmlUnknownTarget -->
-            <a href="/swagger-ui.html" target="_blank" class="btn btn-outline-info btn-sm px-3">
-                <i class="bi bi-code-square me-1"></i> Swagger API
+            <a href="/chat.html" class="btn btn-outline-info btn-sm px-3">
+                <i class="bi bi-robot me-1"></i> AI Assistant
+            </a>
+            <a href="/swagger-ui.html" target="_blank" class="btn btn-outline-secondary btn-sm px-3" style="color: var(--text-heading); border-color: var(--card-border);">
+                <i class="bi bi-code-square me-1"></i> Swagger
             </a>
         </div>
     </nav>
@@ -356,7 +383,7 @@
             <!-- Quick Batch Control Toolbar -->
             <div class="mt-3 pt-3 border-top border-secondary border-opacity-25 d-flex align-items-center justify-content-between flex-wrap gap-2">
                 <div class="d-flex align-items-center gap-2">
-                    <span class="small text-secondary font-monospace fw-bold me-1"><i class="bi bi-lightning-charge-fill text-warning"></i> QUICK BATCH:</span>
+                    <span class="small font-monospace fw-bold me-1" style="color: var(--text-heading);"><i class="bi bi-lightning-charge-fill text-warning"></i> QUICK BATCH:</span>
                     <button class="btn btn-amber btn-sm" onclick="setGroupLevel('DEBUG')">
                         Set App Package to DEBUG
                     </button>
@@ -377,7 +404,7 @@
                     <span class="table-header-title">
                         <i class="bi bi-list-nested me-1"></i> REGISTERED LOGGERS
                     </span>
-                    <span class="badge bg-primary bg-opacity-25 text-info px-2 py-1 fs-7" id="loggerCountBadge">0 Total</span>
+                    <span class="badge bg-primary bg-opacity-25 text-primary px-2 py-1 fs-7" id="loggerCountBadge">0 Total</span>
                 </div>
                 <span class="url-endpoint-badge" id="serviceUrlLabel">http://localhost:8081/actuator/loggers</span>
             </div>
@@ -437,7 +464,38 @@
         let currentLoggers = [];
         let currentScope = 'app'; // 'app' or 'all'
 
+        // Theme Management
+        function initTheme() {
+            const saved = localStorage.getItem('smart_inventory_theme');
+            const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved || (systemDark ? 'dark' : 'light');
+            applyTheme(theme);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('smart_inventory_theme', theme);
+            const icon = document.getElementById('themeIcon');
+            const label = document.getElementById('themeLabel');
+            if (icon) {
+                if (theme === 'dark') {
+                    icon.className = 'bi bi-moon-stars-fill text-warning';
+                    if (label) label.textContent = 'Dark';
+                } else {
+                    icon.className = 'bi bi-sun-fill text-warning';
+                    if (label) label.textContent = 'Light';
+                }
+            }
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            applyTheme(next);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
             loadLoggers();
         });
 
@@ -450,277 +508,171 @@
 
         async function loadLoggers() {
             const serviceKey = document.getElementById('serviceSelect').value;
-            const config = SERVICE_CONFIGS[serviceKey];
-            const targetUrl = (config.baseUrl || window.location.origin) + config.endpoint;
-            document.getElementById('serviceUrlLabel').innerText = targetUrl;
+            const cfg = SERVICE_CONFIGS[serviceKey];
+            const url = `${cfg.baseUrl}${cfg.endpoint}`;
+            document.getElementById('serviceUrlLabel').textContent = url || window.location.origin + cfg.endpoint;
 
-            const tableBody = document.getElementById('loggersTableBody');
-            tableBody.innerHTML = `
+            const tbody = document.getElementById('loggersTableBody');
+            tbody.innerHTML = `
                 <tr>
                     <td colspan="5" class="text-center text-secondary py-5">
                         <div class="spinner-border spinner-border-sm text-info me-2" role="status"></div>
-                        Fetching active loggers from ${config.name}...
+                        Connecting to ${cfg.name}...
                     </td>
                 </tr>`;
 
             try {
-                const response = await fetch(targetUrl);
+                const response = await fetch(url);
                 if (!response.ok) {
-                    showAlert(`Failed to fetch loggers: HTTP ${response.status}: ${response.statusText}`, 'danger');
-                    renderTable([]);
-                    return;
+                    throw new Error(`Endpoint returned status ${response.status} (${response.statusText})`);
                 }
+
                 const data = await response.json();
-
-                currentLoggers = [];
-                if (config.type === 'actuator') {
-                    const loggersMap = data.loggers || {};
-                    Object.keys(loggersMap).forEach(name => {
-                        currentLoggers.push({
-                            name: name,
-                            effectiveLevel: loggersMap[name].effectiveLevel || 'INFO',
-                            configuredLevel: loggersMap[name].configuredLevel || 'NOT CONFIGURED'
-                        });
-                    });
-                } else if (config.type === 'fastapi') {
-                    const loggersMap = data.loggers || {};
-                    Object.keys(loggersMap).forEach(name => {
-                        currentLoggers.push({
-                            name: name,
-                            effectiveLevel: loggersMap[name].effectiveLevel || 'INFO',
-                            configuredLevel: loggersMap[name].configuredLevel || 'NOTSET'
-                        });
-                    });
-                }
-
-                // Sort: App loggers first, then alphabetically
-                currentLoggers.sort((a, b) => {
-                    const aIsApp = isAppLogger(a.name);
-                    const bIsApp = isAppLogger(b.name);
-                    if (aIsApp && !bIsApp) return -1;
-                    if (!aIsApp && bIsApp) return 1;
-                    return a.name.localeCompare(b.name);
-                });
-
+                currentLoggers = normalizeLoggers(data, cfg);
                 filterLoggers();
             } catch (err) {
-                showAlert(`Unable to fetch loggers from ${config.name} (${targetUrl}): ${err.message}`, 'danger');
-                tableBody.innerHTML = `
+                tbody.innerHTML = `
                     <tr>
-                        <td colspan="5" class="text-center text-danger py-5">
+                        <td colspan="5" class="text-center text-danger py-4">
                             <i class="bi bi-exclamation-triangle-fill fs-4 d-block mb-2"></i>
-                            Connection failed to ${config.name} at <code>${targetUrl}</code>.
+                            <strong>Failed to communicate with ${cfg.name}</strong><br>
+                            <small class="text-secondary">${err.message}</small>
                         </td>
                     </tr>`;
             }
         }
 
-        function isAppLogger(name) {
-            return name.startsWith('com.smartinventory') || name.startsWith('app');
+        function normalizeLoggers(data, cfg) {
+            const loggersList = [];
+            if (cfg.type === "actuator" && data.loggers) {
+                for (const [name, info] of Object.entries(data.loggers)) {
+                    loggersList.push({
+                        name: name,
+                        effectiveLevel: info.effectiveLevel || "NOTSET",
+                        configuredLevel: info.configuredLevel || "NOT-CONFIGURED",
+                        isApp: name.startsWith(cfg.appPrefix)
+                    });
+                }
+            } else if (cfg.type === "fastapi" && data.loggers) {
+                for (const [name, info] of Object.entries(data.loggers)) {
+                    loggersList.push({
+                        name: name,
+                        effectiveLevel: info.effective_level || "NOTSET",
+                        configuredLevel: info.configured_level || "NOT-CONFIGURED",
+                        isApp: name.startsWith(cfg.appPrefix) || name === "uvicorn"
+                    });
+                }
+            }
+            return loggersList.sort((a, b) => a.name.localeCompare(b.name));
         }
 
         function filterLoggers() {
-            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+            const term = document.getElementById('searchInput').value.trim().toLowerCase();
             const levelFilter = document.getElementById('levelFilterSelect').value;
 
             const filtered = currentLoggers.filter(l => {
-                const matchesScope = (currentScope === 'all') || isAppLogger(l.name);
-                const matchesSearch = !searchVal || l.name.toLowerCase().includes(searchVal);
-                const matchesLevel = (levelFilter === 'ALL') ||
-                    (l.effectiveLevel === levelFilter) ||
-                    (l.configuredLevel === levelFilter) ||
-                    (levelFilter === 'WARN' && (l.effectiveLevel === 'WARNING' || l.configuredLevel === 'WARNING')) ||
-                    (levelFilter === 'ERROR' && (l.effectiveLevel === 'CRITICAL' || l.configuredLevel === 'CRITICAL'));
-
-                return matchesScope && matchesSearch && matchesLevel;
+                if (currentScope === 'app' && !l.isApp) return false;
+                if (term && !l.name.toLowerCase().includes(term)) return false;
+                if (levelFilter !== 'ALL' && l.effectiveLevel !== levelFilter) return false;
+                return true;
             });
 
-            document.getElementById('loggerCountBadge').innerText = `${filtered.length} Loggers`;
-            renderTable(filtered);
+            document.getElementById('loggerCountBadge').textContent = `${filtered.length} Displayed`;
+            renderLoggersTable(filtered);
         }
 
-        function renderTable(loggers) {
-            const tableBody = document.getElementById('loggersTableBody');
+        function renderLoggersTable(loggers) {
+            const tbody = document.getElementById('loggersTableBody');
             if (loggers.length === 0) {
-                tableBody.innerHTML = `
+                tbody.innerHTML = `
                     <tr>
                         <td colspan="5" class="text-center text-secondary py-5">
-                            No loggers found matching active scope and search criteria.
+                            No loggers matched the search criteria.
                         </td>
                     </tr>`;
                 return;
             }
 
-            const levels = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'OFF'];
+            tbody.innerHTML = '';
+            loggers.forEach((l, index) => {
+                const tr = document.createElement('tr');
+                if (l.isApp) tr.classList.add('tr-app-logger');
 
-            tableBody.innerHTML = loggers.map((l, index) => {
-                const appFlag = isAppLogger(l.name);
-                const rowClass = appFlag ? 'tr-app-logger' : '';
-
-                const optionsHtml = levels.map(lvl => `
-                    <option value="${lvl}" ${(l.configuredLevel === lvl || (l.configuredLevel === 'NOT CONFIGURED' && l.effectiveLevel === lvl)) ? 'selected' : ''}>${lvl}</option>
-                `).join('');
-
-                return `
-                    <tr class="${rowClass}">
-                        <td class="text-secondary small fw-bold">${index + 1}</td>
-                        <td class="font-monospace fw-bold text-light">
-                            ${l.name}
-                            ${appFlag ? '<span class="badge bg-info bg-opacity-25 text-info ms-2 px-2 py-1 align-middle">APP</span>' : ''}
-                        </td>
-                        <td>
-                            <span class="level-pill level-${l.effectiveLevel}">${l.effectiveLevel}</span>
-                        </td>
-                        <td>
-                            <span class="level-pill level-${l.configuredLevel.replace(' ', '-')}">${l.configuredLevel}</span>
-                        </td>
-                        <td>
-                            <div class="input-group input-group-sm">
-                                <select id="select-${index}" class="form-select form-select-custom py-1">
-                                    ${optionsHtml}
-                                </select>
-                                <button class="btn btn-sm btn-sky" onclick="updateLevel('${escapeJs(l.name)}', 'select-${index}')">
-                                    Apply
-                                </button>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="resetLevel('${escapeJs(l.name)}')">
-                                    Reset
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                tr.innerHTML = `
+                    <td class="text-secondary small">${index + 1}</td>
+                    <td>
+                        <span class="font-monospace fw-semibold" style="color: var(--text-heading);">${l.name}</span>
+                        ${l.isApp ? '<span class="badge bg-primary bg-opacity-25 text-primary ms-1 px-2 py-0 fs-8">APP</span>' : ''}
+                    </td>
+                    <td><span class="level-pill level-${l.effectiveLevel}">${l.effectiveLevel}</span></td>
+                    <td><span class="level-pill level-${l.configuredLevel}">${l.configuredLevel}</span></td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" onclick="updateLogLevel('${l.name}', 'TRACE')">TRACE</button>
+                            <button class="btn btn-outline-primary" onclick="updateLogLevel('${l.name}', 'DEBUG')">DEBUG</button>
+                            <button class="btn btn-outline-success" onclick="updateLogLevel('${l.name}', 'INFO')">INFO</button>
+                            <button class="btn btn-outline-warning" onclick="updateLogLevel('${l.name}', 'WARN')">WARN</button>
+                            <button class="btn btn-outline-danger" onclick="updateLogLevel('${l.name}', 'ERROR')">ERROR</button>
+                            <button class="btn btn-outline-secondary" onclick="updateLogLevel('${l.name}', 'OFF')">OFF</button>
+                        </div>
+                    </td>
                 `;
-            }).join('');
+                tbody.appendChild(tr);
+            });
         }
 
-        async function updateLevel(loggerName, selectId) {
-            const newLevel = document.getElementById(selectId).value;
+        async function updateLogLevel(loggerName, newLevel) {
             const serviceKey = document.getElementById('serviceSelect').value;
-            const config = SERVICE_CONFIGS[serviceKey];
+            const cfg = SERVICE_CONFIGS[serviceKey];
+            const targetUrl = `${cfg.baseUrl}${cfg.endpoint}/${encodeURIComponent(loggerName)}`;
 
             try {
-                let url, body;
-                if (config.type === 'actuator') {
-                    url = `${config.baseUrl}/actuator/loggers/${loggerName}`;
-                    body = JSON.stringify({ configuredLevel: newLevel });
-                } else {
-                    url = `${config.baseUrl}/api/admin/loggers/${loggerName}`;
-                    body = JSON.stringify({ level: newLevel });
-                }
-
-                const response = await fetch(url, {
+                const res = await fetch(targetUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: body
+                    body: JSON.stringify({ configuredLevel: newLevel })
                 });
 
-                if (!response.ok) {
-                    showAlert(`Failed to update logger '${loggerName}': HTTP ${response.status}`, 'danger');
-                    return;
-                }
-
-                showToast(`Logger '${loggerName}' level changed to ${newLevel} on ${config.name}!`, 'success');
+                if (!res.ok) throw new Error(`Server returned HTTP ${res.status}`);
+                showToast(`Logger [${loggerName}] changed to ${newLevel}`, 'success');
                 await loadLoggers();
             } catch (err) {
-                showAlert(`Failed to update logger '${loggerName}': ${err.message}`, 'danger');
-            }
-        }
-
-        async function resetLevel(loggerName) {
-            const serviceKey = document.getElementById('serviceSelect').value;
-            const config = SERVICE_CONFIGS[serviceKey];
-
-            try {
-                let url, body;
-                if (config.type === 'actuator') {
-                    url = `${config.baseUrl}/actuator/loggers/${loggerName}`;
-                    body = JSON.stringify({ configuredLevel: null });
-                } else {
-                    url = `${config.baseUrl}/api/admin/loggers/${loggerName}`;
-                    body = JSON.stringify({ level: 'NOTSET' });
-                }
-
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: body
-                });
-
-                if (!response.ok) {
-                    showAlert(`Failed to reset logger '${loggerName}': HTTP ${response.status}`, 'danger');
-                    return;
-                }
-
-                showToast(`Logger '${loggerName}' reset to default configuration.`, 'info');
-                await loadLoggers();
-            } catch (err) {
-                showAlert(`Failed to reset logger '${loggerName}': ${err.message}`, 'danger');
+                showToast(`Failed to update logger: ${err.message}`, 'danger');
             }
         }
 
         async function setGroupLevel(level) {
             const serviceKey = document.getElementById('serviceSelect').value;
-            const config = SERVICE_CONFIGS[serviceKey];
-            const targetName = config.appPrefix;
-
-            try {
-                let url, body;
-                if (config.type === 'actuator') {
-                    url = `${config.baseUrl}/actuator/loggers/${targetName}`;
-                    body = JSON.stringify({ configuredLevel: level });
-                } else {
-                    url = `${config.baseUrl}/api/admin/loggers/${targetName}`;
-                    body = JSON.stringify({ level: level });
-                }
-
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: body
-                });
-
-                if (!response.ok) {
-                    showAlert(`Failed to set group level: HTTP ${response.status}`, 'danger');
-                    return;
-                }
-
-                showToast(`Set root application package '${targetName}' to ${level}!`, 'success');
-                await loadLoggers();
-            } catch (err) {
-                showAlert(`Failed to set group level: ${err.message}`, 'danger');
-            }
+            const cfg = SERVICE_CONFIGS[serviceKey];
+            await updateLogLevel(cfg.appPrefix, level);
         }
 
-        function escapeJs(str) {
-            return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
-        }
-
-        function showAlert(msg, type) {
-            const container = document.getElementById('alertContainer');
-            container.innerHTML = `
-                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i> ${msg}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>`;
-        }
-
-        function showToast(msg, type = 'success') {
+        function showToast(msg, type = 'info') {
             const container = document.getElementById('toastContainer');
             const toastId = 'toast-' + Date.now();
             const toastHtml = `
-                <div id="${toastId}" class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'info'} border-0 mb-2 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+                <div id="${toastId}" class="toast align-items-center text-white bg-${type === 'success' ? 'success' : (type === 'danger' ? 'danger' : 'info')} border-0 mb-2 shadow-lg" role="alert">
                     <div class="d-flex">
-                        <div class="toast-body">
-                            <i class="bi bi-check-circle-fill me-2"></i> ${msg}
-                        </div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        <div class="toast-body">${escapeHtml(msg)}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                     </div>
                 </div>`;
             container.insertAdjacentHTML('beforeend', toastHtml);
             const toastElement = document.getElementById(toastId);
-            const bsToast = new bootstrap.Toast(toastElement, { delay: 4000 });
+            const bsToast = new bootstrap.Toast(toastElement, { delay: 3500 });
             bsToast.show();
         }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
     </script>
-    <script src="/vendor/bootstrap.bundle.min.js"></script>
 </body>
 </html>

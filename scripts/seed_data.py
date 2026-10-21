@@ -97,7 +97,7 @@ def make_request(url, method, data=None, headers=None):
 
 def wait_for_services():
     print("⏳ Checking if microservices are reachable...")
-    for attempt in range(60):
+    for attempt in range(120):
         cat_status, cat_body = make_request(CATALOG_HEALTH_URL, "GET")
         inv_status, inv_body = make_request(INVENTORY_HEALTH_URL, "GET")
 
@@ -108,7 +108,7 @@ def wait_for_services():
             print("🚀 All microservices are online and ready!")
             return True
 
-        time.sleep(0.5)
+        time.sleep(1)
 
     print("❌ Error: Microservices did not become ready in time.")
     print("   Please start them first using Podman or Docker Compose:")

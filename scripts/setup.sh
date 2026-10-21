@@ -173,14 +173,15 @@ configure_env() {
             cat <<EOF > $ENV_FILE
 COMPOSE_PROFILES=postgres
 INVENTORY_DB_TYPE=POSTGRESQL
-SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:${DB_PORT:-5432}/inventory
+SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/inventory
 SPRING_DATASOURCE_USERNAME=${DB_USER:-inventory}
 SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-inventory}
 SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
 SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
-DB_PORT=${DB_PORT:-5432}
+DB_PORT=${DB_PORT:-5433}
 DB_USER=${DB_USER:-inventory}
 DB_PASSWORD=${DB_PASSWORD:-inventory}
+REDIS_PORT=${REDIS_PORT:-6381}
 EOF
             ;;
         mssql)
@@ -285,14 +286,13 @@ case "$COMMAND" in
             configure_env "$DB_TYPE"
         fi
 
+        COMPOSE_ARGS=()
         if [ -f "$ENV_FILE" ]; then
-            ENV_ARG="--env-file $ENV_FILE"
-        else
-            ENV_ARG=""
+            COMPOSE_ARGS+=(--env-file "$ENV_FILE")
         fi
 
         echo "🚀 Starting environment..."
-        $DOCKER_COMPOSE --profile "${DB_TYPE:-postgres}" "$ENV_ARG" -f $COMPOSE_FILE up --build -d
+        $DOCKER_COMPOSE --profile "${DB_TYPE:-postgres}" "${COMPOSE_ARGS[@]}" -f "$COMPOSE_FILE" up --build -d
 
         # Check if user passed --seed
         if [[ "$*" == *"--seed"* ]]; then

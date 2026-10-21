@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2026 Vivek Umrao.
- *
+ * Copyright (c) 2026 Vivek Umrao.\n *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -82,7 +81,7 @@ public class InventoryController {
 
     @PostMapping(value = "/bulk", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<InventoryItem>> createInventoryBulk(@RequestBody List<InventoryItem> items) {
-        log.info("POST /api/inventory/bulk requested with {} items", items.size());
+        log.info("POST /api/inventory/bulk requested with {} items", items != null ? items.size() : 0);
         List<InventoryItem> created = inventoryService.createInventoryItemsBulk(items);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -110,6 +109,18 @@ public class InventoryController {
         InventoryItem updated = inventoryService.adjustStock(sku, quantityChange, transactionType, referenceId);
         log.info("Stock adjusted successfully for SKU: {}. New Quantity: {}", sku, updated.getQuantity());
         return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/{sku}")
+    public ResponseEntity<Void> deleteInventoryItem(@PathVariable String sku) {
+        log.info("DELETE /api/inventory/{} requested", sku);
+        try {
+            inventoryService.deleteInventoryItem(sku);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            log.warn("Failed to delete inventory item for SKU: {}. Reason: {}", sku, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @GetMapping("/{sku}/transactions")
