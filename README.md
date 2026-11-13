@@ -14,6 +14,14 @@
   limitations under the License.
 -->
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo/logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/assets/logo/logo-light.svg">
+    <img alt="Agentic Inventory Logo" src="docs/assets/logo/logo-dark.svg" width="550">
+  </picture>
+</p>
+
 # Smart Inventory Management System
 
 [![Java Version](https://img.shields.io/badge/Java-17%20%7C%2021-orange.svg)](https://openjdk.org/)
@@ -182,6 +190,7 @@ Comprehensive engineering specifications, designs, and guides are located in the
 - 🗄️ **[Database Schemas & Kafka Messaging Guide](docs/DATABASE_AND_MESSAGING.md)**: Relational tables (Postgres, MSSQL, MySQL, Oracle, DB2), MongoDB document schemas, and Kafka event specifications.
 - ⛵ **[Helm Chart Deployment Guide](docs/HELM_DEPLOYMENT.md)**: Distributed Kubernetes deployment, parameterizable Helm values, ingress routing, and multi-cloud setup.
 - 🧪 **[Testing Strategy, JaCoCo & DevOps Guide](docs/TESTING_AND_DEVOPS.md)**: Multi-layered testing strategy, Testcontainers integration, JaCoCo reports, and CI/CD best practices.
+- 🎨 **[Brand Guidelines & Logo System Guide](docs/BRAND_GUIDELINES.md)**: Identity design specifications, vector SVG masters, web favicons, and color palette strategy.
 - 📘 **[Developer Guide & System Manual](docs/README.md)**: Complete developer handbook, security configurations, and REST API reference.
 
 ---

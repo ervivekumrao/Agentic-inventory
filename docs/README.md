@@ -33,8 +33,9 @@ Welcome to the **Smart Inventory Management System** developer guide and technic
 10. [Complete REST API Reference](#10-complete-rest-api-reference)
 11. [Testing Strategy, Testcontainers & JaCoCo Coverage](#11-testing-strategy-testcontainers--jacoco-coverage)
 12. [Podman, Docker & Kubernetes Helm Deployment](#12-podman-docker--kubernetes-helm-deployment)
-13. [Troubleshooting & Developer FAQ](#13-troubleshooting--developer-faq)
-14. [License & Copyright](#14-license--copyright)
+13. [Brand Identity & Logo System Guide](BRAND_GUIDELINES.md)
+14. [Troubleshooting & Developer FAQ](#13-troubleshooting--developer-faq)
+15. [License & Copyright](#14-license--copyright)
 
 ---
 
