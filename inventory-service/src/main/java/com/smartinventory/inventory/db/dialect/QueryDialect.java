@@ -57,6 +57,11 @@ public interface QueryDialect {
     List<Map<String, Object>> executeCustomQuery(String sql, Object... params);
 
     /**
+     * Generates DB-specific non-blocking reservation selection query with SKIP LOCKED / READPAST.
+     */
+    String getReservationLockQuery(String sku, int limit);
+
+    /**
      * Executes custom parameterized UPDATE / INSERT / DELETE query and returns affected row count.
      */
     int executeCustomUpdate(String sql, Object... params);

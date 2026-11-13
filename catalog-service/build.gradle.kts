@@ -38,8 +38,10 @@ dependencies {
     implementation(libs.spring.boot.starter.validation)
     implementation(libs.springdoc.openapi)
     implementation(libs.commons.lang3)
+    implementation(libs.spring.boot.starter.security)
     implementation(libs.micrometer.prometheus)
     implementation(libs.spring.boot.starter.actuator)
 
     testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.spring.security.test)
 }

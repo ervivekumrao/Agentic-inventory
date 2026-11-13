@@ -219,11 +219,32 @@ public class InventoryReservationService {
     }
 
     /**
+     * Automated Reaper for Claimed Units:
+     * Prunes CLAIMED reservation units older than 1 hour to prevent unbounded table bloat in high-volume environments.
+     */
+    @Scheduled(fixedRate = 60000)
+    @Transactional
+    public void cleanupClaimedReservations() {
+        Instant threshold = Instant.now().minus(java.time.Duration.ofHours(1));
+        List<InventoryReservationUnit> claimedOld = unitRepository.findByStatusAndCreatedAtBefore(
+                InventoryReservationUnit.STATUS_CLAIMED,
+                threshold
+        );
+        if (!claimedOld.isEmpty()) {
+            unitRepository.deleteAllInBatch(claimedOld);
+            log.info("Auto-reaper purged {} old claimed reservation units to maintain bounded table size", claimedOld.size());
+        }
+    }
+
+    /**
      * Replenishes the bounded unit pool from the master InventoryItem ledger.
+     * Uses pessimistic write lock on the master ledger record to prevent race conditions across distributed cluster pods.
      */
     @Transactional
     public synchronized void replenishPoolFromMasterLedger(String sku, int minimumNeeded) {
-        InventoryItem item = inventoryRepository.findBySku(sku).orElse(null);
+        InventoryItem item = inventoryRepository.findBySkuForUpdate(sku)
+                .or(() -> inventoryRepository.findBySku(sku))
+                .orElse(null);
         if (item == null) {
             return;
         }

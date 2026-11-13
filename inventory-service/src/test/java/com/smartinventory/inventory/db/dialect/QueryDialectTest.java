@@ -43,6 +43,7 @@ class QueryDialectTest {
         assertEquals(DatabaseType.POSTGRESQL, dialect.getDatabaseType());
         assertTrue(dialect.getPaginationClause(10, 0).contains("LIMIT 10 OFFSET 0"));
         assertTrue(dialect.getTopStockItemsQuery(5).toUpperCase().contains("5"));
+        assertTrue(dialect.getReservationLockQuery("SKU-001", 5).contains("LIMIT 5 FOR UPDATE SKIP LOCKED"));
         assertNotNull(dialect.getInventorySummaryQuery());
     }
 
@@ -52,6 +53,7 @@ class QueryDialectTest {
         assertEquals(DatabaseType.MYSQL, dialect.getDatabaseType());
         assertTrue(dialect.getPaginationClause(10, 5).contains("LIMIT 10 OFFSET 5"));
         assertTrue(dialect.getTopStockItemsQuery(5).toUpperCase().contains("5"));
+        assertTrue(dialect.getReservationLockQuery("SKU-001", 5).contains("LIMIT 5 FOR UPDATE SKIP LOCKED"));
     }
 
     @Test
@@ -60,6 +62,7 @@ class QueryDialectTest {
         assertEquals(DatabaseType.ORACLE, dialect.getDatabaseType());
         assertTrue(dialect.getPaginationClause(10, 5).contains("FETCH NEXT 10 ROWS ONLY"));
         assertTrue(dialect.getTopStockItemsQuery(5).contains("FETCH FIRST 5 ROWS ONLY"));
+        assertTrue(dialect.getReservationLockQuery("SKU-001", 5).contains("FETCH FIRST 5 ROWS ONLY FOR UPDATE SKIP LOCKED"));
     }
 
     @Test
@@ -68,6 +71,7 @@ class QueryDialectTest {
         assertEquals(DatabaseType.MSSQL, dialect.getDatabaseType());
         assertTrue(dialect.getPaginationClause(10, 5).contains("FETCH NEXT 10 ROWS ONLY"));
         assertTrue(dialect.getTopStockItemsQuery(5).contains("SELECT TOP (5)"));
+        assertTrue(dialect.getReservationLockQuery("SKU-001", 5).contains("WITH (UPDLOCK, READPAST, ROWLOCK)"));
     }
 
     @Test
@@ -76,6 +80,7 @@ class QueryDialectTest {
         assertEquals(DatabaseType.DB2, dialect.getDatabaseType());
         assertTrue(dialect.getPaginationClause(10, 5).contains("FETCH FIRST 10 ROWS ONLY"));
         assertTrue(dialect.getTopStockItemsQuery(5).contains("FETCH FIRST 5 ROWS ONLY"));
+        assertTrue(dialect.getReservationLockQuery("SKU-001", 5).contains("FETCH FIRST 5 ROWS ONLY FOR UPDATE SKIP LOCKED"));
     }
 
     @Test

@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -50,6 +51,7 @@ public class InventoryReservationController {
     }
 
     @PostMapping("/reserve")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR', 'USER')")
     public ResponseEntity<ReservationResult> reserveStock(@Valid @RequestBody ReserveStockRequest request) {
         log.info("POST /api/inventory/reservations/reserve requested for SKU: {}, qty: {}, ref: {}",
                 request.sku(), request.quantity(), request.reservationId());
@@ -64,6 +66,7 @@ public class InventoryReservationController {
     }
 
     @PostMapping("/claim/{reservationId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR', 'USER')")
     public ResponseEntity<Map<String, Object>> claimReservation(@PathVariable String reservationId) {
         log.info("POST /api/inventory/reservations/claim/{} requested", reservationId);
         boolean success = reservationService.claimReservation(reservationId);
@@ -83,6 +86,7 @@ public class InventoryReservationController {
     }
 
     @PostMapping("/release/{reservationId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR', 'USER')")
     public ResponseEntity<Map<String, Object>> releaseReservation(@PathVariable String reservationId) {
         log.info("POST /api/inventory/reservations/release/{} requested", reservationId);
         boolean success = reservationService.releaseReservation(reservationId);
@@ -102,6 +106,7 @@ public class InventoryReservationController {
     }
 
     @GetMapping("/pool/{sku}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR', 'USER')")
     public ResponseEntity<PoolStatusDto> getPoolStatus(@PathVariable String sku) {
         log.debug("GET /api/inventory/reservations/pool/{} requested", sku);
         return ResponseEntity.ok(reservationService.getPoolStatus(sku));
@@ -113,6 +118,7 @@ public class InventoryReservationController {
      * Proves non-blocking execution and zero overselling.
      */
     @PostMapping("/simulate-flash-sale")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<Map<String, Object>> simulateFlashSale(@RequestBody FlashSaleSimulationRequest request) {
         String sku = request.sku() != null ? request.sku() : "LAPTOP-PRO-15";
         int concurrentCheckouts = request.concurrentCheckouts() > 0 ? Math.min(request.concurrentCheckouts(), 100) : 30;

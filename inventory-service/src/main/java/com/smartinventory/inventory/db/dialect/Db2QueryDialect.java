@@ -54,4 +54,11 @@ public class Db2QueryDialect extends AbstractQueryDialect {
         int safeLimit = SqlSanitizer.validateLimit(limit);
         return "SELECT sku, quantity, warehouse_location FROM inventory_items ORDER BY quantity DESC FETCH FIRST " + safeLimit + " ROWS ONLY";
     }
+
+    @Override
+    public String getReservationLockQuery(String sku, int limit) {
+        int safeLimit = SqlSanitizer.validateLimit(limit);
+        return String.format("SELECT * FROM inventory_reservation_units WHERE sku = '%s' AND status = 'AVAILABLE' FETCH FIRST %d ROWS ONLY FOR UPDATE SKIP LOCKED",
+                SqlSanitizer.escapeLiteral(sku), safeLimit);
+    }
 }

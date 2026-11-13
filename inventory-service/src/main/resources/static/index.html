@@ -25,51 +25,69 @@
     <script src="/vendor/bootstrap.bundle.min.js"></script>
     <style>
         :root, [data-theme="dark"] {
-            --bg-body: #0b0f19;
-            --bg-surface: #111827;
-            --bg-card: #151d30;
-            --bg-card-hover: #1c263d;
-            --bg-card-nested: #0d1424;
-            --border-subtle: #233148;
-            --border-hover: #38bdf8;
+            --bg-base: #070b14;
+            --bg-surface: #0d1424;
+            --bg-card: #121b2f;
+            --bg-card-hover: #17233d;
+            --bg-card-nested: #090e1a;
+            --border-subtle: rgba(56, 189, 248, 0.12);
+            --border-hover: rgba(56, 189, 248, 0.45);
+            --border-strong: #1e293b;
             --primary: #38bdf8;
-            --primary-gradient: linear-gradient(135deg, #0284c7, #2563eb);
-            --accent-green: #22c55e;
+            --primary-glow: rgba(56, 189, 248, 0.25);
+            --primary-gradient: linear-gradient(135deg, #0284c7 0%, #0ea5e9 50%, #6366f1 100%);
+            --accent-green: #10b981;
+            --accent-green-bg: rgba(16, 185, 129, 0.12);
+            --accent-green-border: rgba(16, 185, 129, 0.3);
             --accent-amber: #f59e0b;
-            --accent-red: #ef4444;
+            --accent-amber-bg: rgba(245, 158, 11, 0.12);
+            --accent-amber-border: rgba(245, 158, 11, 0.3);
+            --accent-red: #f43f5e;
+            --accent-red-bg: rgba(244, 63, 94, 0.12);
+            --accent-red-border: rgba(244, 63, 94, 0.3);
             --text-heading: #f8fafc;
             --text-body: #cbd5e1;
             --text-muted: #94a3b8;
-            --input-bg: #0b1120;
-            --input-border: #2b3d5b;
+            --input-bg: #090f1d;
+            --input-border: #1e2b45;
             --input-text: #f8fafc;
             --input-placeholder: #64748b;
-            --modal-bg: #151d30;
-            --modal-header-bg: #111827;
-            --modal-border: #2b3d5b;
-            --table-th-bg: rgba(255, 255, 255, 0.03);
-            --table-hover: rgba(56, 189, 248, 0.05);
-            --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.35);
-            --shadow-modal: 0 20px 48px rgba(0, 0, 0, 0.6);
-            --tech-callout-bg: rgba(56, 189, 248, 0.07);
+            --modal-bg: #10182b;
+            --modal-header-bg: #0c1322;
+            --modal-border: rgba(56, 189, 248, 0.2);
+            --table-th-bg: rgba(13, 20, 36, 0.85);
+            --table-hover: rgba(56, 189, 248, 0.04);
+            --table-stripe: rgba(255, 255, 255, 0.015);
+            --shadow-card: 0 8px 28px rgba(0, 0, 0, 0.4);
+            --shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.75);
+            --tech-callout-bg: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(99, 102, 241, 0.06) 100%);
             --tech-callout-border: rgba(56, 189, 248, 0.25);
-            --badge-wh-bg: rgba(255, 255, 255, 0.08);
-            --badge-wh-text: #cbd5e1;
+            --badge-wh-bg: rgba(255, 255, 255, 0.07);
+            --badge-wh-text: #e2e8f0;
+            --header-glass: rgba(13, 20, 36, 0.82);
         }
 
         [data-theme="light"] {
-            --bg-body: #f8fafc;
+            --bg-base: #f8fafc;
             --bg-surface: #ffffff;
             --bg-card: #ffffff;
             --bg-card-hover: #f1f5f9;
             --bg-card-nested: #f8fafc;
             --border-subtle: #e2e8f0;
             --border-hover: #0284c7;
+            --border-strong: #cbd5e1;
             --primary: #0284c7;
-            --primary-gradient: linear-gradient(135deg, #0284c7, #1d4ed8);
-            --accent-green: #16a34a;
+            --primary-glow: rgba(2, 132, 199, 0.18);
+            --primary-gradient: linear-gradient(135deg, #0284c7 0%, #0ea5e9 50%, #4f46e5 100%);
+            --accent-green: #059669;
+            --accent-green-bg: rgba(5, 150, 105, 0.1);
+            --accent-green-border: rgba(5, 150, 105, 0.25);
             --accent-amber: #d97706;
-            --accent-red: #dc2626;
+            --accent-amber-bg: rgba(217, 119, 6, 0.1);
+            --accent-amber-border: rgba(217, 119, 6, 0.25);
+            --accent-red: #e11d48;
+            --accent-red-bg: rgba(225, 29, 72, 0.1);
+            --accent-red-border: rgba(225, 29, 72, 0.25);
             --text-heading: #0f172a;
             --text-body: #334155;
             --text-muted: #64748b;
@@ -81,137 +99,279 @@
             --modal-header-bg: #f8fafc;
             --modal-border: #e2e8f0;
             --table-th-bg: #f8fafc;
-            --table-hover: #f1f5f9;
-            --shadow-card: 0 4px 12px rgba(15, 23, 42, 0.06);
-            --shadow-modal: 0 20px 48px rgba(15, 23, 42, 0.18);
-            --tech-callout-bg: rgba(2, 132, 199, 0.06);
-            --tech-callout-border: rgba(2, 132, 199, 0.2);
+            --table-hover: rgba(2, 132, 199, 0.04);
+            --table-stripe: rgba(241, 245, 249, 0.5);
+            --shadow-card: 0 4px 20px rgba(15, 23, 42, 0.06);
+            --shadow-modal: 0 20px 48px rgba(15, 23, 42, 0.16);
+            --tech-callout-bg: linear-gradient(135deg, rgba(2, 132, 199, 0.05) 0%, rgba(99, 102, 241, 0.04) 100%);
+            --tech-callout-border: rgba(2, 132, 199, 0.25);
             --badge-wh-bg: rgba(15, 23, 42, 0.06);
             --badge-wh-text: #334155;
+            --header-glass: rgba(255, 255, 255, 0.88);
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
-            background-color: var(--bg-body);
+            background-color: var(--bg-base);
             color: var(--text-body);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', Helvetica, Arial, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             margin: 0;
-            transition: background-color 0.2s ease, color 0.2s ease;
+            transition: background-color 0.25s ease, color 0.25s ease;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* Top Header Navigation */
         .navbar-custom {
-            background-color: var(--bg-surface);
+            background: var(--header-glass);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border-subtle);
             padding: 0.85rem 2rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: background-color 0.25s ease, border-color 0.25s ease;
         }
 
         .brand-title {
-            font-weight: 700;
-            font-size: 1.2rem;
+            font-weight: 800;
+            font-size: 1.22rem;
             color: var(--text-heading);
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.85rem;
+            letter-spacing: -0.02em;
         }
 
         .brand-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #0284c7, #6366f1);
-            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            background: var(--primary-gradient);
+            border-radius: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.15rem;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 14px var(--primary-glow);
+            transition: transform 0.2s ease;
+        }
+
+        .brand-icon:hover {
+            transform: scale(1.05) rotate(2deg);
+        }
+
+        .brand-badge {
+            font-size: 0.725rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 0.25rem 0.65rem;
+            border-radius: 20px;
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--primary);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .brand-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 6px var(--primary);
+        }
+
+        .nav-btn-link {
+            font-size: 0.84rem;
+            font-weight: 600;
+            padding: 0.45rem 0.95rem;
+            border-radius: 9px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            transition: all 0.15s ease;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            background: transparent;
+        }
+
+        .nav-btn-link:hover {
+            color: var(--primary);
+            border-color: var(--border-hover);
+            background: var(--bg-card-hover);
+            transform: translateY(-1px);
+        }
+
+        .nav-btn-link.active-ai {
+            color: #38bdf8;
+            border-color: rgba(56, 189, 248, 0.35);
+            background: rgba(56, 189, 248, 0.08);
         }
 
         .main-container {
-            padding: 1.75rem 2rem;
+            padding: 2rem 2.25rem;
             flex: 1;
-            max-width: 1600px;
+            max-width: 1650px;
             margin: 0 auto;
             width: 100%;
         }
 
-        /* Stat Cards */
+        /* Modern KPI Cards */
         .kpi-card {
-            background-color: var(--bg-card);
+            background: var(--bg-card);
             border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 1.25rem 1.5rem;
+            border-radius: 16px;
+            padding: 1.4rem 1.6rem;
             box-shadow: var(--shadow-card);
-            transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--border-subtle);
+            transition: background 0.2s ease;
         }
 
         .kpi-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
             border-color: var(--border-hover);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .kpi-card.cyan:hover::before { background: #38bdf8; }
+        .kpi-card.green:hover::before { background: var(--accent-green); }
+        .kpi-card.amber:hover::before { background: var(--accent-amber); }
+        .kpi-card.purple:hover::before { background: #818cf8; }
+
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.6rem;
         }
 
         .kpi-title {
-            font-size: 0.8rem;
+            font-size: 0.775rem;
             text-transform: uppercase;
             font-weight: 700;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
             color: var(--text-muted);
-            margin-bottom: 0.4rem;
         }
 
+        .kpi-icon-pill {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .kpi-icon-pill.cyan { background: rgba(56, 189, 248, 0.12); color: #38bdf8; }
+        .kpi-icon-pill.green { background: var(--accent-green-bg); color: var(--accent-green); }
+        .kpi-icon-pill.amber { background: var(--accent-amber-bg); color: var(--accent-amber); }
+        .kpi-icon-pill.purple { background: rgba(129, 140, 248, 0.12); color: #818cf8; }
+
         .kpi-value {
-            font-size: 1.75rem;
-            font-weight: 700;
+            font-size: 2.15rem;
+            font-weight: 800;
             color: var(--text-heading);
+            letter-spacing: -0.02em;
             line-height: 1.1;
+            margin-bottom: 0.45rem;
+        }
+
+        .kpi-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         /* Main Container Cards */
         .content-card {
             background-color: var(--bg-card);
             border: 1px solid var(--border-subtle);
-            border-radius: 14px;
-            padding: 1.5rem;
+            border-radius: 18px;
+            padding: 1.75rem;
             box-shadow: var(--shadow-card);
-            margin-bottom: 1.5rem;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
+            margin-bottom: 1.75rem;
+            transition: background-color 0.25s ease, border-color 0.25s ease;
         }
 
         .inner-card {
             background-color: var(--bg-card-nested);
             border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 1.25rem;
+            border-radius: 14px;
+            padding: 1.4rem;
             height: 100%;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
+            transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.2s ease;
         }
 
+        .inner-card:hover {
+            border-color: var(--border-hover);
+        }
+
+        /* Modern Segmented Capsule Tabs */
         .nav-tabs-custom {
-            border-bottom: 1px solid var(--border-subtle);
-            gap: 0.5rem;
+            border-bottom: none;
+            background: var(--bg-surface);
+            padding: 0.4rem;
+            border-radius: 14px;
+            border: 1px solid var(--border-subtle);
+            display: inline-flex;
+            gap: 0.35rem;
+            margin-bottom: 1.5rem;
         }
 
         .nav-tabs-custom .nav-link {
             background-color: transparent;
-            border: 1px solid transparent;
+            border: none;
             color: var(--text-muted);
             font-weight: 600;
-            padding: 0.65rem 1.25rem;
-            border-radius: 8px 8px 0 0;
+            font-size: 0.88rem;
+            padding: 0.65rem 1.35rem;
+            border-radius: 10px;
             display: inline-flex;
             align-items: center;
-            gap: 0.45rem;
-            transition: color 0.15s ease;
+            gap: 0.5rem;
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .nav-tabs-custom .nav-link:hover {
+            color: var(--text-heading);
+            background: rgba(255, 255, 255, 0.04);
         }
 
         .nav-tabs-custom .nav-link.active {
-            background-color: var(--bg-card);
-            border-color: var(--border-subtle) var(--border-subtle) transparent;
-            color: var(--primary);
-            border-bottom: 2px solid var(--primary);
+            background: var(--primary-gradient);
+            color: #ffffff;
+            box-shadow: 0 4px 14px var(--primary-glow);
         }
 
         /* Form Inputs & Controls */
@@ -219,17 +379,17 @@
             background-color: var(--input-bg);
             border: 1px solid var(--input-border);
             color: var(--input-text);
-            border-radius: 8px;
-            padding: 0.55rem 0.85rem;
+            border-radius: 10px;
+            padding: 0.625rem 0.95rem;
             font-size: 0.9rem;
-            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.2s ease;
         }
 
         .form-control-custom:focus, .form-select-custom:focus {
             background-color: var(--input-bg);
-            border-color: var(--border-hover);
+            border-color: var(--primary);
             color: var(--input-text);
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+            box-shadow: 0 0 0 3px var(--primary-glow);
             outline: none;
         }
 
@@ -237,22 +397,28 @@
             color: var(--input-placeholder);
         }
 
-        /* High-contrast, crystal-clear labels for all modals and forms */
         .form-label, label {
             color: var(--text-heading) !important;
             font-weight: 600 !important;
             font-size: 0.825rem !important;
-            letter-spacing: 0.015em;
-            margin-bottom: 0.4rem !important;
+            letter-spacing: 0.02em;
+            margin-bottom: 0.45rem !important;
             display: block;
         }
 
-        /* Table Styling */
+        /* Modern Table Styling */
+        .table-responsive {
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+        }
+
         .table-custom {
             color: var(--text-body);
             vertical-align: middle;
             margin-bottom: 0;
             font-size: 0.9rem;
+            background: transparent;
         }
 
         .table-custom th {
@@ -260,54 +426,98 @@
             color: var(--text-muted);
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.04em;
-            padding: 0.75rem 1rem;
+            font-size: 0.74rem;
+            letter-spacing: 0.06em;
+            padding: 0.9rem 1.15rem;
             border-bottom: 1px solid var(--border-subtle);
+            white-space: nowrap;
         }
 
         .table-custom td {
-            padding: 0.75rem 1rem;
+            padding: 0.9rem 1.15rem;
             border-bottom: 1px solid var(--border-subtle);
+            background-color: transparent;
+        }
+
+        .table-custom tbody tr {
+            transition: background-color 0.15s ease;
+        }
+
+        .table-custom tbody tr:nth-child(even) {
+            background-color: var(--table-stripe);
         }
 
         .table-custom tbody tr:hover {
-            background-color: var(--table-hover);
+            background-color: var(--table-hover) !important;
         }
 
         /* Status Badges */
         .status-badge {
             font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.25rem 0.65rem;
-            border-radius: 6px;
+            font-weight: 700;
+            padding: 0.325rem 0.75rem;
+            border-radius: 20px;
             display: inline-flex;
             align-items: center;
-            gap: 0.35rem;
+            gap: 0.45rem;
+            letter-spacing: 0.02em;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
         }
 
         .badge-healthy {
-            background: rgba(34, 197, 94, 0.12);
+            background: var(--accent-green-bg);
             color: var(--accent-green);
-            border: 1px solid rgba(34, 197, 94, 0.3);
+            border: 1px solid var(--accent-green-border);
+        }
+        .badge-healthy::before {
+            background-color: var(--accent-green);
+            box-shadow: 0 0 6px var(--accent-green);
         }
 
         .badge-low {
-            background: rgba(245, 158, 11, 0.12);
+            background: var(--accent-amber-bg);
             color: var(--accent-amber);
-            border: 1px solid rgba(245, 158, 11, 0.3);
+            border: 1px solid var(--accent-amber-border);
+        }
+        .badge-low::before {
+            background-color: var(--accent-amber);
+            box-shadow: 0 0 6px var(--accent-amber);
+            animation: pulseWarning 1.5s infinite;
         }
 
         .badge-out {
-            background: rgba(239, 68, 68, 0.12);
+            background: var(--accent-red-bg);
             color: var(--accent-red);
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            border: 1px solid var(--accent-red-border);
+        }
+        .badge-out::before {
+            background-color: var(--accent-red);
+            box-shadow: 0 0 6px var(--accent-red);
+        }
+
+        @keyframes pulseWarning {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
         }
 
         .badge-wh {
             background-color: var(--badge-wh-bg);
             color: var(--badge-wh-text);
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 0.78rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
         }
 
         /* Action Buttons */
@@ -315,32 +525,34 @@
             background: var(--primary-gradient);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 9px;
             font-weight: 600;
-            padding: 0.5rem 1rem;
+            padding: 0.55rem 1.15rem;
             display: inline-flex;
             align-items: center;
-            gap: 0.4rem;
-            transition: all 0.15s ease;
+            gap: 0.45rem;
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 14px var(--primary-glow);
         }
 
         .btn-action-primary:hover {
             opacity: 0.94;
             color: white;
             transform: translateY(-1px);
+            box-shadow: 0 6px 18px var(--primary-glow);
         }
 
         .btn-theme-toggle {
             background-color: transparent;
             border: 1px solid var(--border-subtle);
             color: var(--text-heading);
-            padding: 0.4rem 0.75rem;
-            border-radius: 8px;
+            padding: 0.45rem 0.85rem;
+            border-radius: 9px;
             font-size: 0.85rem;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.45rem;
             cursor: pointer;
             transition: all 0.15s ease;
         }
@@ -348,16 +560,18 @@
         .btn-theme-toggle:hover {
             border-color: var(--border-hover);
             color: var(--primary);
+            background: var(--bg-card-hover);
         }
 
         /* Tech Callout Banner */
         .tech-callout {
             background: var(--tech-callout-bg);
             border: 1px solid var(--tech-callout-border);
-            border-radius: 10px;
-            padding: 1.15rem 1.35rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.875rem;
+            border-radius: 14px;
+            padding: 1.35rem 1.6rem;
+            margin-bottom: 1.75rem;
+            font-size: 0.885rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         }
 
         /* Custom Modern Modal Styling */
@@ -365,49 +579,83 @@
             background-color: var(--modal-bg);
             border: 1px solid var(--modal-border);
             color: var(--text-body);
-            border-radius: 16px;
+            border-radius: 20px;
             box-shadow: var(--shadow-modal);
             overflow: hidden;
+            backdrop-filter: blur(16px);
         }
 
         .modal-header-custom {
             background-color: var(--modal-header-bg);
             border-bottom: 1px solid var(--border-subtle);
             color: var(--text-heading);
-            padding: 1.15rem 1.5rem;
+            padding: 1.25rem 1.65rem;
         }
 
         .modal-footer-custom {
             background-color: var(--modal-header-bg);
             border-top: 1px solid var(--border-subtle);
-            padding: 1rem 1.5rem;
+            padding: 1.15rem 1.65rem;
         }
 
         /* Pool Status Metric Boxes */
         .metric-box {
             background-color: var(--bg-card-nested);
             border: 1px solid var(--border-subtle);
-            border-radius: 10px;
-            padding: 0.75rem 0.5rem;
-            transition: border-color 0.15s ease;
+            border-radius: 12px;
+            padding: 0.95rem 0.75rem;
+            transition: all 0.18s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .metric-box:hover {
             border-color: var(--border-hover);
+            transform: translateY(-2px);
         }
 
         .metric-label {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--text-muted);
             text-transform: uppercase;
             font-weight: 700;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.35rem;
         }
 
         .metric-val {
-            font-size: 1.4rem;
-            font-weight: 700;
+            font-size: 1.65rem;
+            font-weight: 800;
             line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .sku-code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            background: rgba(56, 189, 248, 0.08);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        [data-theme="light"] .sku-code {
+            background: rgba(2, 132, 199, 0.08);
+            border: 1px solid rgba(2, 132, 199, 0.2);
+            color: #0284c7;
+        }
+
+        .btn-table-action {
+            border-radius: 7px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.32rem 0.65rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: all 0.15s ease;
         }
     </style>
 </head>
@@ -421,7 +669,7 @@
             </div>
             <div>
                 <span>Smart Inventory Platform</span>
-                <span class="badge bg-primary bg-opacity-25 text-primary ms-2 px-2 py-1 fs-7">High-Scale Architecture</span>
+                <span class="brand-badge ms-2">High-Scale Architecture</span>
             </div>
         </div>
         <div class="d-flex align-items-center gap-2">
@@ -430,14 +678,14 @@
                 <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
                 <span id="themeLabel">Dark</span>
             </button>
-            <a href="/chat.html" class="btn btn-outline-info btn-sm px-3">
-                <i class="bi bi-robot me-1"></i> AI Assistant
+            <a href="/chat.html" class="nav-btn-link active-ai" title="AI Operations Assistant">
+                <i class="bi bi-robot"></i> AI Assistant
             </a>
-            <a href="/logging-admin.html" class="btn btn-outline-secondary btn-sm px-3">
-                <i class="bi bi-sliders me-1"></i> Logger Admin
+            <a href="/logging-admin.html" class="nav-btn-link" title="Zero-Downtime Logging Admin">
+                <i class="bi bi-sliders"></i> Logger Admin
             </a>
-            <a href="/swagger-ui.html" target="_blank" class="btn btn-outline-secondary btn-sm px-3">
-                <i class="bi bi-terminal me-1"></i> Swagger API
+            <a href="/swagger-ui.html" target="_blank" class="nav-btn-link" title="OpenAPI Documentation">
+                <i class="bi bi-terminal"></i> Swagger API
             </a>
         </div>
     </header>
@@ -446,40 +694,52 @@
         <!-- KPI Row -->
         <div class="row g-3 mb-4">
             <div class="col-lg-3 col-md-6">
-                <div class="kpi-card">
-                    <div class="kpi-title">Tracked Inventory SKUs</div>
+                <div class="kpi-card cyan">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Tracked Inventory SKUs</span>
+                        <div class="kpi-icon-pill cyan"><i class="bi bi-layers"></i></div>
+                    </div>
                     <div class="kpi-value text-info" id="kpiTotalSkus">0</div>
-                    <small class="text-muted"><i class="bi bi-layers me-1"></i> Distinct SKU catalog items</small>
+                    <div class="kpi-meta"><i class="bi bi-check-circle-fill text-info"></i> Distinct catalog SKU items</div>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
-                <div class="kpi-card">
-                    <div class="kpi-title">Total Units In Stock</div>
+                <div class="kpi-card green">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Total Units In Stock</span>
+                        <div class="kpi-icon-pill green"><i class="bi bi-boxes"></i></div>
+                    </div>
                     <div class="kpi-value text-success" id="kpiTotalQuantity">0</div>
-                    <small class="text-muted"><i class="bi bi-boxes me-1"></i> Master physical ledger</small>
+                    <div class="kpi-meta"><i class="bi bi-database-check text-success"></i> Master physical ledger</div>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
-                <div class="kpi-card">
-                    <div class="kpi-title">Low Stock Reorder Alerts</div>
+                <div class="kpi-card amber">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Low Stock Reorder Alerts</span>
+                        <div class="kpi-icon-pill amber"><i class="bi bi-bell-fill"></i></div>
+                    </div>
                     <div class="kpi-value text-warning" id="kpiLowStockCount">0</div>
-                    <small class="text-muted"><i class="bi bi-bell-fill me-1"></i> At or below safety threshold</small>
+                    <div class="kpi-meta"><i class="bi bi-exclamation-triangle-fill text-warning"></i> At or below safety threshold</div>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
-                <div class="kpi-card">
-                    <div class="kpi-title">Locking Strategy</div>
-                    <div class="kpi-value text-primary" style="font-size: 1.25rem;">SKIP LOCKED</div>
-                    <small class="text-muted"><i class="bi bi-shield-check me-1"></i> Shopify Non-Blocking Pool</small>
+                <div class="kpi-card purple">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Locking Strategy</span>
+                        <div class="kpi-icon-pill purple"><i class="bi bi-shield-check"></i></div>
+                    </div>
+                    <div class="kpi-value" style="font-size: 1.35rem; color: #818cf8;">SKIP LOCKED</div>
+                    <div class="kpi-meta"><i class="bi bi-lightning-charge-fill" style="color: #818cf8;"></i> Shopify Non-Blocking Pool</div>
                 </div>
             </div>
         </div>
 
         <!-- Navigation Tabs -->
-        <ul class="nav nav-tabs nav-tabs-custom mb-3" id="hubTabs" role="tablist">
+        <ul class="nav nav-tabs nav-tabs-custom" id="hubTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="inventory-tab" data-bs-toggle="tab" data-bs-target="#inventoryPanel" type="button" role="tab">
-                    <i class="bi bi-table"></i> Inventory Ledger (Add / Delete / Adjust)
+                    <i class="bi bi-table"></i> Inventory Ledger (Add / Adjust / Delete)
                 </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -497,7 +757,10 @@
                 <div class="content-card">
                     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                         <div class="d-flex align-items-center gap-3 flex-wrap">
-                            <input type="text" id="inventorySearch" class="form-control-custom" placeholder="Filter by SKU or location..." oninput="filterInventoryTable()">
+                            <div class="position-relative">
+                                <input type="text" id="inventorySearch" class="form-control-custom ps-5" placeholder="Filter by SKU or location..." oninput="filterInventoryTable()">
+                                <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary"></i>
+                            </div>
                             <select id="warehouseFilter" class="form-select-custom" onchange="filterInventoryTable()">
                                 <option value="ALL">All Warehouses</option>
                                 <option value="Warehouse-North">Warehouse-North</option>
@@ -506,17 +769,17 @@
                                 <option value="Warehouse-West">Warehouse-West</option>
                                 <option value="Central-Hub">Central-Hub</option>
                             </select>
-                            <div class="form-check form-switch ms-2">
+                            <div class="form-check form-switch ms-1">
                                 <input class="form-check-input" type="checkbox" id="lowStockOnlySwitch" onchange="filterInventoryTable()">
                                 <label class="form-check-label text-warning small fw-bold mb-0" for="lowStockOnlySwitch">Low Stock Only</label>
                             </div>
                         </div>
 
                         <div class="d-flex gap-2">
-                            <button class="btn btn-outline-secondary btn-sm" onclick="loadInventory()">
+                            <button class="nav-btn-link" onclick="loadInventory()">
                                 <i class="bi bi-arrow-clockwise"></i> Refresh
                             </button>
-                            <button class="btn-action-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                            <button class="btn-action-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
                                 <i class="bi bi-plus-circle-fill"></i> Add Inventory Item
                             </button>
                         </div>
@@ -531,12 +794,12 @@
                                     <th>Reorder Point</th>
                                     <th>Warehouse Location</th>
                                     <th>Status</th>
-                                    <th style="width: 230px;">Actions</th>
+                                    <th style="width: 240px;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="inventoryTableBody">
                                 <tr>
-                                    <td colspan="6" class="text-center py-4 text-muted">
+                                    <td colspan="6" class="text-center py-5 text-muted">
                                         <div class="spinner-border spinner-border-sm text-info me-2"></div> Loading inventory records...
                                     </td>
                                 </tr>
@@ -550,11 +813,11 @@
             <div class="tab-pane fade" id="reservationsPanel" role="tabpanel">
                 <div class="content-card">
                     <div class="tech-callout">
-                        <div class="d-flex align-items-center gap-2 mb-1">
-                            <i class="bi bi-info-circle-fill text-info fs-5"></i>
-                            <strong style="color: var(--text-heading);">Shopify High-Scale Flash Sale Architecture (Millions of Requests/Minute)</strong>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-lightning-charge-fill text-warning fs-4"></i>
+                            <strong style="color: var(--text-heading); font-size: 1.05rem;">Shopify High-Scale Flash Sale Architecture (Millions of Requests/Minute)</strong>
                         </div>
-                        <p class="mb-0" style="color: var(--text-body); font-size: 0.85rem; line-height: 1.5;">
+                        <p class="mb-0" style="color: var(--text-body); font-size: 0.88rem; line-height: 1.6;">
                             Traditional row updates (<code>UPDATE items SET qty = qty - 1 WHERE sku = 'HOT-SKU'</code>) fail under peak flash sales because thousands of concurrent checkouts block each other on a single database row lock, causing database connection exhaustion and lock wait timeouts.<br/>
                             Inspired by <strong>Shopify's engineering breakthrough</strong>, this service represents available units as individual rows inside a bounded pool and selects units atomically using <strong><code>FOR UPDATE SKIP LOCKED</code></strong>.
                             Concurrent checkouts skip locked units and lock free units in parallel with <strong>sub-millisecond hold times</strong>!
@@ -565,7 +828,9 @@
                         <!-- Left: Live Reservation Test -->
                         <div class="col-lg-5">
                             <div class="inner-card">
-                                <h6 class="text-primary fw-bold mb-3"><i class="bi bi-cart-check-fill me-1"></i> Interactive Checkout Reservation</h6>
+                                <h6 class="text-primary fw-bold mb-3 d-flex align-items-center gap-2">
+                                    <i class="bi bi-cart-check-fill"></i> Interactive Checkout Reservation
+                                </h6>
                                 <div class="mb-3">
                                     <label class="form-label" for="reserveSkuSelect">Target SKU</label>
                                     <select id="reserveSkuSelect" class="form-select-custom w-100" onchange="refreshPoolStatus()">
@@ -584,7 +849,7 @@
                                     <label class="form-label" for="reserveTtlInput">Hold Time-To-Live (TTL in seconds)</label>
                                     <input type="number" id="reserveTtlInput" class="form-control-custom w-100" value="600">
                                 </div>
-                                <button class="btn btn-action-primary w-100 mb-3" onclick="executeReservation()">
+                                <button class="btn btn-action-primary w-100 mb-3 justify-content-center" onclick="executeReservation()">
                                     <i class="bi bi-lock-fill"></i> Reserve Units Non-Blocking (SKIP LOCKED)
                                 </button>
                                 <div id="reservationResultAlert"></div>
@@ -595,8 +860,10 @@
                         <div class="col-lg-7">
                             <div class="inner-card mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="text-info fw-bold mb-0"><i class="bi bi-speedometer2 me-1"></i> Bounded Unit Pool Live Metrics</h6>
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="refreshPoolStatus()"><i class="bi bi-arrow-clockwise"></i> Inspect</button>
+                                    <h6 class="text-info fw-bold mb-0 d-flex align-items-center gap-2">
+                                        <i class="bi bi-speedometer2"></i> Bounded Unit Pool Live Metrics
+                                    </h6>
+                                    <button class="nav-btn-link py-1 px-2" onclick="refreshPoolStatus()"><i class="bi bi-arrow-clockwise"></i> Inspect</button>
                                 </div>
                                 <div class="row g-2 text-center" id="poolStatusRow">
                                     <div class="col-3">
@@ -628,7 +895,9 @@
 
                             <!-- Flash Sale Stress Simulator -->
                             <div class="inner-card">
-                                <h6 class="text-warning fw-bold mb-2"><i class="bi bi-fire me-1"></i> Concurrency Flash Sale Stress Simulator</h6>
+                                <h6 class="text-warning fw-bold mb-2 d-flex align-items-center gap-2">
+                                    <i class="bi bi-fire"></i> Concurrency Flash Sale Stress Simulator
+                                </h6>
                                 <p class="small text-muted mb-3">
                                     Launches parallel threads hitting the exact same SKU simultaneously to benchmark non-blocking locking throughput.
                                 </p>
@@ -642,7 +911,7 @@
                                         <input type="number" id="simQtyInput" class="form-control-custom w-100" value="1" min="1" max="10">
                                     </div>
                                 </div>
-                                <button class="btn btn-warning w-100 fw-bold py-2" onclick="runFlashSaleSimulation()">
+                                <button class="btn btn-warning w-100 fw-bold py-2 justify-content-center d-flex align-items-center gap-2" onclick="runFlashSaleSimulation()">
                                     <i class="bi bi-rocket-takeoff-fill"></i> Simulate Peak Flash Sale Surge
                                 </button>
                                 <div id="simulationResult" class="mt-3"></div>
@@ -657,11 +926,11 @@
 
     <!-- Modal: Add Inventory Item -->
     <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content modal-content-custom">
                 <div class="modal-header modal-header-custom">
-                    <h5 class="modal-title" id="addItemModalLabel"><i class="bi bi-plus-circle text-info me-2"></i>Add Inventory Item</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title fw-bold" id="addItemModalLabel"><i class="bi bi-plus-circle text-info me-2"></i>Add Inventory Item</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
                     <div class="mb-3">
@@ -688,8 +957,8 @@
                     </div>
                 </div>
                 <div class="modal-footer modal-footer-custom">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-action-primary" onclick="submitCreateInventory()">Create Item</button>
+                    <button type="button" class="nav-btn-link" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn-action-primary" onclick="submitCreateInventory()">Create Item</button>
                 </div>
             </div>
         </div>
@@ -697,16 +966,16 @@
 
     <!-- Modal: Adjust Stock -->
     <div class="modal fade" id="adjustStockModal" tabindex="-1" aria-labelledby="adjustStockModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content modal-content-custom">
                 <div class="modal-header modal-header-custom">
-                    <h5 class="modal-title" id="adjustStockModalLabel"><i class="bi bi-sliders text-warning me-2"></i>Adjust Stock</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title fw-bold" id="adjustStockModalLabel"><i class="bi bi-sliders text-warning me-2"></i>Adjust Stock</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
                     <div class="mb-3">
                         <label class="form-label" for="adjustSku">Target SKU</label>
-                        <input type="text" id="adjustSku" class="form-control-custom w-100" readonly>
+                        <input type="text" id="adjustSku" class="form-control-custom w-100 font-monospace" readonly>
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="adjustDelta">Quantity Delta (+ to restock, - to deduct)</label>
@@ -727,7 +996,7 @@
                     </div>
                 </div>
                 <div class="modal-footer modal-footer-custom">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="nav-btn-link" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-warning fw-bold" onclick="submitAdjustStock()">Apply Adjustment</button>
                 </div>
             </div>
@@ -833,7 +1102,7 @@
         function renderInventoryTable(items) {
             const tbody = document.getElementById('inventoryTableBody');
             if (items.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No inventory records found matching filters.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted"><i class="bi bi-inbox fs-3 d-block mb-2"></i>No inventory records found matching filters.</td></tr>`;
                 return;
             }
 
@@ -845,28 +1114,28 @@
                 const thresh = item.reorderThreshold || 10;
                 let statusBadge;
                 if (qty === 0) {
-                    statusBadge = '<span class="status-badge badge-out"><i class="bi bi-x-circle-fill"></i> Out of Stock</span>';
+                    statusBadge = '<span class="status-badge badge-out">Out of Stock</span>';
                 } else if (qty <= thresh) {
-                    statusBadge = '<span class="status-badge badge-low"><i class="bi bi-exclamation-triangle-fill"></i> Low Stock</span>';
+                    statusBadge = '<span class="status-badge badge-low">Low Stock</span>';
                 } else {
-                    statusBadge = '<span class="status-badge badge-healthy"><i class="bi bi-check-circle-fill"></i> In Stock</span>';
+                    statusBadge = '<span class="status-badge badge-healthy">In Stock</span>';
                 }
 
                 tr.innerHTML = `
-                    <td class="font-monospace fw-bold text-info">${escapeHtml(item.sku)}</td>
-                    <td class="fw-bold">${qty.toLocaleString()} units</td>
-                    <td>${thresh}</td>
-                    <td><span class="badge badge-wh">${escapeHtml(item.warehouseLocation || 'General')}</span></td>
+                    <td><span class="sku-code">${escapeHtml(item.sku)}</span></td>
+                    <td class="fw-bold">${qty.toLocaleString()} <span class="text-muted fw-normal small">units</span></td>
+                    <td class="text-muted">${thresh}</td>
+                    <td><span class="badge badge-wh"><i class="bi bi-geo-alt"></i> ${escapeHtml(item.warehouseLocation || 'General')}</span></td>
                     <td>${statusBadge}</td>
                     <td>
-                        <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-warning" onclick="openAdjustModal('${escapeJs(item.sku)}')">
+                        <div class="d-flex align-items-center gap-1">
+                            <button class="btn btn-outline-warning btn-table-action" onclick="openAdjustModal('${escapeJs(item.sku)}')" title="Adjust Stock">
                                 <i class="bi bi-sliders"></i> Adjust
                             </button>
-                            <button class="btn btn-outline-primary" onclick="jumpToReservation('${escapeJs(item.sku)}')">
+                            <button class="btn btn-outline-primary btn-table-action" onclick="jumpToReservation('${escapeJs(item.sku)}')" title="Inspect High-Scale Pool">
                                 <i class="bi bi-lightning-charge"></i> Pool
                             </button>
-                            <button class="btn btn-outline-danger" onclick="deleteInventoryItem('${escapeJs(item.sku)}')">
+                            <button class="btn btn-outline-danger btn-table-action" onclick="deleteInventoryItem('${escapeJs(item.sku)}')" title="Delete Item">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </div>
@@ -993,7 +1262,7 @@
             const ttlSeconds = parseInt(document.getElementById('reserveTtlInput').value, 10) || 600;
 
             const alertBox = document.getElementById('reservationResultAlert');
-            alertBox.innerHTML = '<div class=\"spinner-border spinner-border-sm text-info me-2\"></div> Reserving units non-blocking...';
+            alertBox.innerHTML = '<div class="spinner-border spinner-border-sm text-info me-2"></div> Reserving units non-blocking...';
 
             try {
                 const res = await fetch('/api/inventory/reservations/reserve', {
@@ -1004,24 +1273,24 @@
 
                 const data = await res.json();
                 if (!res.ok) {
-                    alertBox.innerHTML = `<div class=\"alert alert-danger py-2 small mb-0\"><i class=\"bi bi-x-circle me-1\"></i> ${escapeHtml(data.error || data.message || 'Reservation failed')}</div>`;
+                    alertBox.innerHTML = `<div class="alert alert-danger py-2 small mb-0"><i class="bi bi-x-circle me-1"></i> ${escapeHtml(data.error || data.message || 'Reservation failed')}</div>`;
                     return;
                 }
 
                 alertBox.innerHTML = `
-                    <div class="alert alert-success py-2 small mb-0">
-                        <div class="fw-bold"><i class="bi bi-check-circle-fill me-1"></i> Reserved ${data.quantityReserved} units for ${escapeHtml(data.sku)}!</div>
-                        <div>ID: <code>${escapeHtml(data.reservationId)}</code></div>
+                    <div class="alert alert-success py-2 small mb-0" style="background-color: var(--accent-green-bg); border-color: var(--accent-green-border); color: var(--text-heading);">
+                        <div class="fw-bold"><i class="bi bi-check-circle-fill text-success me-1"></i> Reserved ${data.quantityReserved} units for ${escapeHtml(data.sku)}!</div>
+                        <div class="text-muted">ID: <code class="sku-code">${escapeHtml(data.reservationId)}</code></div>
                         <div class="mt-2 d-flex gap-2">
-                            <button class="btn btn-sm btn-success py-0 px-2" onclick="claimReservation('${escapeJs(data.reservationId)}')">Claim (Pay)</button>
-                            <button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="releaseReservation('${escapeJs(data.reservationId)}')">Release (Cancel)</button>
+                            <button class="btn btn-sm btn-success py-1 px-3" onclick="claimReservation('${escapeJs(data.reservationId)}')">Claim (Pay)</button>
+                            <button class="btn btn-sm btn-outline-danger py-1 px-3" onclick="releaseReservation('${escapeJs(data.reservationId)}')">Release (Cancel)</button>
                         </div>
                     </div>
                 `;
                 showToast(`Reserved ${data.quantityReserved} units successfully!`, 'success');
                 await refreshPoolStatus();
             } catch (e) {
-                alertBox.innerHTML = `<div class=\"alert alert-danger py-2 small mb-0\">${escapeHtml(e.message)}</div>`;
+                alertBox.innerHTML = `<div class="alert alert-danger py-2 small mb-0">${escapeHtml(e.message)}</div>`;
             }
         }
 
@@ -1054,7 +1323,7 @@
             const qtyPerCheckout = parseInt(document.getElementById('simQtyInput').value, 10);
 
             const resultContainer = document.getElementById('simulationResult');
-            resultContainer.innerHTML = '<div class=\"alert alert-info py-2 small mb-0\"><div class=\"spinner-border spinner-border-sm text-info me-2\"></div> Running concurrent simulation threads...</div>';
+            resultContainer.innerHTML = '<div class="alert alert-info py-2 small mb-0"><div class="spinner-border spinner-border-sm text-info me-2"></div> Running concurrent simulation threads...</div>';
 
             try {
                 const res = await fetch('/api/inventory/reservations/simulate-flash-sale', {
@@ -1067,29 +1336,33 @@
                 const data = await res.json();
 
                 resultContainer.innerHTML = `
-                    <div class="alert alert-secondary py-2 small mb-0" style="background-color: var(--bg-card-nested); border: 1px solid var(--border-subtle); color: var(--text-body);">
-                        <div class="fw-bold text-success mb-1"><i class="bi bi-check2-circle me-1"></i> Simulation Completed Successfully!</div>
-                        <div>• Concurrent Buyers: <strong>${data.concurrentCheckoutsAttempted} threads</strong></div>
-                        <div>• Successful Reservations: <strong class="text-success">${data.successfulReservations}</strong></div>
-                        <div>• Rejections (Insufficient Stock): <strong class="text-warning">${data.insufficientStockRejections}</strong></div>
-                        <div>• Total Time: <strong>${data.totalExecutionTimeMs} ms</strong> (Avg: <strong>${data.averageLatencyPerReservationMs.toFixed(2)} ms/req</strong>)</div>
-                        <div>• Strategy: <code>${data.lockingStrategy}</code></div>
+                    <div class="alert alert-secondary py-3 small mb-0" style="background-color: var(--bg-card-nested); border: 1px solid var(--border-subtle); color: var(--text-body); border-radius: 12px;">
+                        <div class="fw-bold text-success mb-2 d-flex align-items-center gap-1"><i class="bi bi-check2-circle fs-5"></i> Simulation Completed Successfully!</div>
+                        <div class="d-flex flex-wrap gap-3">
+                            <div>Concurrent Buyers: <strong>${data.concurrentCheckoutsAttempted} threads</strong></div>
+                            <div>Successful Reservations: <strong class="text-success">${data.successfulReservations}</strong></div>
+                            <div>Rejections (Stock Depleted): <strong class="text-warning">${data.insufficientStockRejections}</strong></div>
+                            <div>Total Duration: <strong>${data.totalExecutionTimeMs} ms</strong></div>
+                            <div>Average Latency: <strong class="text-info">${data.averageLatencyPerReservationMs.toFixed(2)} ms/req</strong></div>
+                            <div>Lock Strategy: <span class="sku-code">${data.lockingStrategy}</span></div>
+                        </div>
                     </div>
                 `;
                 await refreshPoolStatus();
                 showToast('Flash sale benchmark simulation finished!', 'success');
             } catch (e) {
-                resultContainer.innerHTML = `<div class=\"alert alert-danger py-2 small mb-0\">${escapeHtml(e.message)}</div>`;
+                resultContainer.innerHTML = `<div class="alert alert-danger py-2 small mb-0">${escapeHtml(e.message)}</div>`;
             }
         }
 
         function showToast(msg, type = 'info') {
             const container = document.getElementById('toastContainer');
             const toastId = 'toast-' + Date.now();
+            const bgClass = type === 'success' ? 'bg-success' : (type === 'danger' ? 'bg-danger' : 'bg-primary');
             const toastHtml = `
-                <div id="${toastId}" class="toast align-items-center text-white bg-${type === 'success' ? 'success' : (type === 'danger' ? 'danger' : 'info')} border-0 mb-2 shadow-lg" role="alert">
+                <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0 mb-2 shadow-lg" role="alert" style="border-radius: 12px;">
                     <div class="d-flex">
-                        <div class="toast-body">${escapeHtml(msg)}</div>
+                        <div class="toast-body fw-medium">${escapeHtml(msg)}</div>
                         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                     </div>
                 </div>`;

@@ -41,6 +41,8 @@ public interface InventoryReservationUnitRepository extends JpaRepository<Invent
 
     List<InventoryReservationUnit> findByStatusAndExpiresAtBefore(String status, Instant threshold);
 
+    List<InventoryReservationUnit> findByStatusAndCreatedAtBefore(String status, Instant threshold);
+
     void deleteBySku(String sku);
 
     long countBySku(String sku);

@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -73,10 +74,32 @@ public class AiAgentService {
     public AiQueryResponse processQuery(AiQueryRequest request) {
         log.debug("Processing AI query: '{}'", PiiLogSanitizer.mask(request.getQuery()));
 
-        // 1. Hydrate inventory context if missing
+        // 1. Hydrate inventory context if missing with smart targeted retrieval & memory safety cap
         if (request.getInventoryContext() == null || request.getInventoryContext().isEmpty()) {
             log.trace("Inventory context missing in request, querying database repository");
-            List<InventoryItem> items = inventoryRepository.findAll();
+            List<InventoryItem> items;
+            String queryText = request.getQuery() != null ? request.getQuery().toLowerCase() : "";
+
+            // Check for targeted SKU pattern
+            Matcher skuMatcher = Pattern.compile("(?i)\\b([A-Z0-9]+-[A-Z0-9-]+)\\b").matcher(request.getQuery() != null ? request.getQuery() : "");
+            if (skuMatcher.find()) {
+                String targetSku = skuMatcher.group(1);
+                Optional<InventoryItem> singleItem = inventoryRepository.findBySku(targetSku);
+                items = singleItem.map(List::of).orElseGet(inventoryRepository::findAll);
+            } else if (queryText.contains("low stock") || queryText.contains("reorder") || queryText.contains("shortage") || queryText.contains("out of stock") || queryText.contains("depleted")) {
+                items = inventoryRepository.findLowStockItems();
+                if (items.isEmpty()) {
+                    items = inventoryRepository.findAll();
+                }
+            } else {
+                items = inventoryRepository.findAll();
+            }
+
+            // Cap items to prevent OutOfMemory and network payload exhaustion on large catalogs
+            if (items.size() > 250) {
+                items = items.subList(0, 250);
+            }
+
             List<Map<String, Object>> contextList = new ArrayList<>();
             for (InventoryItem item : items) {
                 Map<String, Object> map = new HashMap<>();

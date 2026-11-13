@@ -54,4 +54,11 @@ public class SqlServerQueryDialect extends AbstractQueryDialect {
         int safeLimit = SqlSanitizer.validateLimit(limit);
         return "SELECT TOP (" + safeLimit + ") sku, quantity, warehouse_location FROM inventory_items ORDER BY quantity DESC";
     }
+
+    @Override
+    public String getReservationLockQuery(String sku, int limit) {
+        int safeLimit = SqlSanitizer.validateLimit(limit);
+        return String.format("SELECT TOP (%d) * FROM inventory_reservation_units WITH (UPDLOCK, READPAST, ROWLOCK) WHERE sku = '%s' AND status = 'AVAILABLE'",
+                safeLimit, SqlSanitizer.escapeLiteral(sku));
+    }
 }

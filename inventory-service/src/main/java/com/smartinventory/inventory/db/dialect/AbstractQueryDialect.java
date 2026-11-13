@@ -25,6 +25,7 @@ import com.querydsl.sql.Configuration;
 import com.querydsl.sql.SQLQuery;
 import com.querydsl.sql.SQLTemplates;
 import com.smartinventory.inventory.security.sqli.SqlInjectionDetector;
+import com.smartinventory.inventory.security.sqli.SqlSanitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -92,6 +93,13 @@ public abstract class AbstractQueryDialect implements QueryDialect {
         }
         log.info("Executing custom QueryDSL/Spring-JDBC query: {}", sql);
         return jdbcTemplate.queryForList(sql, params);
+    }
+
+    @Override
+    public String getReservationLockQuery(String sku, int limit) {
+        int safeLimit = SqlSanitizer.validateLimit(limit);
+        return String.format("SELECT * FROM inventory_reservation_units WHERE sku = '%s' AND status = 'AVAILABLE' LIMIT %d FOR UPDATE SKIP LOCKED",
+                SqlSanitizer.escapeLiteral(sku), safeLimit);
     }
 
     @Override

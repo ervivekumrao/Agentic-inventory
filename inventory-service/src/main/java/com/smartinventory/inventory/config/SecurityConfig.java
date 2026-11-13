@@ -45,9 +45,14 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
                 .requestMatchers("/actuator/**", "/logging-admin.html").hasRole("ADMIN")
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/ai/**", "/chat.html", "/index.html", "/", "/*.html", "/static/**", "/api/inventory/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/ai/**", "/chat.html", "/index.html", "/", "/*.html", "/static/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/admin/users").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/inventory/**").hasAnyRole("ADMIN", "MANAGER", "ENTRY_OPERATOR", "USER")
+                .requestMatchers(HttpMethod.POST, "/api/inventory/reservations/**").hasAnyRole("ADMIN", "MANAGER", "ENTRY_OPERATOR", "USER")
+                .requestMatchers(HttpMethod.POST, "/api/inventory/**").hasAnyRole("ADMIN", "MANAGER", "ENTRY_OPERATOR")
+                .requestMatchers(HttpMethod.PUT, "/api/inventory/**").hasAnyRole("ADMIN", "MANAGER", "ENTRY_OPERATOR")
+                .requestMatchers(HttpMethod.DELETE, "/api/inventory/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .httpBasic(Customizer.withDefaults());

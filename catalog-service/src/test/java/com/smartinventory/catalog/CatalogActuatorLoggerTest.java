@@ -26,6 +26,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import org.springframework.security.test.context.support.WithMockUser;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -47,7 +49,21 @@ class CatalogActuatorLoggerTest {
     private CatalogService catalogService;
 
     @Test
-    void getLoggers_shouldReturnLoggersList() throws Exception {
+    void getHealth_shouldBePubliclyAccessible() throws Exception {
+        mockMvc.perform(get("/actuator/health"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"));
+    }
+
+    @Test
+    void getLoggers_unauthenticated_shouldBeUnauthorized() throws Exception {
+        mockMvc.perform(get("/actuator/loggers"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void getLoggers_asAdmin_shouldReturnLoggersList() throws Exception {
         mockMvc.perform(get("/actuator/loggers"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.loggers").exists())
@@ -55,6 +71,7 @@ class CatalogActuatorLoggerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void updateLoggerLevel_shouldModifyLogLevelAtRuntime() throws Exception {
         String loggerName = "com.smartinventory.catalog.controller.CatalogController";
 

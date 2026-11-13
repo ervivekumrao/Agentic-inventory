@@ -286,18 +286,30 @@ class InventoryAIAgent:
             if sku_match:
                 entities["sku"] = sku_match.group(1)
 
-        # 2. Extract Warehouse
-        warehouses = ["WAREHOUSE-NORTH", "WAREHOUSE-SOUTH", "WAREHOUSE-EAST", "WAREHOUSE-WEST", "CENTRAL-HUB"]
+        # 2. Extract Warehouse (Dynamic Extraction from live context with standard fallback)
+        discovered_warehouses = set()
+        for item in inventory_context:
+            wh = item.get("warehouseLocation") or item.get("warehouse")
+            if wh:
+                discovered_warehouses.add(str(wh))
+        warehouses = list(discovered_warehouses) + ["WAREHOUSE-NORTH", "WAREHOUSE-SOUTH", "WAREHOUSE-EAST", "WAREHOUSE-WEST", "CENTRAL-HUB"]
         for wh in warehouses:
-            if wh in q_upper or wh.replace("-", " ") in q_upper:
-                entities["warehouse"] = wh.title() if "-" not in wh else "-".join(part.capitalize() for part in wh.split("-"))
+            wh_str = str(wh).strip()
+            if wh_str and (wh_str.upper() in q_upper or wh_str.replace("-", " ").upper() in q_upper):
+                entities["warehouse"] = wh_str
                 break
 
-        # 3. Extract Category
-        categories = ["Electronics", "Apparel", "Home & Kitchen", "Groceries", "Tools & Hardware", "Sports & Outdoors"]
+        # 3. Extract Category (Dynamic Extraction from live context with standard fallback)
+        discovered_categories = set()
+        for item in (catalog_context or []) + inventory_context:
+            cat = item.get("category")
+            if cat:
+                discovered_categories.add(str(cat))
+        categories = list(discovered_categories) + ["Electronics", "Apparel", "Home & Kitchen", "Groceries", "Tools & Hardware", "Sports & Outdoors"]
         for cat in categories:
-            if cat.lower() in q_lower:
-                entities["category"] = cat
+            cat_str = str(cat).strip()
+            if cat_str and cat_str.lower() in q_lower:
+                entities["category"] = cat_str
                 break
 
         # 4. Extract Superlative / Single-Item Question Flag
@@ -855,7 +867,7 @@ class InventoryAIAgent:
         """
         Attempts external LLM API generation if API keys are configured.
         """
-        if not self.openai_api_key:
+        if not self.openai_api_key and not self.gemini_api_key:
             return None
 
         system_prompt = system_instruction or (
@@ -871,34 +883,62 @@ class InventoryAIAgent:
             f"User Query: {query}\n\n"
             f"Inventory Summary Metrics: {json.dumps(metrics, indent=2)}\n"
             f"Catalog Context Items Count: {len(catalog_context)}\n"
-            f"Raw Inventory Records: {json.dumps(inventory_context[:15], indent=2)}\n"
+            f"Inventory Records: {json.dumps(inventory_context[:100], indent=2)}\n"
         )
 
-        try:
-            headers = {
-                "Authorization": f"Bearer {self.openai_api_key}",
-                "Content-Type": "application/json"
-            }
-            payload = {
-                "model": self.llm_model,
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                "response_format": {"type": "json_object"},
-                "temperature": 0.5
-            }
-            with httpx.Client(timeout=10.0) as client:
-                res = client.post("https://api.openai.com/v1/chat/completions", json=payload, headers=headers)
-                if res.status_code == 200:
-                    content = res.json()["choices"][0]["message"]["content"]
-                    parsed = json.loads(content)
-                    return {
-                        "answer": parsed.get("answer", ""),
-                        "recommendations": parsed.get("recommendations", []),
-                        "risk_level": parsed.get("risk_level", "LOW")
+        # 1. Try OpenAI if API key configured
+        if self.openai_api_key:
+            try:
+                headers = {
+                    "Authorization": f"Bearer {self.openai_api_key}",
+                    "Content-Type": "application/json"
+                }
+                payload = {
+                    "model": self.llm_model,
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.5
+                }
+                with httpx.Client(timeout=10.0) as client:
+                    res = client.post("https://api.openai.com/v1/chat/completions", json=payload, headers=headers)
+                    if res.status_code == 200:
+                        content = res.json()["choices"][0]["message"]["content"]
+                        parsed = json.loads(content)
+                        return {
+                            "answer": parsed.get("answer", ""),
+                            "recommendations": parsed.get("recommendations", []),
+                            "risk_level": parsed.get("risk_level", "LOW")
+                        }
+            except Exception as e:
+                logger.warning("OpenAI LLM call failed: %s", e)
+
+        # 2. Try Google Gemini if API key configured
+        if self.gemini_api_key:
+            try:
+                gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.gemini_api_key}"
+                gemini_payload = {
+                    "contents": [{
+                        "parts": [{"text": f"{system_prompt}\n\n{user_prompt}"}]
+                    }],
+                    "generationConfig": {
+                        "response_mime_type": "application/json",
+                        "temperature": 0.4
                     }
-        except Exception:
-            pass
+                }
+                with httpx.Client(timeout=10.0) as client:
+                    res = client.post(gemini_url, json=gemini_payload)
+                    if res.status_code == 200:
+                        content = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+                        parsed = json.loads(content)
+                        return {
+                            "answer": parsed.get("answer", ""),
+                            "recommendations": parsed.get("recommendations", []),
+                            "risk_level": parsed.get("risk_level", "LOW")
+                        }
+            except Exception as e:
+                logger.warning("Google Gemini LLM call failed: %s", e)
 
         return None

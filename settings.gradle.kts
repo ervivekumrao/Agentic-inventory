@@ -18,4 +18,4 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 rootProject.name = "smart-inventory-gradle-java"
-include("inventory-service", "catalog-service", "forecasting-service", "integration-tests", "infra", "docs")
+include("inventory-service", "catalog-service", "integration-tests")

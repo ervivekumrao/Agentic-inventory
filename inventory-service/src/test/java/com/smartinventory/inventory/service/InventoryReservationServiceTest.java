@@ -105,7 +105,7 @@ class InventoryReservationServiceTest {
     void reserveStock_shouldThrowException_whenInsufficientUnits() {
         when(unitRepository.findByReservationId("RES-EMPTY")).thenReturn(List.of());
         when(unitRepository.fetchAvailableUnitsForUpdate("SKU-TEST", 5)).thenReturn(List.of());
-        when(inventoryRepository.findBySku("SKU-TEST")).thenReturn(Optional.of(new InventoryItem("SKU-TEST", 0, 5, "Warehouse-A")));
+        when(inventoryRepository.findBySkuForUpdate("SKU-TEST")).thenReturn(Optional.of(new InventoryItem("SKU-TEST", 0, 5, "Warehouse-A")));
 
         assertThrows(IllegalArgumentException.class, () ->
                 reservationService.reserveStock("SKU-TEST", 5, "RES-EMPTY", 10));

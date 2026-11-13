@@ -89,6 +89,11 @@ public class DatabaseQueryGenerator implements QueryDialect {
     }
 
     @Override
+    public String getReservationLockQuery(String sku, int limit) {
+        return activeDialect().getReservationLockQuery(sku, limit);
+    }
+
+    @Override
     public int executeCustomUpdate(String sql, Object... params) {
         return activeDialect().executeCustomUpdate(sql, params);
     }

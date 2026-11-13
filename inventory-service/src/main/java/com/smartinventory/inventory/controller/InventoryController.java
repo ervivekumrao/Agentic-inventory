@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,6 +46,7 @@ public class InventoryController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR', 'USER')")
     public ResponseEntity<List<InventoryItem>> getAllInventory(@RequestParam(required = false) Boolean lowStock) {
         log.debug("GET /api/inventory requested with lowStock filter: {}", lowStock);
         if (Boolean.TRUE.equals(lowStock)) {
@@ -58,6 +60,7 @@ public class InventoryController {
     }
 
     @GetMapping("/{sku}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR', 'USER')")
     public ResponseEntity<InventoryItem> getInventoryBySku(@PathVariable String sku) {
         log.debug("GET /api/inventory/{} requested", sku);
         return inventoryService.getInventoryBySku(sku)
@@ -72,6 +75,7 @@ public class InventoryController {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR')")
     public ResponseEntity<InventoryItem> createInventoryItem(@Valid @RequestBody InventoryItem item) {
         log.info("POST /api/inventory requested for SKU: {}, Quantity: {}", item.getSku(), item.getQuantity());
         InventoryItem created = inventoryService.createInventoryItem(item);
@@ -80,6 +84,7 @@ public class InventoryController {
     }
 
     @PostMapping(value = "/bulk", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR')")
     public ResponseEntity<List<InventoryItem>> createInventoryBulk(@RequestBody List<InventoryItem> items) {
         log.info("POST /api/inventory/bulk requested with {} items", items != null ? items.size() : 0);
         List<InventoryItem> created = inventoryService.createInventoryItemsBulk(items);
@@ -87,6 +92,7 @@ public class InventoryController {
     }
 
     @PostMapping("/{sku}/adjust")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR')")
     public ResponseEntity<InventoryItem> adjustStock(
             @PathVariable String sku,
             @RequestBody Map<String, Object> adjustmentRequest) {
@@ -112,6 +118,7 @@ public class InventoryController {
     }
 
     @DeleteMapping("/{sku}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteInventoryItem(@PathVariable String sku) {
         log.info("DELETE /api/inventory/{} requested", sku);
         try {
@@ -124,6 +131,7 @@ public class InventoryController {
     }
 
     @GetMapping("/{sku}/transactions")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR', 'USER')")
     public ResponseEntity<List<StockTransaction>> getTransactions(@PathVariable String sku) {
         log.debug("GET /api/inventory/{}/transactions requested", sku);
         List<StockTransaction> transactions = inventoryService.getTransactionsForSku(sku);
@@ -132,6 +140,7 @@ public class InventoryController {
     }
 
     @GetMapping("/database-info")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR', 'USER')")
     public ResponseEntity<Map<String, Object>> getDatabaseInfo() {
         log.debug("GET /api/inventory/database-info requested");
         Map<String, Object> metadata = queryDialect.getDatabaseMetadata();
