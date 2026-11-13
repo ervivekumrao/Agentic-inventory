@@ -18,6 +18,7 @@ package com.smartinventory.inventory.service;
 
 import com.smartinventory.inventory.dto.AiQueryRequest;
 import com.smartinventory.inventory.dto.AiQueryResponse;
+import com.smartinventory.inventory.dto.RuntimeConfigDto;
 import com.smartinventory.inventory.model.InventoryItem;
 import com.smartinventory.inventory.repository.InventoryRepository;
 import com.smartinventory.inventory.security.pii.PiiLogSanitizer;
@@ -25,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -45,6 +45,8 @@ public class AiAgentService {
     private static final Logger log = LoggerFactory.getLogger(AiAgentService.class);
 
     private final InventoryRepository inventoryRepository;
+    private final CatalogCacheService catalogCacheService;
+    private final RuntimeConfigService runtimeConfigService;
     private final RestClient restClient;
 
     @Value("${forecasting.service.url:http://localhost:8083}")
@@ -54,8 +56,11 @@ public class AiAgentService {
     private String catalogServiceUrl;
 
     @Autowired
-    public AiAgentService(InventoryRepository inventoryRepository) {
+    public AiAgentService(InventoryRepository inventoryRepository, CatalogCacheService catalogCacheService, RuntimeConfigService runtimeConfigService) {
         this.inventoryRepository = inventoryRepository;
+        this.catalogCacheService = catalogCacheService;
+        this.runtimeConfigService = runtimeConfigService;
+
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(5000);
         requestFactory.setReadTimeout(15000);
@@ -66,6 +71,8 @@ public class AiAgentService {
 
     public AiAgentService(InventoryRepository inventoryRepository, RestClient restClient, String forecastingServiceUrl, String catalogServiceUrl) {
         this.inventoryRepository = inventoryRepository;
+        this.catalogCacheService = new CatalogCacheService();
+        this.runtimeConfigService = new RuntimeConfigService();
         this.restClient = restClient;
         this.forecastingServiceUrl = forecastingServiceUrl;
         this.catalogServiceUrl = catalogServiceUrl;
@@ -73,31 +80,33 @@ public class AiAgentService {
 
     public AiQueryResponse processQuery(AiQueryRequest request) {
         log.debug("Processing AI query: '{}'", PiiLogSanitizer.mask(request.getQuery()));
+        RuntimeConfigDto config = runtimeConfigService.getConfig();
+        log.trace("Active runtime configuration: maxContextLimit={}", config.getMaxContextLimit());
 
-        // 1. Hydrate inventory context if missing with smart targeted retrieval & memory safety cap
+        // 1. Hydrate inventory context if missing using smart targeted retrieval & DB pushdown projections
         if (request.getInventoryContext() == null || request.getInventoryContext().isEmpty()) {
             log.trace("Inventory context missing in request, querying database repository");
             List<InventoryItem> items;
             String queryText = request.getQuery() != null ? request.getQuery().toLowerCase() : "";
 
             // Check for targeted SKU pattern
-            Matcher skuMatcher = Pattern.compile("(?i)\\b([A-Z0-9]+-[A-Z0-9-]+)\\b").matcher(request.getQuery() != null ? request.getQuery() : "");
+            Matcher skuMatcher = Pattern.compile("(?i)\\b([A-Z0-9]+-[A-Z0-9-]+|SKU[0-9_]+)\b").matcher(request.getQuery() != null ? request.getQuery() : "");
             if (skuMatcher.find()) {
                 String targetSku = skuMatcher.group(1);
                 Optional<InventoryItem> singleItem = inventoryRepository.findBySku(targetSku);
-                items = singleItem.map(List::of).orElseGet(inventoryRepository::findAll);
-            } else if (queryText.contains("low stock") || queryText.contains("reorder") || queryText.contains("shortage") || queryText.contains("out of stock") || queryText.contains("depleted")) {
+                items = singleItem.map(List::of).orElseGet(() -> {
+                    List<InventoryItem> res = inventoryRepository.findTop250By();
+                    return (res != null && !res.isEmpty()) ? res : inventoryRepository.findAll();
+                });
+            } else if (queryText.contains("low stock") || queryText.contains("low in stock") || queryText.contains("reorder") || queryText.contains("shortage") || queryText.contains("out of stock") || queryText.contains("depleted")) {
                 items = inventoryRepository.findLowStockItems();
-                if (items.isEmpty()) {
-                    items = inventoryRepository.findAll();
+                if (items == null || items.isEmpty()) {
+                    List<InventoryItem> res = inventoryRepository.findTop250By();
+                    items = (res != null && !res.isEmpty()) ? res : inventoryRepository.findAll();
                 }
             } else {
-                items = inventoryRepository.findAll();
-            }
-
-            // Cap items to prevent OutOfMemory and network payload exhaustion on large catalogs
-            if (items.size() > 250) {
-                items = items.subList(0, 250);
+                List<InventoryItem> res = inventoryRepository.findTop250By();
+                items = (res != null && !res.isEmpty()) ? res : inventoryRepository.findAll();
             }
 
             List<Map<String, Object>> contextList = new ArrayList<>();
@@ -113,20 +122,13 @@ public class AiAgentService {
             log.debug("Hydrated inventory context with {} items", contextList.size());
         }
 
-        // 2. Hydrate catalog context from catalog-service if missing
+        // 2. Hydrate catalog context from CatalogCacheService (with StampedLock resilience) if missing
         if (request.getCatalogContext() == null || request.getCatalogContext().isEmpty()) {
-            log.trace("Catalog context missing, calling catalog-service at {}", catalogServiceUrl);
-            try {
-                List<Map<String, Object>> catalogList = restClient.get()
-                        .uri(catalogServiceUrl + "/api/catalog")
-                        .retrieve()
-                        .body(new ParameterizedTypeReference<>() {});
-                if (catalogList != null) {
-                    request.setCatalogContext(catalogList);
-                    log.debug("Hydrated catalog context with {} products from catalog-service", catalogList.size());
-                }
-            } catch (Exception e) {
-                log.warn("Unable to fetch catalog context from catalog-service at {}: {}", catalogServiceUrl, e.getMessage());
+            log.trace("Catalog context missing, calling CatalogCacheService");
+            List<Map<String, Object>> catalogList = catalogCacheService.getCatalogList(restClient, catalogServiceUrl);
+            if (catalogList != null && !catalogList.isEmpty()) {
+                request.setCatalogContext(catalogList);
+                log.debug("Hydrated catalog context with {} products from cache/catalog-service", catalogList.size());
             }
         }
 
@@ -155,7 +157,7 @@ public class AiAgentService {
         Map<String, Map<String, Object>> catalogBySku = new HashMap<>();
         for (Map<String, Object> prod : catContext) {
             if (prod.get("sku") != null) {
-                catalogBySku.put(String.valueOf(prod.get("sku")), prod);
+                catalogBySku.put(String.valueOf(prod.get("sku")).toUpperCase(), prod);
             }
         }
 
@@ -176,7 +178,10 @@ public class AiAgentService {
             int threshold = item.get("reorderThreshold") instanceof Number ? ((Number) item.get("reorderThreshold")).intValue() : 10;
             String warehouse = item.get("warehouseLocation") != null ? String.valueOf(item.get("warehouseLocation")) : "Unassigned";
 
-            Map<String, Object> prod = catalogBySku.get(sku);
+            Map<String, Object> prod = catalogBySku.get(sku.toUpperCase());
+            if (prod == null) {
+                prod = catalogCacheService.getCatalogProductBySku(sku);
+            }
             double price = 0.0;
             String category = "General";
 
@@ -222,32 +227,32 @@ public class AiAgentService {
                 limit = 5;
             }
 
-            boolean ascending = lowerQuery.contains("lowest") || lowerQuery.contains("ascending") || lowerQuery.contains(" asc") || lowerQuery.contains("cheapest");
+            boolean ascending = lowerQuery.contains("lowest") || lowerQuery.contains("lowes") || lowerQuery.contains("ascending") || lowerQuery.contains(" asc") || lowerQuery.contains("cheapest");
             List<Map<String, Object>> sortedList = new ArrayList<>(invContext);
 
-            if (lowerQuery.contains("value") || lowerQuery.contains("valuation")) {
+            if (lowerQuery.contains("per value") || lowerQuery.contains("per unit") || lowerQuery.contains("unit price") || lowerQuery.contains("price per") || lowerQuery.contains("per item") || lowerQuery.contains("price") || lowerQuery.contains("cost") || lowerQuery.contains("expensive") || lowerQuery.contains("cheapest")) {
                 sortedList.sort((a, b) -> {
-                    String skuA = String.valueOf(a.get("sku"));
-                    String skuB = String.valueOf(b.get("sku"));
+                    String skuA = String.valueOf(a.get("sku")).toUpperCase();
+                    String skuB = String.valueOf(b.get("sku")).toUpperCase();
+                    Map<String, Object> pAObj = catalogBySku.getOrDefault(skuA, catalogCacheService.getCatalogProductBySku(skuA));
+                    Map<String, Object> pBObj = catalogBySku.getOrDefault(skuB, catalogCacheService.getCatalogProductBySku(skuB));
+                    double pA = pAObj != null && pAObj.get("price") instanceof Number ? ((Number) pAObj.get("price")).doubleValue() : 0.0;
+                    double pB = pBObj != null && pBObj.get("price") instanceof Number ? ((Number) pBObj.get("price")).doubleValue() : 0.0;
+                    return ascending ? Double.compare(pA, pB) : Double.compare(pB, pA);
+                });
+            } else if (lowerQuery.contains("value") || lowerQuery.contains("valuation") || lowerQuery.contains("worth")) {
+                sortedList.sort((a, b) -> {
+                    String skuA = String.valueOf(a.get("sku")).toUpperCase();
+                    String skuB = String.valueOf(b.get("sku")).toUpperCase();
                     int qA = a.get("quantity") instanceof Number ? ((Number) a.get("quantity")).intValue() : 0;
                     int qB = b.get("quantity") instanceof Number ? ((Number) b.get("quantity")).intValue() : 0;
-                    double pA = catalogBySku.containsKey(skuA) && catalogBySku.get(skuA).get("price") instanceof Number
-                            ? ((Number) catalogBySku.get(skuA).get("price")).doubleValue() : 0.0;
-                    double pB = catalogBySku.containsKey(skuB) && catalogBySku.get(skuB).get("price") instanceof Number
-                            ? ((Number) catalogBySku.get(skuB).get("price")).doubleValue() : 0.0;
+                    Map<String, Object> pAObj = catalogBySku.getOrDefault(skuA, catalogCacheService.getCatalogProductBySku(skuA));
+                    Map<String, Object> pBObj = catalogBySku.getOrDefault(skuB, catalogCacheService.getCatalogProductBySku(skuB));
+                    double pA = pAObj != null && pAObj.get("price") instanceof Number ? ((Number) pAObj.get("price")).doubleValue() : 0.0;
+                    double pB = pBObj != null && pBObj.get("price") instanceof Number ? ((Number) pBObj.get("price")).doubleValue() : 0.0;
                     double vA = qA * pA;
                     double vB = qB * pB;
                     return ascending ? Double.compare(vA, vB) : Double.compare(vB, vA);
-                });
-            } else if (lowerQuery.contains("price") || lowerQuery.contains("cost") || lowerQuery.contains("expensive") || lowerQuery.contains("cheapest")) {
-                sortedList.sort((a, b) -> {
-                    String skuA = String.valueOf(a.get("sku"));
-                    String skuB = String.valueOf(b.get("sku"));
-                    double pA = catalogBySku.containsKey(skuA) && catalogBySku.get(skuA).get("price") instanceof Number
-                            ? ((Number) catalogBySku.get(skuA).get("price")).doubleValue() : 0.0;
-                    double pB = catalogBySku.containsKey(skuB) && catalogBySku.get(skuB).get("price") instanceof Number
-                            ? ((Number) catalogBySku.get(skuB).get("price")).doubleValue() : 0.0;
-                    return ascending ? Double.compare(pA, pB) : Double.compare(pB, pA);
                 });
             } else {
                 // Default sort by quantity
@@ -274,7 +279,10 @@ public class AiAgentService {
                 String sku = String.valueOf(item.get("sku"));
                 int qty = item.get("quantity") instanceof Number ? ((Number) item.get("quantity")).intValue() : 0;
                 String warehouse = item.get("warehouseLocation") != null ? String.valueOf(item.get("warehouseLocation")) : "Unassigned";
-                Map<String, Object> prod = catalogBySku.get(sku);
+                Map<String, Object> prod = catalogBySku.get(sku.toUpperCase());
+                if (prod == null) {
+                    prod = catalogCacheService.getCatalogProductBySku(sku);
+                }
                 String category = prod != null && prod.get("category") != null ? String.valueOf(prod.get("category")) : "General";
                 double price = prod != null && prod.get("price") instanceof Number ? ((Number) prod.get("price")).doubleValue() : 0.0;
                 double val = qty * price;
@@ -293,7 +301,10 @@ public class AiAgentService {
                 int qty = item.get("quantity") instanceof Number ? ((Number) item.get("quantity")).intValue() : 0;
                 int threshold = item.get("reorderThreshold") instanceof Number ? ((Number) item.get("reorderThreshold")).intValue() : 10;
                 String warehouse = item.get("warehouseLocation") != null ? String.valueOf(item.get("warehouseLocation")) : "Unassigned";
-                Map<String, Object> prod = catalogBySku.get(sku);
+                Map<String, Object> prod = catalogBySku.get(sku.toUpperCase());
+                if (prod == null) {
+                    prod = catalogCacheService.getCatalogProductBySku(sku);
+                }
                 String category = prod != null && prod.get("category") != null ? String.valueOf(prod.get("category")) : "General";
                 sb.append(String.format("| %s | %s | %s | %d | %d |\n", sku, category, warehouse, qty, threshold));
             }

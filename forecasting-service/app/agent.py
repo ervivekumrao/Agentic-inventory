@@ -36,7 +36,22 @@ class InventoryAIAgent:
         self.gemini_api_key = os.getenv("GEMINI_API_KEY")
         self.llm_model = os.getenv("LLM_MODEL", "gpt-3.5-turbo")
         self.ml_model = None
+        self.feedback_cache: List[Dict[str, Any]] = []
         self._load_ml_model()
+
+    def sync_feedback(self, payload: Dict[str, Any]):
+        """
+        Ingests user interaction feedback, updates in-memory active learning cache,
+        and appends new gold-standard queries to persistent datasets.
+        """
+        if not payload or not isinstance(payload, dict):
+            return
+        orig_q = payload.get("originalQuery") or payload.get("original_query")
+        if not orig_q:
+            return
+        
+        self.feedback_cache.append(payload)
+        logger.info("Active learning feedback ingested for query: '%s', corrected intent: '%s'", orig_q, payload.get("correctedIntent"))
 
     def _load_ml_model(self):
         """Loads trained scikit-learn intent classifier pipeline if available."""
@@ -67,6 +82,23 @@ class InventoryAIAgent:
         metrics = self._analyze_context(inventory_context, catalog_ctx)
         intent, confidence = self._classify_intent(query)
         entities = self._extract_entities(query, inventory_context, catalog_ctx)
+
+        # Check Active Learning Feedback Cache for User Correction Overrides
+        q_clean = query.lower().strip()
+        for fb in reversed(self.feedback_cache):
+            fb_orig = (fb.get("originalQuery") or fb.get("original_query") or "").lower().strip()
+            if fb_orig and fb_orig == q_clean:
+                if fb.get("correctedIntent"):
+                    intent = fb["correctedIntent"]
+                    confidence = 1.0
+                if fb.get("sortField"):
+                    entities["sort_field"] = fb["sortField"]
+                if fb.get("sortOrder"):
+                    entities["sort_order"] = fb["sortOrder"]
+                logger.info("Active learning override applied for query '%s': intent='%s', sort_field='%s', sort_order='%s'",
+                            query, intent, entities.get("sort_field"), entities.get("sort_order"))
+                break
+
         logger.info("Classified query intent as '%s' (confidence: %.2f%%) with entities: %s", intent, confidence * 100, entities)
 
         # 1. Try external LLM if API key is present
@@ -197,16 +229,18 @@ class InventoryAIAgent:
         q = query.lower().strip()
 
         # 1. Deterministic High-Precision Pattern Matching for Superlatives & Custom Sorting
-        # Handles queries like "which item has highest value", "what product has lowest stock", "top 10 sorted by quantity"
-        if re.search(r"\b(which|what)\s+(item|product|sku)\s+(has|is|have)\s+(the\s+)?(highest|lowest|most|least|maximum|minimum|cheapest|expensive)\b", q) or \
-           re.search(r"\b(item|product|sku)\s+with\s+(the\s+)?(highest|lowest|most|least|maximum|minimum)\b", q) or \
+        # Handles queries like "which item has highest value", "what product has lowest stock", "high per stock val item", "top 10 sorted by quantity"
+        if re.search(r"\b(which|what)\s+(item|product|sku)\s+(has|is|have)\s+(the\s+)?(highest|high|lowest|lowes|most|least|maximum|minimum|cheapest|expensive)\b", q) or \
+           re.search(r"\b(item|product|sku)\s+with\s+(the\s+)?(highest|high|lowest|lowes|most|least|maximum|minimum)\b", q) or \
+           re.search(r"\b(highest|high|lowest|lowes|most|least|cheapest|expensive)\s+.*(value|val|valuation|price|cost|quantity|stock)\b", q) or \
            any(w in q for w in [
-               "highest value", "highest valuation", "lowest value", "lowest valuation",
-               "highest price", "lowest price", "most expensive", "cheapest product", "cheapest item",
-               "highest quantity", "lowest quantity", "highest stock", "lowest stock", "most stock", "least stock",
-               "most valuable", "sorted by", "sort by", "order by", "ordered by", "rank by", "ranked by"
+               "highest value", "highest valuation", "lowest value", "lowest valuation", "lowes value", "lowes valuation",
+               "highest price", "lowest price", "lowes price", "most expensive", "cheapest product", "cheapest item",
+               "highest quantity", "lowest quantity", "lowes quantity", "highest stock", "lowest stock", "lowes stock", "most stock", "least stock",
+               "most valuable", "sorted by", "sort by", "order by", "ordered by", "rank by", "ranked by", "lowes item",
+               "high per stock val", "high val", "low val", "highest val", "lowest val", "stock val"
            ]) or \
-           re.search(r"\b(top|lowest|highest|bottom|first)\s+\d+\b", q) or \
+           re.search(r"\b(top|lowest|lowes|highest|bottom|first)\s+\d+\b", q) or \
            any(w in q for w in ["top inventory", "sorted inventory", "most expensive items", "cheapest items"]):
             return "CUSTOM_SORT_FILTER", 1.0
 
@@ -282,7 +316,7 @@ class InventoryAIAgent:
                 break
 
         if "sku" not in entities:
-            sku_match = re.search(r"\b([A-Z0-9]+-[A-Z0-9-]+)\b", q_upper)
+            sku_match = re.search(r"\b([A-Z0-9]+-[A-Z0-9-]+|[A-Z0-9_]{5,})\b", q_upper)
             if sku_match:
                 entities["sku"] = sku_match.group(1)
 
@@ -314,19 +348,20 @@ class InventoryAIAgent:
 
         # 4. Extract Superlative / Single-Item Question Flag
         is_superlative = bool(
-            re.search(r"\b(which|what)\s+(item|product|sku)\s+(has|is|have)\s+(the\s+)?(highest|lowest|most|least|maximum|minimum|cheapest|expensive)\b", q_lower) or
-            re.search(r"\b(item|product|sku)\s+with\s+(the\s+)?(highest|lowest|most|least|maximum|minimum)\b", q_lower) or
+            re.search(r"\b(which|what)\s+(item|product|sku)\s+(has|is|have)\s+(the\s+)?(highest|high|lowest|lowes|most|least|maximum|minimum|cheapest|expensive)\b", q_lower) or
+            re.search(r"\b(item|product|sku)\s+with\s+(the\s+)?(highest|high|lowest|lowes|most|least|maximum|minimum)\b", q_lower) or
+            re.search(r"\b(highest|high|lowest|lowes|most|least|cheapest|expensive)\s+.*(value|val|valuation|price|cost|quantity|stock)\b", q_lower) or
             any(w in q_lower for w in [
-                "highest value", "highest valuation", "lowest value", "lowest valuation",
-                "highest price", "lowest price", "most expensive", "cheapest product", "cheapest item",
-                "highest quantity", "lowest quantity", "highest stock", "lowest stock", "most stock", "least stock",
-                "most valuable"
+                "highest value", "highest valuation", "lowest value", "lowest valuation", "lowes value", "lowes valuation",
+                "highest price", "lowest price", "lowes price", "most expensive", "cheapest product", "cheapest item",
+                "highest quantity", "lowest quantity", "lowes quantity", "highest stock", "lowest stock", "lowes stock", "most stock", "least stock",
+                "most valuable", "lowes item", "high per stock val", "high val", "low val", "highest val", "lowest val", "stock val"
             ])
         )
         entities["is_superlative"] = is_superlative
 
         # 5. Extract Limit
-        limit_match = re.search(r"\b(?:top|lowest|highest|bottom|first|limit)\s+(\d+)\b", q_lower)
+        limit_match = re.search(r"\b(?:top|lowest|lowes|highest|high|bottom|first|limit)\s+(\d+)\b", q_lower)
         if not limit_match:
             limit_match = re.search(r"\b(\d+)\s+(?:items|products|records|rows|skus|inventory)\b", q_lower)
         if limit_match:
@@ -339,10 +374,16 @@ class InventoryAIAgent:
             entities["limit"] = 5
 
         # 6. Extract Sort Field
-        if any(w in q_lower for w in ["valuation", "value", "worth", "holding value", "asset value"]):
+        if any(w in q_lower for w in ["stock val", "stock value", "stock valuation", "holding val", "holding valuation", "asset val", "asset valuation", "total val", "total valuation", "per stock val", "portfolio val", "val"]):
+            entities["sort_field"] = "valuation"
+        elif any(w in q_lower for w in ["per unit", "unit price", "cost per", "unit value", "price per", "per piece", "per-unit", "per item"]):
+            entities["sort_field"] = "price"
+        elif any(w in q_lower for w in ["valuation", "total value", "holding value", "asset value", "overall value", "portfolio value"]):
             entities["sort_field"] = "valuation"
         elif any(w in q_lower for w in ["price", "cost", "unit price", "rate", "expensive", "cheapest"]):
             entities["sort_field"] = "price"
+        elif any(w in q_lower for w in ["value", "worth"]):
+            entities["sort_field"] = "valuation"
         elif any(w in q_lower for w in ["quantity", "stock", "qty", "units", "volume"]):
             entities["sort_field"] = "quantity"
         elif any(w in q_lower for w in ["threshold", "reorder", "safety"]):
@@ -359,7 +400,7 @@ class InventoryAIAgent:
             entities["sort_field"] = "quantity"
 
         # 7. Extract Sort Order (asc vs desc)
-        if any(w in q_lower for w in ["lowest", "bottom", "least", "smallest", "ascending", " asc", "min", "cheapest"]):
+        if any(w in q_lower for w in ["lowest", "lowes", "bottom", "least", "smallest", "ascending", " asc", "min", "cheapest", "cheaper"]):
             entities["sort_order"] = "asc"
         else:
             entities["sort_order"] = "desc"
@@ -531,11 +572,11 @@ class InventoryAIAgent:
             }
 
         # Handle Custom Sort / Top-N Filter / Superlative Queries
-        if intent in ["CUSTOM_SORT_FILTER", "TOP_N_SORTED"] or (intent == "TABULAR_REPORT" and any(k in query.lower() for k in ["sort", "top", "lowest", "highest", "order by", "rank"])):
+        is_superlative = entities.get("is_superlative", False)
+        if intent in ["CUSTOM_SORT_FILTER", "TOP_N_SORTED"] or any(k in query.lower() for k in ["sort", "top", "lowest", "lowes", "highest", "order by", "rank"]) or (is_superlative and any(k in query.lower() for k in ["value", "valuation", "price", "quantity", "item"])):
             sort_field = entities.get("sort_field", "quantity")
             sort_order = entities.get("sort_order", "desc")
-            is_superlative = entities.get("is_superlative", False)
-            default_limit = 5 if is_superlative else (10 if any(k in query.lower() for k in ["top", "lowest", "highest", "bottom"]) else len(sku_details))
+            default_limit = 5 if is_superlative else (10 if any(k in query.lower() for k in ["top", "lowest", "lowes", "highest", "bottom"]) else len(sku_details))
             limit = entities.get("limit", default_limit)
 
             filtered_items = list(sku_details)
@@ -559,8 +600,8 @@ class InventoryAIAgent:
             if is_superlative and top_item:
                 # 1. Highest / Lowest Value Questions
                 if sort_field in ["valuation", "price"] and any(w in query.lower() for w in ["value", "valuation", "worth", "valuable"]):
-                    top_val_item = sorted(sku_details, key=lambda x: x["valuation"], reverse=True)[0]
-                    top_price_item = sorted(sku_details, key=lambda x: x["price"], reverse=True)[0]
+                    top_val_item = sorted(sku_details, key=lambda x: x["valuation"], reverse=reverse)[0]
+                    top_price_item = sorted(sku_details, key=lambda x: x["price"], reverse=reverse)[0]
 
                     table_rows = [
                         "| Rank | SKU | Product Name | Category | Warehouse | Quantity | Unit Price | Total Valuation | Status |",
@@ -571,17 +612,21 @@ class InventoryAIAgent:
                         v_str = f"${it['valuation']:,.2f}" if it['valuation'] > 0 else "N/A"
                         table_rows.append(f"| {rank} | **{it['sku']}** | {it['name']} | {it['category']} | {it['warehouse']} | {it['quantity']} | {p_str} | {v_str} | {it['status']} |")
 
+                    title_prefix = "Highest" if reverse else "Lowest"
+                    order_prefix = "Top" if reverse else "Bottom"
+                    sort_order_str = "Descending" if reverse else "Ascending"
+
                     answer = (
-                        f"### Highest Value Inventory Item Analysis\n\n"
-                        f"• **Highest Total Holding Valuation**: **{top_val_item['sku']}** ({top_val_item['name']}) — "
+                        f"### {title_prefix} Value Inventory Item Analysis\n\n"
+                        f"• **{title_prefix} Total Holding Valuation**: **{top_val_item['sku']}** ({top_val_item['name']}) — "
                         f"**{top_val_item['quantity']} units** @ ${top_val_item['price']:,.2f} = **${top_val_item['valuation']:,.2f}** ({top_val_item['warehouse']})\n"
-                        f"• **Highest Unit Price**: **{top_price_item['sku']}** ({top_price_item['name']}) — "
+                        f"• **{title_prefix} Unit Price**: **{top_price_item['sku']}** ({top_price_item['name']}) — "
                         f"**${top_price_item['price']:,.2f}/unit** ({top_price_item['quantity']} units, total ${top_price_item['valuation']:,.2f})\n\n"
-                        f"### Top {len(display_items)} Holdings Ranked by Total Valuation\n\n"
+                        f"### {order_prefix} {len(display_items)} Inventory Items (Sorted by Total Valuation {sort_order_str})\n\n"
                         f"{chr(10).join(table_rows)}\n"
                     )
                     risk_level = "HIGH" if top_price_item["status"] in ["LOW_STOCK", "OUT_OF_STOCK"] else "LOW"
-                    recommendations.append(f"Top holding: {top_val_item['sku']}.")
+                    recommendations.append(f"{title_prefix} holding: {top_val_item['sku']}.")
                     return {
                         "answer": answer,
                         "recommendations": recommendations,

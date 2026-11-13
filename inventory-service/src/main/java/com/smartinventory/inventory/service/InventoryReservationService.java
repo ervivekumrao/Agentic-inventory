@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * High-Scale Inventory Reservation Service implementing Shopify's bounded unit-pool
+ * High-Scale Inventory Reservation Service implementing a bounded unit-pool
  * non-blocking locking architecture (FOR UPDATE SKIP LOCKED).
  *
  * Eliminates database hot-row serialization and lock wait timeouts during peak flash sales.

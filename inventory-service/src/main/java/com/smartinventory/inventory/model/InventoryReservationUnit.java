@@ -23,8 +23,7 @@ import java.time.Instant;
 
 /**
  * Represents an individual inventory unit within the bounded pool, enabling
- * non-blocking reservations using database-native FOR UPDATE SKIP LOCKED
- * as pioneered by Shopify's high-scale flash sale architecture.
+ * non-blocking reservations using database-native FOR UPDATE SKIP LOCKED.
  */
 @Entity
 @Table(name = "inventory_reservation_units", indexes = {

@@ -16,9 +16,8 @@
 
 package com.smartinventory.inventory.security.pii;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import com.smartinventory.inventory.security.hash.Hashing;
+
 import java.util.regex.Matcher;
 
 /**
@@ -212,20 +211,10 @@ public final class PiiSanitizer {
     }
 
     private static String hash(String value) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] encodedHash = digest.digest(value.getBytes(StandardCharsets.UTF_8));
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : encodedHash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) {
-                    hexString.append('0');
-                }
-                hexString.append(hex);
-            }
-            return "hash:" + hexString.substring(0, 16);
-        } catch (NoSuchAlgorithmException e) {
+        if (value == null) {
             return "[HASH_UNAVAILABLE]";
         }
+        String hex = Hashing.hash(value);
+        return "hash:" + (hex.length() >= 16 ? hex.substring(0, 16) : hex);
     }
 }

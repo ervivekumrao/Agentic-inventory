@@ -19,6 +19,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>(function(){var t;try{t=localStorage.getItem("theme");}catch(e){}if(!t){t="dark";}document.documentElement.setAttribute("data-theme",t);})();</script>
     <title>Smart Inventory - Agentic AI Workspace</title>
     <link href="/vendor/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/vendor/bootstrap-icons.css">
@@ -192,6 +193,131 @@
             background-color: var(--bg-surface-elevated);
             color: var(--text-primary);
             border-color: var(--border-hover);
+        }
+
+        /* Theme Switcher Widget (Reference: ervivekumrao.github.io) */
+        .theme-switch {
+            background: transparent;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            outline: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .switch-track {
+            position: relative;
+            width: 54px;
+            height: 28px;
+            border-radius: 99px;
+            background: #cbd5e1;
+            border: 1.5px solid #94a3b8;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.12);
+            transition: background-color .3s ease, border-color .3s ease;
+        }
+        [data-theme="dark"] .switch-track {
+            background: #1e293b;
+            border-color: #334155;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
+        }
+        .switch-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+            display: grid;
+            place-items: center;
+            transition: transform .3s cubic-bezier(0.34,1.56,0.64,1), background-color .3s ease, box-shadow .3s ease;
+        }
+        [data-theme="dark"] .switch-knob {
+            transform: translateX(26px);
+            background: #0b0f19;
+            box-shadow: 0 2px 8px rgba(56,189,248,0.35);
+        }
+        .switch-knob svg {
+            grid-area: 1 / 1;
+            transition: opacity .25s ease, transform .3s ease;
+        }
+        .icon-sun { color: #f59e0b; opacity: 1; transform: scale(1); }
+        .icon-moon { color: #38bdf8; opacity: 0; transform: scale(0.5); }
+        [data-theme="dark"] .icon-sun { opacity: 0; transform: scale(0.5); }
+        [data-theme="dark"] .icon-moon { opacity: 1; transform: scale(1); }
+        .track-icon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0.45;
+        }
+        .track-sun { left: 6px; color: #f59e0b; }
+        .track-moon { right: 6px; color: #38bdf8; }
+        .theme-switch:hover .switch-track { border-color: var(--primary); }
+
+        /* Ribbon Navigation Bar */
+        .ribbon-nav {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 10px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            height: 38px;
+            max-width: 100%;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .ribbon-nav::-webkit-scrollbar { display: none; }
+        .ribbon-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            height: 100%;
+            padding: 0 16px 0 22px;
+            font-size: 0.83rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: var(--bg-surface);
+            text-decoration: none !important;
+            white-space: nowrap;
+            position: relative;
+            transition: all .2s ease;
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%, 10px 50%);
+            margin-left: -9px;
+            z-index: 1;
+        }
+        .ribbon-item:hover {
+            background: #0284c7;
+            color: #ffffff !important;
+            z-index: 5;
+        }
+        .ribbon-item.ribbon-first {
+            margin-left: 0;
+            padding-left: 14px;
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%);
+            border-top-left-radius: 9px;
+            border-bottom-left-radius: 9px;
+            z-index: 4;
+        }
+        .ribbon-item.ribbon-last {
+            padding-right: 16px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 10px 50%);
+            border-top-right-radius: 9px;
+            border-bottom-right-radius: 9px;
+        }
+        .ribbon-item.ribbon-active {
+            background: #0284c7;
+            color: #ffffff !important;
+            font-weight: 700;
+            z-index: 3;
         }
 
         /* Message Stream */
@@ -584,16 +710,38 @@
             </div>
         </div>
         <div class="header-actions">
-            <!-- Theme Toggle -->
-            <button class="btn-header" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Light / Dark Mode">
-                <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
-                <span id="themeLabel">Dark</span>
-            </button>
+            <nav class="ribbon-nav" aria-label="Navigation">
+                <a href="/index.html" class="ribbon-item ribbon-first"><i class="bi bi-box-seam"></i> Operations Hub</a>
+                <a href="/chat.html" class="ribbon-item ribbon-active"><i class="bi bi-robot"></i> AI Assistant</a>
+                <a href="/logging-admin.html" class="ribbon-item"><i class="bi bi-sliders"></i> Logger Admin</a>
+                <a href="/swagger-ui.html" target="_blank" class="ribbon-item ribbon-last"><i class="bi bi-journal-code"></i> Swagger API</a>
+            </nav>
 
-            <!-- Navigation Links -->
-            <a href="/index.html" class="btn-header" title="Operations & Reservations Dashboard">
-                <i class="bi bi-grid-1x2"></i> Dashboard
-            </a>
+            <!-- Theme Switcher -->
+            <button id="theme-toggle" class="theme-switch ms-2" aria-label="Toggle dark/light theme" type="button" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+              <span class="switch-track">
+                <span class="track-icon track-sun">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+                  </svg>
+                </span>
+                <span class="track-icon track-moon">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                  </svg>
+                </span>
+                <span class="switch-knob">
+                  <svg class="icon-sun" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+                  </svg>
+                  <svg class="icon-moon" viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                  </svg>
+                </span>
+              </span>
+            </button>
 
             <!-- Export Dropdown -->
             <div class="dropdown">
@@ -739,6 +887,39 @@
         const typingIndicator = document.getElementById('typingIndicator');
 
         let isWaitingForResponse = false;
+        let lastUserQuery = "";
+
+        async function sendFeedback(queryText, correctionText, rating, btn) {
+            try {
+                const targetQuery = queryText || lastUserQuery || "inventory query";
+                const response = await fetch('/api/ai/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        originalQuery: targetQuery,
+                        userCorrection: correctionText || "",
+                        correctedIntent: "CUSTOM_SORT_FILTER",
+                        sortField: correctionText && (correctionText.includes("price") || correctionText.includes("unit")) ? "price" : "valuation",
+                        sortOrder: correctionText && (correctionText.includes("lowest") || correctionText.includes("lowes") || correctionText.includes("cheapest")) ? "asc" : "desc",
+                        rating: rating
+                    })
+                });
+                if (response.ok) {
+                    if (btn) btn.innerHTML = '<i class="bi bi-check2 text-success"></i> Saved!';
+                    showExportToast("Feedback saved! Active learning updated.");
+                }
+            } catch (err) {
+                console.warn("Unable to submit feedback:", err);
+            }
+        }
+
+        function promptCorrectionFeedback(queryText, btn) {
+            const targetQuery = queryText || lastUserQuery || "inventory query";
+            const correction = prompt(`Help train the AI Assistant:\nWhat answer did you expect for query "${targetQuery}"?`, "show lowest unit price items");
+            if (correction !== null && correction.trim() !== "") {
+                sendFeedback(targetQuery, correction.trim(), 'THUMBS_DOWN', btn);
+            }
+        }
 
         // Theme management (matches index.html)
         function initTheme() {
@@ -798,6 +979,7 @@
             const query = userInput.value.trim();
             if (!query || isWaitingForResponse) return;
 
+            lastUserQuery = query;
             appendUserMessage(query);
             userInput.value = '';
 
@@ -878,6 +1060,20 @@
             copyBtn.innerHTML = '<i class="bi bi-clipboard"></i> Copy';
             copyBtn.onclick = () => copyText(copyBtn);
             actions.appendChild(copyBtn);
+
+            const thumbsUpBtn = document.createElement('button');
+            thumbsUpBtn.className = 'btn-copy';
+            thumbsUpBtn.innerHTML = '<i class="bi bi-hand-thumbs-up text-success"></i> Helpful';
+            thumbsUpBtn.title = "Mark answer as accurate";
+            thumbsUpBtn.onclick = () => sendFeedback(lastUserQuery, null, 'THUMBS_UP', thumbsUpBtn);
+            actions.appendChild(thumbsUpBtn);
+
+            const thumbsDownBtn = document.createElement('button');
+            thumbsDownBtn.className = 'btn-copy';
+            thumbsDownBtn.innerHTML = '<i class="bi bi-hand-thumbs-down text-warning"></i> Correct';
+            thumbsDownBtn.title = "Submit correction so AI learns for next time";
+            thumbsDownBtn.onclick = () => promptCorrectionFeedback(lastUserQuery, thumbsDownBtn);
+            actions.appendChild(thumbsDownBtn);
 
             const hasTable = bubble.querySelector('table') !== null;
             if (hasTable) {

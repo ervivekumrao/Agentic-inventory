@@ -125,6 +125,60 @@ def test_ai_agent_chat_valuation():
     data = response.json()
     assert "10,000" in data["answer"] or "10000" in data["answer"] or "Total" in data["answer"]
 
+def test_forecast_demand_seasonal():
+    payload = {
+        "sku": "SKU-SEASONAL",
+        "historical_sales": [10.0, 12.0, 15.0, 14.0, 16.0, 18.0, 20.0, 11.0, 13.0, 16.0, 15.0, 17.0, 19.0, 21.0],
+        "horizon": 7,
+        "lead_time_days": 5
+    }
+    response = client.post("/forecast", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["sku"] == "SKU-SEASONAL"
+    assert data["horizon"] == 7
+    assert len(data["predictions"]) == 7
+
+def test_ai_agent_chat_lowes_value_item():
+    payload = {
+        "query": "lowes value item",
+        "inventoryContext": [
+            {"sku": "SKU-CHEAP", "name": "Cable", "quantity": 10, "reorderThreshold": 5, "price": 5.0, "warehouseLocation": "Warehouse-North"},
+            {"sku": "SKU-EXPENSIVE", "name": "Server", "quantity": 10, "reorderThreshold": 2, "price": 5000.0, "warehouseLocation": "Central-Hub"}
+        ]
+    }
+    response = client.post("/api/ai/agent/chat", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert "Lowest Value Inventory Item Analysis" in data["answer"]
+    assert "SKU-CHEAP" in data["answer"]
+    assert data["answer"].index("SKU-CHEAP") < data["answer"].index("SKU-EXPENSIVE")
+
+def test_active_learning_feedback():
+    feedback_payload = {
+        "originalQuery": "custom un-trained query test",
+        "userCorrection": "show lowest unit price items",
+        "correctedIntent": "CUSTOM_SORT_FILTER",
+        "sortField": "price",
+        "sortOrder": "asc",
+        "rating": "THUMBS_DOWN"
+    }
+    fb_res = client.post("/api/ai/feedback", json=feedback_payload)
+    assert fb_res.status_code == 200
+
+    query_payload = {
+        "query": "custom un-trained query test",
+        "inventoryContext": [
+            {"sku": "SKU-CHEAP", "name": "Cable", "quantity": 10, "reorderThreshold": 5, "price": 5.0, "warehouseLocation": "Warehouse-North"},
+            {"sku": "SKU-EXPENSIVE", "name": "Server", "quantity": 10, "reorderThreshold": 2, "price": 5000.0, "warehouseLocation": "Central-Hub"}
+        ]
+    }
+    chat_res = client.post("/api/ai/agent/chat", json=query_payload)
+    assert chat_res.status_code == 200
+    data = chat_res.json()
+    assert "SKU-CHEAP" in data["answer"]
+    assert data["answer"].index("SKU-CHEAP") < data["answer"].index("SKU-EXPENSIVE")
+
 def test_admin_get_loggers():
     response = client.get("/api/admin/loggers")
     assert response.status_code == 200

@@ -13,6 +13,9 @@
 # limitations under the License.
 
 spring:
+  threads:
+    virtual:
+      enabled: true
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:inventory}}
     username: ${SPRING_DATASOURCE_USERNAME:inventory}

@@ -45,11 +45,15 @@ public class KafkaProducerService {
     }
 
     public void sendStockUpdateEvent(StockUpdateEvent event) {
+        sendStockUpdateEvent(event, null);
+    }
+
+    public void sendStockUpdateEvent(StockUpdateEvent event, OutboxEvent existingOutbox) {
         log.debug("Publishing StockUpdateEvent to Kafka topic '{}': SKU={}, Quantity={}, EventType={}",
                 TOPIC, event.getSku(), event.getQuantity(), event.getEventType());
 
-        OutboxEvent outbox = null;
-        if (outboxEventRepository != null) {
+        OutboxEvent outbox = existingOutbox;
+        if (outbox == null && outboxEventRepository != null) {
             try {
                 String payload = String.format("{\"sku\":\"%s\",\"quantity\":%d,\"eventType\":\"%s\"}",
                         event.getSku(), event.getQuantity(), event.getEventType());

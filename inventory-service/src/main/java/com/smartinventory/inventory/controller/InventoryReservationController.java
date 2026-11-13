@@ -114,7 +114,7 @@ public class InventoryReservationController {
 
     /**
      * Benchmark endpoint: Simulates high-concurrency flash sale traffic (e.g. 50 parallel buyers
-     * competing for the exact same SKU simultaneously) using Shopify's FOR UPDATE SKIP LOCKED.
+     * competing for the exact same SKU simultaneously) using FOR UPDATE SKIP LOCKED.
      * Proves non-blocking execution and zero overselling.
      */
     @PostMapping("/simulate-flash-sale")
@@ -167,7 +167,7 @@ public class InventoryReservationController {
                 "insufficientStockRejections", failureCount,
                 "totalExecutionTimeMs", durationMs,
                 "averageLatencyPerReservationMs", durationMs / (double) concurrentCheckouts,
-                "lockingStrategy", "Shopify-Style Unit Pool (FOR UPDATE SKIP LOCKED)",
+                "lockingStrategy", "Bounded Unit Pool (FOR UPDATE SKIP LOCKED)",
                 "currentPoolStatus", poolStatus
         ));
     }

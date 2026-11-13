@@ -18,6 +18,8 @@ RUN groupadd -r appgroup && useradd -r -u 10001 -g appgroup appuser
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY app ./app
+COPY data ./data
+COPY train_classifier.py .
 COPY healthcheck.py .
 RUN chown -R appuser:appgroup /app
 USER 10001

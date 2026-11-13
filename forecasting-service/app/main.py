@@ -95,6 +95,35 @@ class AIAgentQueryResponse(BaseModel):
     risk_level: str
     riskLevel: Optional[str] = None
 
+class UserFeedbackRequest(BaseModel):
+    original_query: Optional[str] = None
+    originalQuery: Optional[str] = None
+    user_correction: Optional[str] = None
+    userCorrection: Optional[str] = None
+    corrected_intent: Optional[str] = "CUSTOM_SORT_FILTER"
+    correctedIntent: Optional[str] = "CUSTOM_SORT_FILTER"
+    sort_field: Optional[str] = None
+    sortField: Optional[str] = None
+    sort_order: Optional[str] = None
+    sortOrder: Optional[str] = None
+    rating: Optional[str] = "THUMBS_DOWN"
+
+    @model_validator(mode="before")
+    @classmethod
+    def handle_camel_case_feedback(cls, values: Any) -> Any:
+        if isinstance(values, dict):
+            if "originalQuery" in values and "original_query" not in values:
+                values["original_query"] = values["originalQuery"]
+            if "userCorrection" in values and "user_correction" not in values:
+                values["user_correction"] = values["userCorrection"]
+            if "correctedIntent" in values and "corrected_intent" not in values:
+                values["corrected_intent"] = values["correctedIntent"]
+            if "sortField" in values and "sort_field" not in values:
+                values["sort_field"] = values["sortField"]
+            if "sortOrder" in values and "sort_order" not in values:
+                values["sort_order"] = values["sortOrder"]
+        return values
+
 # --- REST Logging Management Endpoints ---
 
 @app.get("/api/admin/loggers")
@@ -190,7 +219,7 @@ def forecast_demand(req: ForecastRequest):
     series = pd.Series(req.historical_sales, dtype=float)
     n = len(series)
 
-    # 1. Statistical Baseline & Linear Trend Regression
+    # 1. Statistical Baseline & Linear / Holt-Winters Trend & Seasonal Regression
     x = np.arange(n)
     y = series.values
     if n >= 2:
@@ -200,6 +229,14 @@ def forecast_demand(req: ForecastRequest):
 
     std_dev = float(series.std()) if n > 1 else 0.0
     mean_val = float(series.mean())
+
+    # Seasonal pattern detection (period = 7 days) if history >= 14
+    seasonal_factors = np.ones(7)
+    if n >= 14:
+        weekly_averages = [series[i::7].mean() for i in range(7)]
+        overall_avg = series.mean()
+        if overall_avg > 0:
+            seasonal_factors = np.array([max(0.2, avg / overall_avg) for avg in weekly_averages])
 
     # 2. Anomaly Detection (Z-score > 2.0)
     anomalies = []
@@ -214,10 +251,17 @@ def forecast_demand(req: ForecastRequest):
 
     last_val = series.iloc[-1]
     for step in range(1, req.horizon + 1):
-        # Blend autoregressive momentum with linear trend projection
-        pred = max(0.0, float(last_val + (slope * step * 0.5)))
+        if n >= 14:
+            s_idx = (n + step - 1) % 7
+            season_mult = seasonal_factors[s_idx]
+            base_pred = max(0.0, float(last_val + (slope * step * 0.3)))
+            pred = round(base_pred * season_mult, 2)
+        else:
+            # Blend autoregressive momentum with linear trend projection
+            pred = round(max(0.0, float(last_val + (slope * step * 0.5))), 2)
+
         margin = max(1.0, 1.96 * (std_dev if std_dev > 0 else 1.0))
-        predictions.append(round(pred, 2))
+        predictions.append(pred)
         lower_bound.append(round(max(0.0, pred - margin), 2))
         upper_bound.append(round(pred + margin, 2))
 
@@ -275,6 +319,16 @@ def ai_agent_chat(req: AIAgentQueryRequest):
     """
     logger.debug("Routing chat request to ai_inventory_assistant")
     return ai_inventory_assistant(req)
+
+@app.post("/api/ai/feedback")
+def process_user_feedback(req: UserFeedbackRequest):
+    """
+    Ingests user interaction feedback and updates active learning memory.
+    """
+    payload = req.model_dump()
+    logger.info("Active learning feedback received: %s", payload)
+    agent.sync_feedback(payload)
+    return {"status": "success", "message": "Feedback ingested into active learning memory"}
 
 @app.get("/health")
 def health_check():

@@ -141,6 +141,7 @@ usage() {
     echo "  clean                  Clean all containers, volumes, networks, and images related to project"
     echo "  reload [service]       Rebuild and reload service(s) (inventory-service, catalog-service, forecasting-service, all)"
     echo "  seed                   Run sample data seeding manually"
+    echo "  train                  Generate dataset & retrain ML intent classifier"
     echo ""
     echo "Supported DB Types:"
     echo "  postgres (default), mssql, mysql, oracle, db2"
@@ -326,6 +327,12 @@ case "$COMMAND" in
         ;;
     seed)
         python3 scripts/seed_data.py
+        ;;
+    train)
+        echo "🧠 Generating in-depth training dataset and retraining ML Intent Classifier..."
+        python3 scripts/generate_training_data.py
+        python3 forecasting-service/train_classifier.py
+        echo "✅ ML Intent Classifier model retrained and updated successfully!"
         ;;
     *)
         echo "❌ Unknown command: $COMMAND"

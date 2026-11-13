@@ -19,6 +19,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>(function(){var t;try{t=localStorage.getItem("theme");}catch(e){}if(!t){t="dark";}document.documentElement.setAttribute("data-theme",t);})();</script>
     <title>Smart Inventory - Operations & High-Scale Reservation Hub</title>
     <link href="/vendor/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/vendor/bootstrap-icons.css">
@@ -542,25 +543,129 @@
             box-shadow: 0 6px 18px var(--primary-glow);
         }
 
-        .btn-theme-toggle {
-            background-color: transparent;
-            border: 1px solid var(--border-subtle);
-            color: var(--text-heading);
-            padding: 0.45rem 0.85rem;
-            border-radius: 9px;
-            font-size: 0.85rem;
-            font-weight: 600;
+        /* Theme Switcher Widget (Reference: ervivekumrao.github.io) */
+        .theme-switch {
+            background: transparent;
+            border: none;
+            padding: 0;
+            cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 0.45rem;
-            cursor: pointer;
-            transition: all 0.15s ease;
+            outline: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
+        .switch-track {
+            position: relative;
+            width: 54px;
+            height: 28px;
+            border-radius: 99px;
+            background: #cbd5e1;
+            border: 1.5px solid #94a3b8;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.12);
+            transition: background-color .3s ease, border-color .3s ease;
+        }
+        [data-theme="dark"] .switch-track {
+            background: #1e293b;
+            border-color: #334155;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
+        }
+        .switch-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+            display: grid;
+            place-items: center;
+            transition: transform .3s cubic-bezier(0.34,1.56,0.64,1), background-color .3s ease, box-shadow .3s ease;
+        }
+        [data-theme="dark"] .switch-knob {
+            transform: translateX(26px);
+            background: #0b0f19;
+            box-shadow: 0 2px 8px rgba(56,189,248,0.35);
+        }
+        .switch-knob svg {
+            grid-area: 1 / 1;
+            transition: opacity .25s ease, transform .3s ease;
+        }
+        .icon-sun { color: #f59e0b; opacity: 1; transform: scale(1); }
+        .icon-moon { color: #38bdf8; opacity: 0; transform: scale(0.5); }
+        [data-theme="dark"] .icon-sun { opacity: 0; transform: scale(0.5); }
+        [data-theme="dark"] .icon-moon { opacity: 1; transform: scale(1); }
+        .track-icon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0.45;
+        }
+        .track-sun { left: 6px; color: #f59e0b; }
+        .track-moon { right: 6px; color: #38bdf8; }
+        .theme-switch:hover .switch-track { border-color: var(--primary); }
 
-        .btn-theme-toggle:hover {
-            border-color: var(--border-hover);
-            color: var(--primary);
-            background: var(--bg-card-hover);
+        /* Ribbon Navigation Bar */
+        .ribbon-nav {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 10px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            height: 38px;
+            max-width: 100%;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .ribbon-nav::-webkit-scrollbar { display: none; }
+        .ribbon-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            height: 100%;
+            padding: 0 16px 0 22px;
+            font-size: 0.83rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: var(--bg-surface);
+            text-decoration: none !important;
+            white-space: nowrap;
+            position: relative;
+            transition: all .2s ease;
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%, 10px 50%);
+            margin-left: -9px;
+            z-index: 1;
+        }
+        .ribbon-item:hover {
+            background: #0284c7;
+            color: #ffffff !important;
+            z-index: 5;
+        }
+        .ribbon-item.ribbon-first {
+            margin-left: 0;
+            padding-left: 14px;
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%);
+            border-top-left-radius: 9px;
+            border-bottom-left-radius: 9px;
+            z-index: 4;
+        }
+        .ribbon-item.ribbon-last {
+            padding-right: 16px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 10px 50%);
+            border-top-right-radius: 9px;
+            border-bottom-right-radius: 9px;
+        }
+        .ribbon-item.ribbon-active {
+            background: #0284c7;
+            color: #ffffff !important;
+            font-weight: 700;
+            z-index: 3;
         }
 
         /* Tech Callout Banner */
@@ -672,21 +777,37 @@
                 <span class="brand-badge ms-2">High-Scale Architecture</span>
             </div>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <!-- Light/Dark Theme Switcher -->
-            <button class="btn-theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Light / Dark Mode">
-                <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
-                <span id="themeLabel">Dark</span>
+        <div class="d-flex align-items-center gap-3">
+            <nav class="ribbon-nav" aria-label="Navigation">
+                <a href="/index.html" class="ribbon-item ribbon-first ribbon-active"><i class="bi bi-box-seam"></i> Operations Hub</a>
+                <a href="/chat.html" class="ribbon-item"><i class="bi bi-robot"></i> AI Assistant</a>
+                <a href="/logging-admin.html" class="ribbon-item"><i class="bi bi-sliders"></i> Logger Admin</a>
+                <a href="/swagger-ui.html" target="_blank" class="ribbon-item ribbon-last"><i class="bi bi-journal-code"></i> Swagger API</a>
+            </nav>
+            <button id="theme-toggle" class="theme-switch" aria-label="Toggle dark/light theme" type="button" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+              <span class="switch-track">
+                <span class="track-icon track-sun">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+                  </svg>
+                </span>
+                <span class="track-icon track-moon">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                  </svg>
+                </span>
+                <span class="switch-knob">
+                  <svg class="icon-sun" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+                  </svg>
+                  <svg class="icon-moon" viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                  </svg>
+                </span>
+              </span>
             </button>
-            <a href="/chat.html" class="nav-btn-link active-ai" title="AI Operations Assistant">
-                <i class="bi bi-robot"></i> AI Assistant
-            </a>
-            <a href="/logging-admin.html" class="nav-btn-link" title="Zero-Downtime Logging Admin">
-                <i class="bi bi-sliders"></i> Logger Admin
-            </a>
-            <a href="/swagger-ui.html" target="_blank" class="nav-btn-link" title="OpenAPI Documentation">
-                <i class="bi bi-terminal"></i> Swagger API
-            </a>
         </div>
     </header>
 
@@ -730,7 +851,7 @@
                         <div class="kpi-icon-pill purple"><i class="bi bi-shield-check"></i></div>
                     </div>
                     <div class="kpi-value" style="font-size: 1.35rem; color: #818cf8;">SKIP LOCKED</div>
-                    <div class="kpi-meta"><i class="bi bi-lightning-charge-fill" style="color: #818cf8;"></i> Shopify Non-Blocking Pool</div>
+                    <div class="kpi-meta"><i class="bi bi-lightning-charge-fill" style="color: #818cf8;"></i> Non-Blocking Pool</div>
                 </div>
             </div>
         </div>
@@ -744,7 +865,7 @@
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="reservations-tab" data-bs-toggle="tab" data-bs-target="#reservationsPanel" type="button" role="tab">
-                    <i class="bi bi-lightning-charge-fill text-warning"></i> Shopify-Style Non-Blocking Reservations
+                    <i class="bi bi-lightning-charge-fill text-warning"></i> Non-Blocking Reservations (SKIP LOCKED)
                 </button>
             </li>
         </ul>
@@ -809,17 +930,17 @@
                 </div>
             </div>
 
-            <!-- TAB 2: SHOPIFY-STYLE RESERVATIONS & BENCHMARK -->
+            <!-- TAB 2: NON-BLOCKING RESERVATIONS & BENCHMARK -->
             <div class="tab-pane fade" id="reservationsPanel" role="tabpanel">
                 <div class="content-card">
                     <div class="tech-callout">
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <i class="bi bi-lightning-charge-fill text-warning fs-4"></i>
-                            <strong style="color: var(--text-heading); font-size: 1.05rem;">Shopify High-Scale Flash Sale Architecture (Millions of Requests/Minute)</strong>
+                            <strong style="color: var(--text-heading); font-size: 1.05rem;">High-Scale Flash Sale Reservation Architecture (SKIP LOCKED)</strong>
                         </div>
                         <p class="mb-0" style="color: var(--text-body); font-size: 0.88rem; line-height: 1.6;">
                             Traditional row updates (<code>UPDATE items SET qty = qty - 1 WHERE sku = 'HOT-SKU'</code>) fail under peak flash sales because thousands of concurrent checkouts block each other on a single database row lock, causing database connection exhaustion and lock wait timeouts.<br/>
-                            Inspired by <strong>Shopify's engineering breakthrough</strong>, this service represents available units as individual rows inside a bounded pool and selects units atomically using <strong><code>FOR UPDATE SKIP LOCKED</code></strong>.
+                            This service represents available units as individual rows inside a bounded pool and selects units atomically using <strong><code>FOR UPDATE SKIP LOCKED</code></strong>.
                             Concurrent checkouts skip locked units and lock free units in parallel with <strong>sub-millisecond hold times</strong>!
                         </p>
                     </div>

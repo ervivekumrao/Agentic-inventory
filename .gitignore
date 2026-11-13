@@ -146,3 +146,7 @@ replay_pid*
 *.tgz
 *.rar
 *.7z
+
+# --- Architecture Assessment Artifacts ---
+architecture-assessment/
+

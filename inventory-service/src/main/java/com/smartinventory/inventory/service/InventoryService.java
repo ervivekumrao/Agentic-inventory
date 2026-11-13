@@ -20,6 +20,8 @@ import com.smartinventory.inventory.kafka.KafkaProducerService;
 import com.smartinventory.inventory.kafka.StockUpdateEvent;
 import com.smartinventory.inventory.model.InventoryItem;
 import com.smartinventory.inventory.model.StockTransaction;
+import com.smartinventory.inventory.model.OutboxEvent;
+import com.smartinventory.inventory.repository.OutboxEventRepository;
 import com.smartinventory.inventory.repository.InventoryRepository;
 import com.smartinventory.inventory.repository.InventoryReservationUnitRepository;
 import com.smartinventory.inventory.repository.StockTransactionRepository;
@@ -41,16 +43,19 @@ public class InventoryService {
     private final StockTransactionRepository transactionRepository;
     private final KafkaProducerService kafkaProducerService;
     private final InventoryReservationUnitRepository unitRepository;
+    private final OutboxEventRepository outboxEventRepository;
 
     @Autowired
     public InventoryService(InventoryRepository inventoryRepository,
                             StockTransactionRepository transactionRepository,
                             KafkaProducerService kafkaProducerService,
-                            @Autowired(required = false) InventoryReservationUnitRepository unitRepository) {
+                            @Autowired(required = false) InventoryReservationUnitRepository unitRepository,
+                            @Autowired(required = false) OutboxEventRepository outboxEventRepository) {
         this.inventoryRepository = inventoryRepository;
         this.transactionRepository = transactionRepository;
         this.kafkaProducerService = kafkaProducerService;
         this.unitRepository = unitRepository;
+        this.outboxEventRepository = outboxEventRepository;
     }
 
     public List<InventoryItem> getAllInventory() {
@@ -70,6 +75,17 @@ public class InventoryService {
         return lowStockItems;
     }
 
+    private OutboxEvent saveOutboxEvent(String sku, int quantity, String eventType) {
+        if (outboxEventRepository == null) return null;
+        try {
+            String payload = String.format("{\"sku\":\"%s\",\"quantity\":%d,\"eventType\":\"%s\"}", sku, quantity, eventType);
+            return outboxEventRepository.save(new OutboxEvent("INVENTORY", sku, eventType, payload));
+        } catch (Exception e) {
+            log.warn("Failed to persist Transactional Outbox record for SKU {}: {}", sku, e.getMessage());
+            return null;
+        }
+    }
+
     @Transactional
     public InventoryItem createInventoryItem(InventoryItem item) {
         log.debug("Creating inventory item for SKU: {}", item.getSku());
@@ -79,7 +95,13 @@ public class InventoryService {
         }
         InventoryItem saved = inventoryRepository.save(item);
         transactionRepository.save(new StockTransaction(saved.getSku(), saved.getQuantity(), "INITIAL", "SETUP"));
-        kafkaProducerService.sendStockUpdateEvent(new StockUpdateEvent(saved.getSku(), saved.getQuantity(), "CREATED"));
+        OutboxEvent outbox = saveOutboxEvent(saved.getSku(), saved.getQuantity(), "CREATED");
+        StockUpdateEvent event = new StockUpdateEvent(saved.getSku(), saved.getQuantity(), "CREATED");
+        if (outbox != null) {
+            kafkaProducerService.sendStockUpdateEvent(event, outbox);
+        } else {
+            kafkaProducerService.sendStockUpdateEvent(event);
+        }
         log.debug("Inventory item saved and event published for SKU: {}", saved.getSku());
         return saved;
     }
@@ -91,7 +113,13 @@ public class InventoryService {
         for (InventoryItem saved : savedItems) {
             transactionRepository.save(new StockTransaction(saved.getSku(), saved.getQuantity(), "INITIAL", "SETUP"));
             try {
-                kafkaProducerService.sendStockUpdateEvent(new StockUpdateEvent(saved.getSku(), saved.getQuantity(), "CREATED"));
+                OutboxEvent outbox = saveOutboxEvent(saved.getSku(), saved.getQuantity(), "CREATED");
+                StockUpdateEvent event = new StockUpdateEvent(saved.getSku(), saved.getQuantity(), "CREATED");
+                if (outbox != null) {
+                    kafkaProducerService.sendStockUpdateEvent(event, outbox);
+                } else {
+                    kafkaProducerService.sendStockUpdateEvent(event);
+                }
             } catch (Exception e) {
                 log.warn("Failed to send Kafka event for bulk item {}: {}", saved.getSku(), e.getMessage());
             }
@@ -119,7 +147,13 @@ public class InventoryService {
         InventoryItem updated = inventoryRepository.save(item);
 
         transactionRepository.save(new StockTransaction(sku, quantityChange, transactionType, referenceId));
-        kafkaProducerService.sendStockUpdateEvent(new StockUpdateEvent(sku, newQuantity, transactionType));
+        OutboxEvent outbox = saveOutboxEvent(sku, newQuantity, transactionType);
+        StockUpdateEvent event = new StockUpdateEvent(sku, newQuantity, transactionType);
+        if (outbox != null) {
+            kafkaProducerService.sendStockUpdateEvent(event, outbox);
+        } else {
+            kafkaProducerService.sendStockUpdateEvent(event);
+        }
 
         log.debug("Updated stock for SKU: {} to new quantity: {}", sku, newQuantity);
         return updated;
@@ -138,7 +172,13 @@ public class InventoryService {
             unitRepository.deleteBySku(sku);
         }
         transactionRepository.save(new StockTransaction(sku, 0, "DELETED", "MANUAL"));
-        kafkaProducerService.sendStockUpdateEvent(new StockUpdateEvent(sku, 0, "DELETED"));
+        OutboxEvent outbox = saveOutboxEvent(sku, 0, "DELETED");
+        StockUpdateEvent event = new StockUpdateEvent(sku, 0, "DELETED");
+        if (outbox != null) {
+            kafkaProducerService.sendStockUpdateEvent(event, outbox);
+        } else {
+            kafkaProducerService.sendStockUpdateEvent(event);
+        }
         log.info("Successfully deleted inventory item and associated units for SKU: {}", sku);
     }
 

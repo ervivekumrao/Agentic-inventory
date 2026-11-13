@@ -29,6 +29,9 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = InventoryApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -43,6 +46,12 @@ class AiAgentIntegrationTest {
     @BeforeEach
     void setUp() {
         inventoryRepository.deleteAll();
+        Map<String, Object> userPayload = Map.of(
+                "username", "admin",
+                "password", "password",
+                "roles", List.of("ROLE_ADMIN")
+        );
+        restTemplate.postForEntity("/api/admin/users", userPayload, Map.class);
     }
 
     @Test
@@ -55,6 +64,7 @@ class AiAgentIntegrationTest {
         AiQueryRequest request = new AiQueryRequest("Which items are low in stock?");
 
         ResponseEntity<AiQueryResponse> response = restTemplate
+                .withBasicAuth("admin", "password")
                 .postForEntity("/api/ai/agent/chat", request, AiQueryResponse.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());

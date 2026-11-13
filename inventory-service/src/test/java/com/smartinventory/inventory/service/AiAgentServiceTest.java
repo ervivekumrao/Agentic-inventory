@@ -52,7 +52,7 @@ class AiAgentServiceTest {
     void processQuery_shouldHydrateContextAndCallFallbackWhenRestClientFails() {
         InventoryItem item1 = new InventoryItem("SKU-001", 3, 10, "Warehouse-North");
         InventoryItem item2 = new InventoryItem("SKU-002", 50, 10, "Warehouse-South");
-        when(inventoryRepository.findAll()).thenReturn(List.of(item1, item2));
+        when(inventoryRepository.findLowStockItems()).thenReturn(List.of(item1, item2));
 
         AiQueryRequest request = new AiQueryRequest("Which items are low in stock?");
         AiQueryResponse response = aiAgentService.processQuery(request);
@@ -67,7 +67,7 @@ class AiAgentServiceTest {
     @Test
     void processQuery_shouldHandleTabularFallback() {
         InventoryItem item = new InventoryItem("SKU-001", 10, 5, "Warehouse-North");
-        when(inventoryRepository.findAll()).thenReturn(List.of(item));
+        when(inventoryRepository.findTop250By()).thenReturn(List.of(item));
 
         AiQueryRequest request = new AiQueryRequest("can you share this data in more details in tabular form?");
         AiQueryResponse response = aiAgentService.processQuery(request);
@@ -80,7 +80,7 @@ class AiAgentServiceTest {
     @Test
     void processQuery_shouldHandleSkuCountFallback() {
         InventoryItem item = new InventoryItem("SKU-001", 10, 5, "Warehouse-North");
-        when(inventoryRepository.findAll()).thenReturn(List.of(item));
+        when(inventoryRepository.findTop250By()).thenReturn(List.of(item));
 
         AiQueryRequest request = new AiQueryRequest("how many different skus stock has?");
         AiQueryResponse response = aiAgentService.processQuery(request);

@@ -38,7 +38,20 @@ public interface InventoryRepository extends JpaRepository<InventoryItem, Long> 
     @Query("SELECT i FROM InventoryItem i WHERE i.quantity <= i.reorderThreshold")
     List<InventoryItem> findLowStockItems();
 
+    List<InventoryItem> findTop250By();
+
     boolean existsBySku(String sku);
 
     void deleteBySku(String sku);
+
+    @Query("SELECT COUNT(i) AS totalSkus, COALESCE(SUM(i.quantity), 0) AS totalQuantity, " +
+           "SUM(CASE WHEN i.quantity <= i.reorderThreshold THEN 1 ELSE 0 END) AS lowStockCount, " +
+           "SUM(CASE WHEN i.quantity = 0 THEN 1 ELSE 0 END) AS outOfStockCount, " +
+           "SUM(CASE WHEN i.quantity > (i.reorderThreshold * 5) AND i.quantity >= 50 THEN 1 ELSE 0 END) AS overstockedCount " +
+           "FROM InventoryItem i")
+    InventorySummaryProjection getPortfolioSummaryProjection();
+
+    @Query("SELECT i.warehouseLocation AS warehouseLocation, COUNT(i) AS totalSkus, COALESCE(SUM(i.quantity), 0) AS totalQuantity " +
+           "FROM InventoryItem i GROUP BY i.warehouseLocation")
+    List<WarehouseSummaryProjection> getWarehouseSummaryProjections();
 }

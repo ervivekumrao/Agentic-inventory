@@ -61,7 +61,7 @@ def run_tests():
     print(f"Adjust Stock: status={s}, newQuantity={b.get('quantity')}")
     assert s == 200 and b.get("quantity") == 120
 
-    print("\n--- 5. Shopify Bounded Unit Pool Initial State ---")
+    print("\n--- 5. Bounded Unit Pool Initial State ---")
     s, b = req(f"http://localhost:8081/api/inventory/reservations/pool/{sku}")
     print(f"Initial Pool State: masterStock={b.get('masterStock')}, availableUnits={b.get('availableUnits')}, reservedUnits={b.get('reservedUnits')}")
     assert s == 200 and b.get("masterStock") == 120
@@ -101,7 +101,7 @@ def run_tests():
     print(f"Released reservation: status={s}, statusField={b.get('status')}")
     assert s == 200 and b.get("status") == "RELEASED"
 
-    print("\n--- 11. Multi-Threaded Flash Sale Benchmark (Shopify Non-Blocking Concurrency) ---")
+    print("\n--- 11. Multi-Threaded Flash Sale Benchmark (Non-Blocking Concurrency) ---")
     flash_sim = {"sku": sku, "concurrentCheckouts": 50, "qtyPerCheckout": 2}
     t0 = time.time()
     s, b = req("http://localhost:8081/api/inventory/reservations/simulate-flash-sale", method="POST", data=flash_sim)

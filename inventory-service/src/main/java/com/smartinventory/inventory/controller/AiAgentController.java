@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,6 +45,7 @@ public class AiAgentController {
     }
 
     @PostMapping("/agent/chat")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR', 'USER')")
     @Operation(summary = "Chat with AI Inventory Agent", description = "Answers complex inventory questions, provides valuation, reorder recommendations, and human-like operational advice.")
     public ResponseEntity<AiQueryResponse> chatWithAgent(@Valid @RequestBody AiQueryRequest request) {
         log.info("AI Agent chat query received: '{}'", request.getQuery());
@@ -54,6 +56,7 @@ public class AiAgentController {
     }
 
     @PostMapping("/inventory-assistant")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR', 'USER')")
     @Operation(summary = "Legacy Inventory Assistant Endpoint", description = "Delegates to AI Agent for RAG inventory insights.")
     public ResponseEntity<AiQueryResponse> inventoryAssistant(@Valid @RequestBody AiQueryRequest request) {
         log.debug("Legacy /inventory-assistant endpoint called, delegating to chatWithAgent");

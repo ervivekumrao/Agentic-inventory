@@ -29,7 +29,7 @@ import java.util.List;
 public interface InventoryReservationUnitRepository extends JpaRepository<InventoryReservationUnit, Long> {
 
     /**
-     * Shopify-style non-blocking reservation selection using FOR UPDATE SKIP LOCKED.
+     * Non-blocking reservation selection using FOR UPDATE SKIP LOCKED.
      * Skips currently locked units by other concurrent checkouts and locks the next available units immediately.
      */
     @Query(value = "SELECT * FROM inventory_reservation_units WHERE sku = :sku AND status = 'AVAILABLE' LIMIT :count FOR UPDATE SKIP LOCKED", nativeQuery = true)
