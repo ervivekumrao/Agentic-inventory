@@ -643,13 +643,15 @@ class InventoryAIAgent:
                         p_str = f"${it['price']:,.2f}" if it['price'] > 0 else "N/A"
                         table_rows.append(f"| {rank} | **{it['sku']}** | {it['name']} | {it['category']} | {it['warehouse']} | {it['quantity']} | {it['threshold']} | {p_str} | {it['status']} |")
 
+                    sort_order_str = "Descending" if reverse else "Ascending"
+
                     answer = (
                         f"### {'Highest' if reverse else 'Lowest'} Stock Item: **{top_item['sku']}** ({top_item['name']})\n\n"
                         f"• **SKU**: **`{top_item['sku']}`** ({top_item['name']})\n"
                         f"• **Quantity**: **{top_item['quantity']} units** (Reorder Point: {top_item['threshold']})\n"
                         f"• **Location**: `{top_item['warehouse']}` | **Category**: {top_item['category']}\n"
                         f"• **Unit Price**: ${top_item['price']:,.2f} | **Total Valuation**: ${top_item['valuation']:,.2f}\n\n"
-                        f"### {'Top' if reverse else 'Lowest'} {len(display_items)} Items Ranked by Quantity\n\n"
+                        f"### {'Top' if reverse else 'Lowest'} {len(display_items)} Items Ranked by Quantity ({sort_order_str})\n\n"
                         f"{chr(10).join(table_rows)}\n"
                     )
                     risk_level = "HIGH" if top_item["status"] in ["LOW_STOCK", "OUT_OF_STOCK"] else "LOW"
@@ -671,13 +673,15 @@ class InventoryAIAgent:
                         v_str = f"${it['valuation']:,.2f}" if it['valuation'] > 0 else "N/A"
                         table_rows.append(f"| {rank} | **{it['sku']}** | {it['name']} | {it['category']} | {it['warehouse']} | {p_str} | {it['quantity']} | {v_str} | {it['status']} |")
 
+                    sort_order_str = "Descending" if reverse else "Ascending"
+
                     answer = (
                         f"### {'Most Expensive' if reverse else 'Cheapest'} Item: **{top_item['sku']}** ({top_item['name']})\n\n"
                         f"• **SKU**: **`{top_item['sku']}`** ({top_item['name']})\n"
                         f"• **Unit Price**: **${top_item['price']:,.2f}**\n"
                         f"• **Current Stock**: {top_item['quantity']} units (Total Valuation: ${top_item['valuation']:,.2f})\n"
                         f"• **Location**: `{top_item['warehouse']}` | **Category**: {top_item['category']}\n\n"
-                        f"### Ranked Items by Unit Price\n\n"
+                        f"### Ranked Items by Unit Price ({sort_order_str})\n\n"
                         f"{chr(10).join(table_rows)}\n"
                     )
                     risk_level = "HIGH" if top_item["status"] in ["LOW_STOCK", "OUT_OF_STOCK"] else "LOW"
