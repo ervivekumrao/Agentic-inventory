@@ -120,7 +120,34 @@ The frontend is served from `inventory-service` static resources ([`index.html`]
 
 ---
 
-## 📜 7. License & Copyright
+## 🔌 7. Model Context Protocol (MCP) Server Adapter
+
+The `forecasting-service` exposes an **MCP Server (`SmartInventoryAgent`)** via the official FastMCP specification. This allows external AI clients (Claude Desktop, Cursor, IDE assistants, or custom LLM agent networks) to dynamically discover and call inventory intelligence tools:
+
+### Exposed MCP Tools
+
+| Tool Identifier | Description | Parameters |
+| :--- | :--- | :--- |
+| **`get_low_stock_reorder_list`** | Identifies items below threshold and estimates replenishment deficit costs. | `inventory_context` (list), `deficit_multiplier` (float, default: 2.0) |
+| **`forecast_sku_demand`** | Computes 14-day exponential smoothing projection, safety stock ($Z=1.65$), dynamic ROP, and anomaly detection. | `sku` (str), `historical_sales` (list), `horizon` (int), `lead_time_days` (int) |
+| **`get_inventory_valuation`** | Computes total holding valuation, total physical units, and warehouse distribution. | `inventory_context` (list) |
+| **`lookup_sku_details`** | Searches for a single SKU and returns item ledger card and stock status. | `sku` (str), `inventory_context` (list) |
+| **`query_inventory_agent`** | Natural language intent classification and local RAG response synthesis. | `query` (str), `inventory_context` (list, optional) |
+
+### Transport Modes & Configuration
+
+1. **JSON-RPC REST Integration**:
+   - `GET /mcp/info`: Returns active MCP server status and tool schemas.
+   - `POST /mcp/tools/execute`: Direct tool execution endpoint over HTTP JSON.
+2. **Standard IO (stdio) Local Transport**:
+   - Launch MCP server for local desktop LLMs (Claude Desktop, Cursor, etc.):
+     ```bash
+     python -m app.main --mcp-stdio
+     ```
+
+---
+
+## 📜 8. License & Copyright
 
 ```text
 Copyright (c) 2026 Vivek Umrao.

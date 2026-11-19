@@ -20,6 +20,14 @@ import numpy as np
 import pandas as pd
 from typing import List, Optional, Dict, Any
 from app.agent import InventoryAIAgent
+from app.mcp_server import (
+    mcp,
+    get_low_stock_reorder_list,
+    forecast_sku_demand,
+    get_inventory_valuation,
+    lookup_sku_details,
+    query_inventory_agent
+)
 
 # Configure structured logging for Python FastAPI
 logging.basicConfig(
@@ -334,3 +342,98 @@ def process_user_feedback(req: UserFeedbackRequest):
 def health_check():
     logger.debug("Health check requested")
     return {"status": "healthy", "service": "forecasting-ai-service"}
+
+
+class MCPToolCallRequest(BaseModel):
+    tool_name: str
+    arguments: Dict[str, Any] = Field(default_factory=dict)
+
+
+@app.get("/mcp/info")
+def get_mcp_info():
+    """
+    Returns MCP server metadata and available tool declarations.
+    """
+    return {
+        "mcp_server_name": "SmartInventoryAgent",
+        "status": "active",
+        "tools": [
+            {
+                "name": "get_low_stock_reorder_list",
+                "description": "Identifies stock items below reorder point and estimates procurement deficit cost.",
+                "parameters": {"deficit_multiplier": "float (default: 2.0)"}
+            },
+            {
+                "name": "forecast_sku_demand",
+                "description": "Calculates demand forecast, safety stock (Z=1.65), ROP, and anomalies.",
+                "parameters": {"sku": "str", "historical_sales": "list", "horizon": "int (default: 14)", "lead_time_days": "int (default: 5)"}
+            },
+            {
+                "name": "get_inventory_valuation",
+                "description": "Computes total inventory holding valuation and warehouse asset distribution.",
+                "parameters": {"inventory_context": "list"}
+            },
+            {
+                "name": "lookup_sku_details",
+                "description": "Searches for a specific SKU and returns its stock ledger card.",
+                "parameters": {"sku": "str", "inventory_context": "list"}
+            },
+            {
+                "name": "query_inventory_agent",
+                "description": "Processes natural language queries via intent classification and local synthesis.",
+                "parameters": {"query": "str", "inventory_context": "list (optional)"}
+            }
+        ]
+    }
+
+
+@app.post("/mcp/tools/execute")
+def execute_mcp_tool(req: MCPToolCallRequest):
+    """
+    Direct execution endpoint for MCP tools over JSON HTTP protocol.
+    """
+    name = req.tool_name
+    args = req.arguments
+    logger.info("Executing MCP tool: '%s'", name)
+    if name == "get_low_stock_reorder_list":
+        return get_low_stock_reorder_list(
+            inventory_context=args.get("inventory_context", []),
+            deficit_multiplier=float(args.get("deficit_multiplier", 2.0))
+        )
+    elif name == "forecast_sku_demand":
+        return forecast_sku_demand(
+            sku=args.get("sku", ""),
+            historical_sales=args.get("historical_sales", []),
+            horizon=int(args.get("horizon", 14)),
+            lead_time_days=int(args.get("lead_time_days", 5))
+        )
+    elif name == "get_inventory_valuation":
+        return get_inventory_valuation(inventory_context=args.get("inventory_context", []))
+    elif name == "lookup_sku_details":
+        return lookup_sku_details(
+            sku=args.get("sku", ""),
+            inventory_context=args.get("inventory_context", [])
+        )
+    elif name == "query_inventory_agent":
+        return query_inventory_agent(
+            query=args.get("query", ""),
+            inventory_context=args.get("inventory_context"),
+            catalog_context=args.get("catalog_context")
+        )
+    else:
+        raise HTTPException(status_code=404, detail=f"MCP tool '{name}' not found")
+
+
+if __name__ == "__main__":
+    import sys
+    import uvicorn
+
+    if "--mcp-stdio" in sys.argv:
+        if mcp:
+            print("Starting MCP Server in stdio mode...", file=sys.stderr)
+            mcp.run(transport="stdio")
+        else:
+            print("MCP SDK not installed.", file=sys.stderr)
+            sys.exit(1)
+    else:
+        uvicorn.run(app, host="0.0.0.0", port=8000)
