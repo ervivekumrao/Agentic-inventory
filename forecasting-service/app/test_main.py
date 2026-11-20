@@ -47,9 +47,8 @@ def test_forecast_demand_empty():
         "horizon": 5
     }
     response = client.post("/forecast", json=payload)
-    assert response.status_code == 200
-    data = response.json()
-    assert len(data["predictions"]) == 5
+    assert response.status_code == 422
+    assert "Insufficient historical sales data" in response.json()["detail"]
 
 def test_ai_inventory_assistant_low_stock():
     payload = {

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM eclipse-temurin:17-jre-jammy
+FROM eclipse-temurin:21-jre-jammy
 RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 RUN groupadd -r appgroup && useradd -r -u 10001 -g appgroup appuser
 ARG JAR_FILE=build/libs/*.jar
@@ -22,4 +22,4 @@ USER 10001
 EXPOSE 8081
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
   CMD curl -f http://localhost:8081/actuator/health || exit 1
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-XX:InitialRAMPercentage=50.0", "-jar", "/app.jar"]

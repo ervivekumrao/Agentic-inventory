@@ -16,10 +16,8 @@
 
 package com.smartinventory.inventory.config;
 
-import com.smartinventory.inventory.model.InventoryItem;
 import com.smartinventory.inventory.model.RoleEntity;
 import com.smartinventory.inventory.model.UserEntity;
-import com.smartinventory.inventory.repository.InventoryRepository;
 import com.smartinventory.inventory.repository.RoleRepository;
 import com.smartinventory.inventory.repository.UserRepository;
 import org.slf4j.Logger;
@@ -30,13 +28,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
 import java.util.Set;
 
+/**
+ * Initializes essential security roles and baseline administrative user accounts
+ * required for system authentication and authorization at startup.
+ */
 @Configuration
-public class FastDataInitializer {
+public class SecurityDataInitializer {
 
-    private static final Logger log = LoggerFactory.getLogger(FastDataInitializer.class);
+    private static final Logger log = LoggerFactory.getLogger(SecurityDataInitializer.class);
 
     @Value("${app.security.default-admin-password:admin123}")
     private String adminDefaultPassword;
@@ -51,10 +52,9 @@ public class FastDataInitializer {
     private String viewerDefaultPassword;
 
     @Bean
-    public CommandLineRunner initializeInventoryData(
-            RoleRepository roleRepository,
-            UserRepository userRepository,
-            InventoryRepository inventoryRepository,
+    public CommandLineRunner initializeSecurityData(
+            @org.springframework.context.annotation.Lazy RoleRepository roleRepository,
+            @org.springframework.context.annotation.Lazy UserRepository userRepository,
             PasswordEncoder passwordEncoder) {
         return args -> {
             // Warn if default credentials are detected in the environment
@@ -70,7 +70,7 @@ public class FastDataInitializer {
                 }
             }
 
-            // 2. Seed Users
+            // 2. Seed Baseline Users
             if (!userRepository.existsByUsername("admin")) {
                 UserEntity admin = new UserEntity("admin", passwordEncoder.encode(adminDefaultPassword));
                 admin.setRoles(Set.of(roleRepository.findByName("ROLE_ADMIN").orElseThrow()));
@@ -92,31 +92,7 @@ public class FastDataInitializer {
                 userRepository.save(viewer);
             }
 
-            // 3. Seed Inventory Items if empty (using batch saveAll for maximum speed)
-            if (inventoryRepository.count() == 0) {
-                log.info("🌱 Inventory database is empty. Fast-seeding inventory items...");
-                List<String> warehouses = List.of("Warehouse-North", "Warehouse-South", "Warehouse-East", "Warehouse-West", "Central-Hub");
-                List<String> sampleSkus = List.of(
-                    "LAPTOP-PRO-15", "SMARTPHONE-X", "WIRELESS-BUDS", "MECHANICAL-KEYBOARD", "4K-MONITOR",
-                    "DENIM-JACKET", "RUNNING-SHOES", "MERINO-SWEATER", "COTTON-HOODIE", "LEATHER-BELT",
-                    "BLENDER-PRO", "COFFEE-MAKER", "AIR-FRYER", "CHEF-KNIFE", "CERAMIC-MUG-SET",
-                    "ORGANIC-HONEY", "ESPRESSO-BEANS", "ALMOND-BUTTER", "GREEN-TEA", "DARK-CHOCOLATE",
-                    "CORDLESS-DRILL", "TOOL-SET", "LED-WORK-LIGHT", "DIGITAL-MULTIMETER", "STAINLESS-SCREWS",
-                    "YOGA-MAT", "CAMPING-TENT", "HIKING-BACKPACK", "INSULATED-FLASK", "BIKE-HELMET"
-                );
-
-                List<InventoryItem> itemsToSave = new java.util.ArrayList<>();
-                for (int idx = 0; idx < sampleSkus.size(); idx++) {
-                    String sku = sampleSkus.get(idx);
-                    int initialQty = (idx * 13) % 85 + 5;
-                    int threshold = 10;
-                    String warehouse = warehouses.get(idx % warehouses.size());
-
-                    itemsToSave.add(new InventoryItem(sku, initialQty, threshold, warehouse));
-                }
-                inventoryRepository.saveAll(itemsToSave);
-                log.info("✅ Successfully fast-seeded {} inventory items!", itemsToSave.size());
-            }
+            log.info("🔐 Security roles and default user accounts successfully initialized.");
         };
     }
 }

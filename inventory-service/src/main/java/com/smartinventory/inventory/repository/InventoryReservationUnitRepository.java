@@ -37,6 +37,10 @@ public interface InventoryReservationUnitRepository extends JpaRepository<Invent
 
     List<InventoryReservationUnit> findByReservationId(String reservationId);
 
+    List<InventoryReservationUnit> findByReservationIdAndStatus(String reservationId, String status);
+
+    List<InventoryReservationUnit> findBySkuAndStatus(String sku, String status);
+
     long countBySkuAndStatus(String sku, String status);
 
     List<InventoryReservationUnit> findByStatusAndExpiresAtBefore(String status, Instant threshold);

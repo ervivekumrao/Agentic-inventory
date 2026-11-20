@@ -59,6 +59,9 @@ public class InventoryReservationUnit {
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
+    @Version
+    private Long version;
+
     public InventoryReservationUnit() {}
 
     public InventoryReservationUnit(String sku) {
@@ -87,6 +90,9 @@ public class InventoryReservationUnit {
 
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+
+    public Long getVersion() { return version; }
+    public void setVersion(Long version) { this.version = version; }
 
     public void reserve(String reservationId, Instant expiresAt) {
         this.status = STATUS_RESERVED;

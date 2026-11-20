@@ -185,8 +185,27 @@ def seed_data():
         print(f" ℹ️ [Catalog Products Ready] Found {cat_count} products (already seeded)")
 
     if inv_count == 0:
-        inv_post_status, _ = make_request(INVENTORY_URL + "/bulk", "POST", inventory_payloads, headers=inv_headers)
-        print(f" ✅ [Bulk Inventory Seeding] Status: {inv_post_status} ({len(inventory_payloads)} items seeded)")
+        csv_file_path = os.path.join(os.path.dirname(__file__), "..", "samples", "inventory_import_template.csv")
+        if os.path.exists(csv_file_path):
+            with open(csv_file_path, "r", encoding="utf-8") as f:
+                csv_data = f.read()
+            csv_headers = {
+                "Content-Type": "text/plain",
+                "Authorization": f"Basic {auth_str}"
+            }
+            req_data = csv_data.encode("utf-8")
+            req = urllib.request.Request(INVENTORY_URL + "/import/csv", data=req_data, headers=csv_headers, method="POST")
+            try:
+                with urllib.request.urlopen(req) as resp:
+                    resp_body = json.loads(resp.read().decode("utf-8") or "{}")
+                    print(f" ✅ [Bulk Inventory Data Import] Status: {resp.status} | Imported: {resp_body.get('importedRecords')} records in {resp_body.get('durationMs')} ms")
+            except Exception as e:
+                print(f" ⚠️ [Bulk Import Fallback] {e}")
+                inv_post_status, _ = make_request(INVENTORY_URL + "/bulk", "POST", inventory_payloads, headers=inv_headers)
+                print(f" ✅ [Bulk Inventory Seeding] Status: {inv_post_status} ({len(inventory_payloads)} items seeded)")
+        else:
+            inv_post_status, _ = make_request(INVENTORY_URL + "/bulk", "POST", inventory_payloads, headers=inv_headers)
+            print(f" ✅ [Bulk Inventory Seeding] Status: {inv_post_status} ({len(inventory_payloads)} items seeded)")
     else:
         print(f" ℹ️ [Inventory Items Ready] Found {inv_count} inventory items (already seeded)")
 

@@ -55,6 +55,9 @@ class InventoryControllerTest {
     @MockitoBean
     private QueryDialect queryDialect;
 
+    @MockitoBean
+    private com.smartinventory.inventory.importer.BulkDataImporter bulkDataImporter;
+
     @Test
     @WithMockUser
     void getAllInventory_shouldReturnList() throws Exception {
@@ -143,5 +146,20 @@ class InventoryControllerTest {
         mockMvc.perform(get("/api/inventory/database-info"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.databaseType").value("POSTGRESQL"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void importInventoryCsvText_shouldReturnBulkImportResult() throws Exception {
+        com.smartinventory.inventory.dto.BulkImportResult result = new com.smartinventory.inventory.dto.BulkImportResult(true, 1, 1, 0, 10, "Success");
+        when(bulkDataImporter.importFromCsvContent(any(String.class))).thenReturn(result);
+
+        mockMvc.perform(post("/api/inventory/import/csv")
+                .with(csrf())
+                .contentType(MediaType.TEXT_PLAIN)
+                .content("sku,quantity,reorder_threshold,warehouse_location\nTEST-01,10,5,WH-1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.importedRecords").value(1));
     }
 }

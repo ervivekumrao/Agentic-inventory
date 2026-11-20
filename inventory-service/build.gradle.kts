@@ -24,7 +24,8 @@ group = "com.smartinventory"
 version = "0.0.1-SNAPSHOT"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 repositories {
@@ -34,11 +35,14 @@ repositories {
 dependencies {
     implementation(libs.spring.boot.starter.web)
     implementation(libs.spring.boot.starter.data.jpa)
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation(libs.querydsl.sql)
     implementation(libs.spring.boot.starter.security)
     implementation(libs.spring.boot.starter.validation)
     implementation(libs.springdoc.openapi)
     implementation(libs.commons.lang3)
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-database-postgresql")
     implementation(libs.postgresql)
     implementation(libs.mysql)
     implementation(libs.oracle)
@@ -53,4 +57,35 @@ dependencies {
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.spring.kafka.test)
     testImplementation(libs.spring.security.test)
+}
+
+tasks.register<JavaExec>("runMigrationSeeder") {
+    group = "application"
+    description = "Runs the standalone Database Migration & Data Seeding Tool independently."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.smartinventory.inventory.tool.MigrationSeederTool")
+    args = listOf("--config=config/seeder-migration.properties", "--mode=all")
+}
+
+tasks.register<Jar>("buildSeederJar") {
+    group = "build"
+    description = "Builds a standalone executable fat JAR for the Migration & Seeding Tool."
+    archiveFileName.set("migration-seeder-tool.jar")
+    destinationDirectory.set(file("${rootDir}/bin"))
+
+    manifest {
+        attributes(
+            "Main-Class" to "com.smartinventory.inventory.tool.MigrationSeederTool"
+        )
+    }
+
+    val runtimeClasspath = configurations.runtimeClasspath.get()
+    from(sourceSets.main.get().output)
+    from({
+        runtimeClasspath.filter { it.name.endsWith(".jar") }.map { zipTree(it) }
+    }) {
+        exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

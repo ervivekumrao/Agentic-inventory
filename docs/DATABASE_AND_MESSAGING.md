@@ -160,7 +160,27 @@ Stores fine-grained system action permissions.
 
 ---
 
-## 📜 5. License & Copyright
+## 🛠️ 5. Standalone Database Migration & Data Seeding Tool
+
+Database migration (Flyway DDL) and initial reference data seeding are decoupled into a standalone tool that can be executed independently from a external configuration file (`config/seeder-migration.properties`) or environment variables:
+
+- **Class**: [`MigrationSeederTool.java`](file:///H:/GitHubProjects/AgenticInventory/inventory-service/src/main/java/com/smartinventory/inventory/tool/MigrationSeederTool.java)
+- **Config File**: [`config/seeder-migration.properties`](file:///H:/GitHubProjects/AgenticInventory/config/seeder-migration.properties)
+- **Runner Scripts**: [`scripts/run_migration_seeder.sh`](file:///H:/GitHubProjects/AgenticInventory/scripts/run_migration_seeder.sh) & [`scripts/run_migration_seeder.bat`](file:///H:/GitHubProjects/AgenticInventory/scripts/run_migration_seeder.bat)
+
+### Execution Modes (`--mode`):
+- `migrate`: Runs Flyway schema DDL migrations against the target database.
+- `seed`: Seeds security roles/users and executes JDBC bulk inventory reference data import.
+- `all`: Sequentially runs migrations followed by data seeding.
+
+### CLI Execution Example:
+```bash
+./gradlew :inventory-service:runMigrationSeeder --args="--config=config/seeder-migration.properties --mode=all"
+```
+
+---
+
+## 📜 6. License & Copyright
 
 ```text
 Copyright (c) 2026 Vivek Umrao.

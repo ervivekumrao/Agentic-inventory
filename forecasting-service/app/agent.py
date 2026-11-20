@@ -964,10 +964,14 @@ class InventoryAIAgent:
             except Exception as e:
                 logger.warning("OpenAI LLM call failed: %s", e)
 
-        # 2. Try Google Gemini if API key configured
+        # 2. Try Google Gemini if API key configured (using HTTP Header instead of URL param to avoid log exposure)
         if self.gemini_api_key:
             try:
-                gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.gemini_api_key}"
+                gemini_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+                gemini_headers = {
+                    "x-goog-api-key": self.gemini_api_key,
+                    "Content-Type": "application/json"
+                }
                 gemini_payload = {
                     "contents": [{
                         "parts": [{"text": f"{system_prompt}\n\n{user_prompt}"}]
@@ -978,6 +982,7 @@ class InventoryAIAgent:
                     }
                 }
                 with httpx.Client(timeout=10.0) as client:
+                    res = client.post(gemini_url, json=gemini_payload, headers=gemini_headers)
                     res = client.post(gemini_url, json=gemini_payload)
                     if res.status_code == 200:
                         content = res.json()["candidates"][0]["content"]["parts"][0]["text"]

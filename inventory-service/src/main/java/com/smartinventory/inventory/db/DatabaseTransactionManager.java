@@ -38,7 +38,7 @@ public class DatabaseTransactionManager {
     private final PlatformTransactionManager transactionManager;
 
     @Autowired
-    public DatabaseTransactionManager(@Autowired(required = false) PlatformTransactionManager transactionManager) {
+    public DatabaseTransactionManager(@Autowired(required = false) @org.springframework.context.annotation.Lazy PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
         log.info("Initialized DatabaseTransactionManager (TransactionManager active: {})", transactionManager != null);
     }

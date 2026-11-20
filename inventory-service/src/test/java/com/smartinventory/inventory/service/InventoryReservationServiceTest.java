@@ -18,8 +18,10 @@ package com.smartinventory.inventory.service;
 
 import com.smartinventory.inventory.kafka.KafkaProducerService;
 import com.smartinventory.inventory.model.InventoryItem;
+import com.smartinventory.inventory.model.InventoryReservation;
 import com.smartinventory.inventory.model.InventoryReservationUnit;
 import com.smartinventory.inventory.repository.InventoryRepository;
+import com.smartinventory.inventory.repository.InventoryReservationRepository;
 import com.smartinventory.inventory.repository.InventoryReservationUnitRepository;
 import com.smartinventory.inventory.repository.StockTransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,6 +44,9 @@ class InventoryReservationServiceTest {
 
     @Mock
     private InventoryReservationUnitRepository unitRepository;
+
+    @Mock
+    private InventoryReservationRepository reservationRepository;
 
     @Mock
     private InventoryRepository inventoryRepository;
@@ -72,7 +77,7 @@ class InventoryReservationServiceTest {
 
     @Test
     void reserveStock_shouldSucceed_whenAvailableUnitsExist() {
-        when(unitRepository.findByReservationId("RES-123")).thenReturn(List.of());
+        when(reservationRepository.findById("RES-123")).thenReturn(Optional.empty());
         when(unitRepository.fetchAvailableUnitsForUpdate("SKU-TEST", 2)).thenReturn(List.of(unit1, unit2));
 
         var result = reservationService.reserveStock("SKU-TEST", 2, "RES-123", 10);
@@ -85,13 +90,14 @@ class InventoryReservationServiceTest {
         assertEquals("RES-123", unit1.getReservationId());
         assertNotNull(unit1.getExpiresAt());
         verify(unitRepository, times(1)).saveAll(anyList());
+        verify(reservationRepository, times(1)).save(any(InventoryReservation.class));
     }
 
     @Test
     void reserveStock_idempotency_shouldReturnExistingReservation() {
-        unit1.reserve("RES-EXISTING", Instant.now().plusSeconds(600));
-
-        when(unitRepository.findByReservationId("RES-EXISTING")).thenReturn(List.of(unit1));
+        Instant exp = Instant.now().plusSeconds(600);
+        InventoryReservation existingHeader = new InventoryReservation("RES-EXISTING", "SKU-TEST", 1, exp);
+        when(reservationRepository.findById("RES-EXISTING")).thenReturn(Optional.of(existingHeader));
 
         var result = reservationService.reserveStock("SKU-TEST", 1, "RES-EXISTING", 10);
 
@@ -103,9 +109,9 @@ class InventoryReservationServiceTest {
 
     @Test
     void reserveStock_shouldThrowException_whenInsufficientUnits() {
-        when(unitRepository.findByReservationId("RES-EMPTY")).thenReturn(List.of());
+        when(reservationRepository.findById("RES-EMPTY")).thenReturn(Optional.empty());
         when(unitRepository.fetchAvailableUnitsForUpdate("SKU-TEST", 5)).thenReturn(List.of());
-        when(inventoryRepository.findBySkuForUpdate("SKU-TEST")).thenReturn(Optional.of(new InventoryItem("SKU-TEST", 0, 5, "Warehouse-A")));
+        when(inventoryRepository.findBySku("SKU-TEST")).thenReturn(Optional.of(new InventoryItem("SKU-TEST", 0, 5, "Warehouse-A")));
 
         assertThrows(IllegalArgumentException.class, () ->
                 reservationService.reserveStock("SKU-TEST", 5, "RES-EMPTY", 10));
@@ -116,6 +122,7 @@ class InventoryReservationServiceTest {
         unit1.reserve("RES-CLAIM", Instant.now().plusSeconds(300));
 
         when(unitRepository.findByReservationId("RES-CLAIM")).thenReturn(List.of(unit1));
+        when(inventoryRepository.decrementStockIfSufficient("SKU-TEST", 1)).thenReturn(1);
         when(inventoryRepository.findBySku("SKU-TEST")).thenReturn(Optional.of(masterItem));
 
         boolean claimed = reservationService.claimReservation("RES-CLAIM");
@@ -124,6 +131,18 @@ class InventoryReservationServiceTest {
         assertEquals(InventoryReservationUnit.STATUS_CLAIMED, unit1.getStatus());
         verify(transactionRepository, times(1)).save(any());
         verify(kafkaProducerService, times(1)).sendStockUpdateEvent(any());
+    }
+
+    @Test
+    void claimReservation_shouldBeIdempotent_whenAlreadyClaimed() {
+        unit1.claim();
+        when(reservationRepository.findById("RES-ALREADY")).thenReturn(Optional.empty());
+        when(unitRepository.findByReservationId("RES-ALREADY")).thenReturn(List.of(unit1));
+
+        boolean claimed = reservationService.claimReservation("RES-ALREADY");
+
+        assertTrue(claimed);
+        verify(inventoryRepository, never()).decrementStockIfSufficient(anyString(), anyInt());
     }
 
     @Test

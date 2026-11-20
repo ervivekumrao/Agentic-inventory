@@ -39,9 +39,19 @@ public class AiAgentController {
     private static final Logger log = LoggerFactory.getLogger(AiAgentController.class);
 
     private final AiAgentService aiAgentService;
+    private final com.smartinventory.inventory.service.SalesHistoryAggregationService salesHistoryAggregationService;
+    private final com.smartinventory.inventory.service.PurchaseOrderCopilotService purchaseOrderCopilotService;
+    private final com.smartinventory.inventory.service.DeadStockAdvisorService deadStockAdvisorService;
 
-    public AiAgentController(AiAgentService aiAgentService) {
+    public AiAgentController(
+            AiAgentService aiAgentService,
+            com.smartinventory.inventory.service.SalesHistoryAggregationService salesHistoryAggregationService,
+            com.smartinventory.inventory.service.PurchaseOrderCopilotService purchaseOrderCopilotService,
+            com.smartinventory.inventory.service.DeadStockAdvisorService deadStockAdvisorService) {
         this.aiAgentService = aiAgentService;
+        this.salesHistoryAggregationService = salesHistoryAggregationService;
+        this.purchaseOrderCopilotService = purchaseOrderCopilotService;
+        this.deadStockAdvisorService = deadStockAdvisorService;
     }
 
     @PostMapping("/agent/chat")
@@ -53,6 +63,35 @@ public class AiAgentController {
         log.info("AI Agent responded with risk level: {}", response.getRiskLevel());
         log.debug("AI Agent response answer snippet: {}", response.getAnswer() != null && response.getAnswer().length() > 80 ? response.getAnswer().substring(0, 80) + "..." : response.getAnswer());
         return ResponseEntity.ok(response);
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/sales-history/{sku}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR', 'USER')")
+    @Operation(summary = "Get Historical Sales Time-Series for SKU", description = "Aggregates daily sales transactions from immutable StockTransaction ledger for forecasting models.")
+    public ResponseEntity<com.smartinventory.inventory.service.SalesHistoryAggregationService.SalesHistoryDto> getSalesHistory(
+            @org.springframework.web.bind.annotation.PathVariable("sku") String sku,
+            @org.springframework.web.bind.annotation.RequestParam(name = "days", defaultValue = "30") int days) {
+        log.info("Fetching sales transaction history for SKU: {}, days: {}", sku, days);
+        var salesHistory = salesHistoryAggregationService.getSalesHistoryForSku(sku, days);
+        return ResponseEntity.ok(salesHistory);
+    }
+
+    @org.springframework.web.bind.annotation.PostMapping("/copilot/purchase-order-draft")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @Operation(summary = "Generate Draft Purchase Order", description = "Evaluates low stock items against sales velocity and generates a human-approvable draft Purchase Order.")
+    public ResponseEntity<com.smartinventory.inventory.service.PurchaseOrderCopilotService.PurchaseOrderDraftDto> generatePurchaseOrderDraft() {
+        log.info("Generating Purchase Order draft via AI Copilot...");
+        var draft = purchaseOrderCopilotService.generateDraftPurchaseOrder();
+        return ResponseEntity.ok(draft);
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/copilot/dead-stock-advisor")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @Operation(summary = "Audit Dead Stock & Markdown Recommendations", description = "Audits slow-moving inventory items and produces recommended markdown percentages or warehouse transfers.")
+    public ResponseEntity<com.smartinventory.inventory.service.DeadStockAdvisorService.DeadStockReportDto> getDeadStockReport() {
+        log.info("Auditing dead stock via AI Copilot...");
+        var report = deadStockAdvisorService.analyzeDeadStock();
+        return ResponseEntity.ok(report);
     }
 
     @PostMapping("/inventory-assistant")

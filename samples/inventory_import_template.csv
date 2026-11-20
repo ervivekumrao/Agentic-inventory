@@ -1,0 +1,16 @@
+sku,quantity,reorder_threshold,warehouse_location
+LAPTOP-PRO-15,50,10,Warehouse-North
+SMARTPHONE-X,37,10,Warehouse-South
+WIRELESS-BUDS,24,10,Warehouse-East
+MECHANICAL-KEYBOARD,11,10,Warehouse-West
+4K-MONITOR,63,10,Central-Hub
+DENIM-JACKET,50,10,Warehouse-North
+RUNNING-SHOES,37,10,Warehouse-South
+MERINO-SWEATER,24,10,Warehouse-East
+COTTON-HOODIE,11,10,Warehouse-West
+LEATHER-BELT,63,10,Central-Hub
+BLENDER-PRO,45,10,Warehouse-North
+COFFEE-MAKER,30,10,Warehouse-South
+AIR-FRYER,25,10,Warehouse-East
+CHEF-KNIFE,60,10,Warehouse-West
+CERAMIC-MUG-SET,100,10,Central-Hub

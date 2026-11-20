@@ -1,0 +1,59 @@
+# Prometheus Alert Rules & Multi-Window Burn-Rate Alerts for Smart Inventory
+groups:
+  - name: inventory_slo_alerts
+    rules:
+      # SLO 1: Reservation Request Success Rate < 99.9% (5m burn rate)
+      - alert: InventoryReservationHighFailureRate
+        expr: |
+          (
+            sum(rate(inventory_reservation_requests_total{status="INSUFFICIENT_STOCK"}[5m]))
+            /
+            sum(rate(inventory_reservation_requests_total[5m]))
+          ) > 0.01
+        for: 2m
+        labels:
+          severity: critical
+          slo: reservation_success_rate
+        annotations:
+          summary: "High reservation failure rate detected (> 1% failures in 5m window)"
+          description: "Over 1% of reservation requests are failing due to stock depletion or concurrency locks."
+
+      # SLO 2: Reservation Claim Failure Rate > 0.05% (5m burn rate)
+      - alert: InventoryClaimHighFailureRate
+        expr: |
+          (
+            sum(rate(inventory_reservation_claims_total{status="FAILED"}[5m]))
+            /
+            sum(rate(inventory_reservation_claims_total[5m]))
+          ) > 0.0005
+        for: 1m
+        labels:
+          severity: critical
+          slo: claim_success_rate
+        annotations:
+          summary: "Reservation claim failure rate exceeds 0.05% threshold"
+          description: "Paid customer checkout claims are failing to deduct master stock, indicating transactional inconsistency."
+
+      # Transactional Outbox Queue Lag Alert
+      - alert: TransactionalOutboxQueueLagHigh
+        expr: |
+          sum(rate(inventory_outbox_events_processed_total{status="FAILED"}[5m])) > 5
+        for: 3m
+        labels:
+          severity: warning
+          component: outbox_relay
+        annotations:
+          summary: "Transactional outbox event relay failures elevated"
+          description: "Kafka event dispatch is failing in OutboxRelayService, events are accumulating in outbox_events."
+
+      # Database Connection Pool Exhaustion Alert
+      - alert: HikariConnectionPoolExhaustion
+        expr: |
+          hikaricp_pending_threads{pool="HikariPool-1"} > 5
+        for: 1m
+        labels:
+          severity: critical
+          component: database_pool
+        annotations:
+          summary: "HikariCP database connection pool has waiting threads"
+          description: "More than 5 request threads are blocked waiting for database connections."

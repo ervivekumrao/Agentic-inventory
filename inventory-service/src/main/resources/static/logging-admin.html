@@ -108,7 +108,7 @@
             gap: 0.4rem;
         }
 
-        /* Theme Switcher Widget (Reference: ervivekumrao.github.io) */
+        /* Theme Switcher Widget */
         .theme-switch {
             background: transparent;
             border: none;
@@ -282,9 +282,9 @@
             background-color: var(--input-bg);
             border: 1px solid var(--input-border);
             color: var(--text-label);
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 600;
-            padding: 0.55rem 1rem;
+            padding: 0.55rem 0.75rem;
         }
 
         .btn-group-segmented .btn.active {
@@ -322,6 +322,88 @@
         .btn-amber:hover {
             background-color: rgba(245, 158, 11, 0.25);
             color: #fbbf24;
+        }
+
+        .preset-chip {
+            font-size: 0.75rem;
+            font-weight: 600;
+            background-color: var(--input-bg);
+            color: var(--text-label);
+            border: 1px solid var(--input-border);
+            border-radius: 16px;
+            padding: 0.25rem 0.65rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .preset-chip:hover {
+            background-color: rgba(56, 189, 248, 0.15);
+            color: var(--primary-sky);
+            border-color: var(--primary-sky);
+        }
+
+        /* Autocomplete Suggestions Floating Dropdown */
+        .logger-suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 1060;
+            max-height: 280px;
+            overflow-y: auto;
+            background-color: var(--card-bg);
+            border: 1px solid var(--primary-sky);
+            border-radius: 8px;
+            margin-top: 4px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .suggestion-item {
+            padding: 0.55rem 0.9rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-heading);
+            cursor: pointer;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover, .suggestion-item.active-item {
+            background-color: var(--table-hover);
+            color: var(--primary-sky);
+        }
+
+        .suggestion-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .history-item {
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 0.5rem 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            font-size: 0.83rem;
+            transition: all 0.15s ease;
+        }
+
+        .history-item:hover {
+            border-color: var(--primary-sky);
         }
 
         /* Data Table Card */
@@ -380,6 +462,10 @@
 
         .tr-app-logger {
             border-left: 3px solid var(--primary-sky);
+        }
+
+        .tr-hikari-logger {
+            border-left: 3px solid #a855f7;
         }
 
         /* Vivid Level Badges */
@@ -461,10 +547,148 @@
     </nav>
 
     <!-- Main Content Area -->
-    <div class="main-container">
+    <div class="main-container px-4 py-4">
         <div id="alertContainer"></div>
 
-        <!-- Control Panel -->
+        <!-- Dynamic Custom Logger Configurator Card -->
+        <div class="control-panel mb-4" style="border-left: 4px solid var(--primary-sky);">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="fw-bold font-monospace" style="color: var(--text-heading); font-size: 0.95rem;">
+                    <i class="bi bi-gear-wide-connected text-primary me-1"></i> DYNAMIC LOGGER CONFIGURATOR
+                </span>
+                <span class="small text-secondary"><i class="bi bi-info-circle me-1"></i> Dynamically add or change log levels for ANY package or class at runtime</span>
+            </div>
+
+            <!-- Prominent Applied Confirmation Alert Box -->
+            <div id="lastAppliedAlert" class="d-none mb-3"></div>
+
+            <div class="row g-2 align-items-end">
+                <div class="col-lg-5 col-md-6">
+                    <label for="customLoggerInput" class="field-label">Target Logger / Class / Package</label>
+                    <div class="position-relative">
+                        <input type="text" id="customLoggerInput" class="form-control form-control-custom font-monospace"
+                               placeholder="e.g. com.zaxxer.hikari or org.hibernate.SQL or com.zaxxer.hikari.pool.HikariPool"
+                               autocomplete="off"
+                               oninput="handleCustomLoggerInput(this.value)"
+                               onfocus="handleCustomLoggerInput(this.value)"
+                               onkeydown="handleCustomLoggerKeydown(event)">
+                        <div id="loggerSuggestionsDropdown" class="logger-suggestions-dropdown shadow-lg d-none"></div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3">
+                    <label for="customLevelSelect" class="field-label">Target Log Level</label>
+                    <select id="customLevelSelect" class="form-select form-select-custom">
+                        <option value="DEBUG">DEBUG</option>
+                        <option value="TRACE">TRACE</option>
+                        <option value="INFO">INFO</option>
+                        <option value="WARN">WARN</option>
+                        <option value="ERROR">ERROR</option>
+                        <option value="OFF">OFF</option>
+                        <option value="RESET">RESET (Inherit Parent)</option>
+                    </select>
+                </div>
+                <div class="col-lg-4 col-md-3 d-flex gap-2">
+                    <button class="btn btn-sky w-100" onclick="applyCustomLoggerLevel()">
+                        <i class="bi bi-check-circle-fill me-1"></i> Apply Log Level
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Infrastructure Presets -->
+            <div class="mt-3 pt-2 d-flex align-items-center flex-wrap gap-2">
+                <span class="small font-monospace fw-bold text-secondary me-1"><i class="bi bi-lightning-fill text-warning"></i> Quick Presets:</span>
+                <span class="preset-chip" onclick="fillCustomLogger('com.zaxxer.hikari')"><i class="bi bi-database-fill-gear text-purple me-1"></i> HikariCP</span>
+                <span class="preset-chip" onclick="fillCustomLogger('com.zaxxer.hikari.pool.HikariPool')"><i class="bi bi-cpu me-1"></i> HikariPool Detail</span>
+                <span class="preset-chip" onclick="fillCustomLogger('org.hibernate.SQL')"><i class="bi bi-code-slash text-info me-1"></i> Hibernate SQL</span>
+                <span class="preset-chip" onclick="fillCustomLogger('org.springframework.security')"><i class="bi bi-shield-lock me-1"></i> Spring Security</span>
+                <span class="preset-chip" onclick="fillCustomLogger('org.springframework.web')"><i class="bi bi-globe me-1"></i> Spring Web</span>
+                <span class="preset-chip" onclick="fillCustomLogger('org.flywaydb')"><i class="bi bi-arrow-repeat me-1"></i> Flyway</span>
+            </div>
+        </div>
+
+        <!-- Recent Applied Loggers History Audit Card -->
+        <div class="control-panel mb-4" id="recentHistoryCard" style="border-left: 4px solid #f59e0b;">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="fw-bold font-monospace" style="color: var(--text-heading); font-size: 0.9rem;">
+                    <i class="bi bi-clock-history text-warning me-1"></i> RECENT LOG MODIFICATIONS & REVERT HISTORY
+                </span>
+                <button class="btn btn-sm btn-outline-secondary font-monospace py-0 px-2 fs-8" onclick="clearModificationHistory()">
+                    <i class="bi bi-trash me-1"></i> Clear History
+                </button>
+            </div>
+            <div id="recentHistoryList" class="d-flex flex-column gap-2 mt-2">
+                <div class="text-secondary small font-monospace py-1"><i class="bi bi-info-circle me-1"></i> No log level modifications performed in this session yet.</div>
+            </div>
+        </div>
+
+        <!-- Category-Based Multi-Logger Batch & Conflict Resolution Strategy Card -->
+        <div class="control-panel mb-4" style="border-left: 4px solid #a855f7;">
+            <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+                <span class="fw-bold font-monospace" style="color: var(--text-heading); font-size: 0.95rem;">
+                    <i class="bi bi-diagram-3-fill me-1" style="color: #c084fc;"></i> CATEGORY MULTI-LOGGER BATCH & CONFLICT RESOLUTION ENGINE
+                </span>
+                <span class="small text-secondary"><i class="bi bi-shield-check me-1"></i> Apply log levels to entire functional categories with custom precedence strategies</span>
+            </div>
+
+            <div class="row g-3 align-items-end">
+                <!-- Target Category Selection -->
+                <div class="col-lg-4 col-md-6">
+                    <label for="categorySelect" class="field-label">Select Logger Category</label>
+                    <select id="categorySelect" class="form-select form-select-custom" onchange="previewCategoryLoggers()">
+                        <option value="hikari_db" selected>Database & Connection Pools (HikariCP, Hibernate, Flyway)</option>
+                        <option value="spring_sec_web">Spring Security & Web MVC</option>
+                        <option value="app_services">Application Core Services & Controllers</option>
+                        <option value="full_debug">Full Deep Diagnostic Profile (All Infrastructure)</option>
+                    </select>
+                </div>
+
+                <!-- Target Level -->
+                <div class="col-lg-2 col-md-3">
+                    <label for="categoryLevelSelect" class="field-label">Category Log Level</label>
+                    <select id="categoryLevelSelect" class="form-select form-select-custom">
+                        <option value="DEBUG">DEBUG</option>
+                        <option value="TRACE">TRACE</option>
+                        <option value="INFO">INFO</option>
+                        <option value="WARN">WARN</option>
+                        <option value="ERROR">ERROR</option>
+                        <option value="OFF">OFF</option>
+                        <option value="RESET">RESET (Inherit)</option>
+                    </select>
+                </div>
+
+                <!-- Conflict Resolution Strategy -->
+                <div class="col-lg-4 col-md-6">
+                    <label for="conflictStrategySelect" class="field-label">Conflict Resolution Strategy</label>
+                    <select id="conflictStrategySelect" class="form-select form-select-custom" onchange="previewCategoryLoggers()">
+                        <option value="specific" selected>🎯 Specific Over Broad (SLF4J Standard: Class > Package)</option>
+                        <option value="last_applied">⏱️ Last-Applied Wins (Latest Rule Overrides)</option>
+                        <option value="most_verbose">🔍 Highest Verbosity (TRACE > DEBUG > INFO > WARN > ERROR)</option>
+                        <option value="most_restrictive">🛡️ Most Restrictive (OFF > ERROR > WARN > INFO > DEBUG)</option>
+                    </select>
+                </div>
+
+                <!-- Apply Button -->
+                <div class="col-lg-2 col-md-3">
+                    <button class="btn btn-purple w-100" style="background-color: #9333ea; color: #fff; font-weight: 600; border-radius: 8px; padding: 0.55rem 1rem;" onclick="applyCategoryBatchLevel()">
+                        <i class="bi bi-layers-fill me-1"></i> Apply Category
+                    </button>
+                </div>
+            </div>
+
+            <!-- Category Preview Box -->
+            <div id="categoryPreviewBox" class="mt-3 p-3 border border-secondary border-opacity-25 rounded-3" style="background: rgba(13, 19, 34, 0.6);">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="small font-monospace fw-bold text-info"><i class="bi bi-eye me-1"></i> CATEGORY PREVIEW & CONFLICT MATRIX</span>
+                    <span class="badge bg-info bg-opacity-25 text-info" id="categoryCountBadge">0 Loggers Target</span>
+                </div>
+                <div id="categoryLoggersList" class="small font-monospace text-secondary d-flex flex-wrap gap-2 mb-2"></div>
+                <div id="conflictWarningNotice" class="text-warning small font-monospace pt-2 border-top border-secondary border-opacity-25">
+                    <i class="bi bi-shield-shaded me-1"></i> <span id="conflictNoticeText">Strategy: Specific package rules (e.g. HikariPool) override broader parent rules (e.g. com.zaxxer.hikari).</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Filter & Control Panel -->
         <div class="control-panel">
             <div class="row g-3 align-items-end">
 
@@ -479,14 +703,20 @@
                 </div>
 
                 <!-- Scope Filter Buttons -->
-                <div class="col-lg-3 col-md-6">
-                    <label class="field-label">Logger Scope</label>
+                <div class="col-lg-4 col-md-6">
+                    <label class="field-label">Logger Scope Filter</label>
                     <div class="btn-group w-100 btn-group-segmented" role="group">
-                        <button type="button" id="scopeAppBtn" class="btn active" onclick="setScope('app')">
-                            <i class="bi bi-star-fill text-warning me-1"></i> App Loggers
+                        <button type="button" id="scopeAppBtn" class="btn active" onclick="setScope('app')" title="Application package loggers only">
+                            <i class="bi bi-star-fill text-warning me-1"></i> App
                         </button>
-                        <button type="button" id="scopeAllBtn" class="btn" onclick="setScope('all')">
-                            All Loggers
+                        <button type="button" id="scopeHikariBtn" class="btn" onclick="setScope('hikari')" title="HikariCP & Database connection pool loggers">
+                            <i class="bi bi-database-fill-gear text-purple me-1"></i> HikariCP / DB
+                        </button>
+                        <button type="button" id="scopeSpringBtn" class="btn" onclick="setScope('spring')" title="Spring framework loggers">
+                            <i class="bi bi-diagram-3 me-1"></i> Spring
+                        </button>
+                        <button type="button" id="scopeAllBtn" class="btn" onclick="setScope('all')" title="Show all registered loggers">
+                            All
                         </button>
                     </div>
                 </div>
@@ -495,28 +725,28 @@
                 <div class="col-lg-3 col-md-6">
                     <label for="searchInput" class="field-label">Filter Class / Package</label>
                     <div class="position-relative">
-                        <input type="text" id="searchInput" class="form-control form-control-custom ps-5"
-                               placeholder="e.g. CatalogController or AiAgent" oninput="filterLoggers()">
+                        <input type="text" id="searchInput" class="form-control form-control-custom ps-5 font-monospace"
+                               placeholder="e.g. Hikari or CatalogController" oninput="filterLoggers()">
                         <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary"></i>
                     </div>
                 </div>
 
                 <!-- Level Filter -->
-                <div class="col-lg-2 col-md-4">
-                    <label for="levelFilterSelect" class="field-label">Filter Level</label>
+                <div class="col-lg-1 col-md-3">
+                    <label for="levelFilterSelect" class="field-label">Level Filter</label>
                     <select id="levelFilterSelect" class="form-select form-select-custom" onchange="filterLoggers()">
-                        <option value="ALL">All Levels</option>
+                        <option value="ALL">All</option>
                         <option value="TRACE">TRACE</option>
                         <option value="DEBUG">DEBUG</option>
                         <option value="INFO">INFO</option>
-                        <option value="WARN">WARN / WARNING</option>
-                        <option value="ERROR">ERROR / CRITICAL</option>
+                        <option value="WARN">WARN</option>
+                        <option value="ERROR">ERROR</option>
                         <option value="OFF">OFF</option>
                     </select>
                 </div>
 
-                <!-- Refresh & Quick Action -->
-                <div class="col-lg-1 col-md-2 d-flex gap-2">
+                <!-- Refresh Button -->
+                <div class="col-lg-1 col-md-3 d-flex gap-2">
                     <button class="btn btn-sky w-100" onclick="loadLoggers()" title="Refresh Loggers">
                         <i class="bi bi-arrow-clockwise"></i>
                     </button>
@@ -526,13 +756,19 @@
 
             <!-- Quick Batch Control Toolbar -->
             <div class="mt-3 pt-3 border-top border-secondary border-opacity-25 d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
                     <span class="small font-monospace fw-bold me-1" style="color: var(--text-heading);"><i class="bi bi-lightning-charge-fill text-warning"></i> QUICK BATCH:</span>
-                    <button class="btn btn-amber btn-sm" onclick="setGroupLevel('DEBUG')">
-                        Set App Package to DEBUG
+                    <button class="btn btn-amber btn-sm" onclick="setGroupLevel('com.smartinventory', 'DEBUG')">
+                        App -> DEBUG
                     </button>
-                    <button class="btn btn-outline-success btn-sm" onclick="setGroupLevel('INFO')">
-                        Set App Package to INFO
+                    <button class="btn btn-outline-success btn-sm" onclick="setGroupLevel('com.smartinventory', 'INFO')">
+                        App -> INFO
+                    </button>
+                    <button class="btn btn-outline-purple btn-sm" style="border: 1px solid #a855f7; color: #c084fc;" onclick="setGroupLevel('com.zaxxer.hikari', 'DEBUG')">
+                        Hikari -> DEBUG
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="setGroupLevel('com.zaxxer.hikari', 'INFO')">
+                        Hikari -> INFO
                     </button>
                 </div>
                 <div class="text-secondary small">
@@ -557,11 +793,11 @@
                 <table class="table table-custom">
                     <thead>
                         <tr>
-                            <th style="width: 60px;">#</th>
+                            <th style="width: 50px;">#</th>
                             <th>LOGGER NAME / PACKAGE</th>
-                            <th style="width: 170px;">EFFECTIVE LEVEL</th>
-                            <th style="width: 170px;">CONFIGURED LEVEL</th>
-                            <th style="width: 320px;">RUNTIME LEVEL ACTION</th>
+                            <th style="width: 160px;">EFFECTIVE LEVEL</th>
+                            <th style="width: 160px;">CONFIGURED LEVEL</th>
+                            <th style="width: 380px;">RUNTIME LEVEL ACTION</th>
                         </tr>
                     </thead>
                     <tbody id="loggersTableBody">
@@ -605,8 +841,90 @@
             }
         };
 
+        const KNOWN_PRESET_LOGGERS = [
+            { name: "com.zaxxer.hikari", category: "HIKARI" },
+            { name: "com.zaxxer.hikari.HikariConfig", category: "HIKARI" },
+            { name: "com.zaxxer.hikari.pool.HikariPool", category: "HIKARI" },
+            { name: "com.zaxxer.hikari.pool.PoolBase", category: "HIKARI" },
+            { name: "com.zaxxer.hikari.HikariDataSource", category: "HIKARI" },
+            { name: "org.hibernate.SQL", category: "DB" },
+            { name: "org.hibernate.type.descriptor.sql", category: "DB" },
+            { name: "org.flywaydb", category: "DB" },
+            { name: "org.springframework.security", category: "SPRING" },
+            { name: "org.springframework.security.web", category: "SPRING" },
+            { name: "org.springframework.web", category: "SPRING" },
+            { name: "org.springframework.jdbc", category: "SPRING" },
+            { name: "org.springframework.orm.jpa", category: "SPRING" },
+            { name: "org.springframework.transaction", category: "SPRING" },
+            { name: "com.smartinventory.inventory", category: "APP" },
+            { name: "com.smartinventory.inventory.controller.InventoryController", category: "APP" },
+            { name: "com.smartinventory.inventory.service.InventoryService", category: "APP" },
+            { name: "com.smartinventory.catalog", category: "APP" },
+            { name: "com.smartinventory.catalog.controller.CatalogController", category: "APP" },
+            { name: "app.main", category: "APP" },
+            { name: "app.agent", category: "APP" },
+            { name: "uvicorn", category: "INFRA" },
+            { name: "uvicorn.access", category: "INFRA" }
+        ];
+
+        const CATEGORY_DEFINITIONS = {
+            hikari_db: {
+                name: "Database & Connection Pools",
+                loggers: [
+                    "com.zaxxer.hikari",
+                    "com.zaxxer.hikari.pool.HikariPool",
+                    "org.hibernate.SQL",
+                    "org.hibernate.type.descriptor.sql",
+                    "org.flywaydb"
+                ]
+            },
+            spring_sec_web: {
+                name: "Spring Security & Web MVC",
+                loggers: [
+                    "org.springframework.security",
+                    "org.springframework.security.web",
+                    "org.springframework.web"
+                ]
+            },
+            app_services: {
+                name: "Application Core Services & Controllers",
+                loggers: [
+                    "com.smartinventory.inventory.service",
+                    "com.smartinventory.inventory.controller",
+                    "com.smartinventory.catalog.service",
+                    "app.agent"
+                ]
+            },
+            full_debug: {
+                name: "Full Deep Diagnostic Profile",
+                loggers: [
+                    "com.zaxxer.hikari",
+                    "com.zaxxer.hikari.pool.HikariPool",
+                    "org.hibernate.SQL",
+                    "org.springframework.security",
+                    "org.springframework.web",
+                    "com.smartinventory.inventory",
+                    "com.smartinventory.catalog",
+                    "app.main"
+                ]
+            }
+        };
+
+        const VERBOSITY_RANK = {
+            "TRACE": 1,
+            "DEBUG": 2,
+            "INFO": 3,
+            "WARN": 4,
+            "ERROR": 5,
+            "OFF": 6,
+            "RESET": 7
+        };
+
         let currentLoggers = [];
-        let currentScope = 'app'; // 'app' or 'all'
+        let currentScope = 'all';
+        let activeSuggestionIndex = -1;
+        let modificationHistory = [];
+        let lastAppliedChange = null;
 
         // Theme Management
         function initTheme() {
@@ -614,6 +932,17 @@
             const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             const theme = saved || (systemDark ? 'dark' : 'light');
             applyTheme(theme);
+
+            // Load saved modification history
+            try {
+                const storedHistory = sessionStorage.getItem('smart_inventory_log_history');
+                if (storedHistory) {
+                    modificationHistory = JSON.parse(storedHistory);
+                    renderModificationHistory();
+                }
+            } catch (e) {
+                console.error("Failed to load modification history", e);
+            }
         }
 
         function applyTheme(theme) {
@@ -641,13 +970,196 @@
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
             loadLoggers();
+            previewCategoryLoggers();
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                const wrapper = document.getElementById('customLoggerInput')?.parentElement;
+                if (wrapper && !wrapper.contains(e.target)) {
+                    hideSuggestionsDropdown();
+                }
+            });
         });
 
         function setScope(scope) {
             currentScope = scope;
             document.getElementById('scopeAppBtn').classList.toggle('active', scope === 'app');
+            document.getElementById('scopeHikariBtn').classList.toggle('active', scope === 'hikari');
+            document.getElementById('scopeSpringBtn').classList.toggle('active', scope === 'spring');
             document.getElementById('scopeAllBtn').classList.toggle('active', scope === 'all');
             filterLoggers();
+        }
+
+        function fillCustomLogger(loggerName) {
+            document.getElementById('customLoggerInput').value = loggerName;
+            hideSuggestionsDropdown();
+        }
+
+        function handleCustomLoggerInput(value) {
+            const query = value.trim().toLowerCase();
+            const dropdown = document.getElementById('loggerSuggestionsDropdown');
+            activeSuggestionIndex = -1;
+
+            if (!query) {
+                hideSuggestionsDropdown();
+                return;
+            }
+
+            const candidateMap = new Map();
+
+            currentLoggers.forEach(l => {
+                candidateMap.set(l.name, { name: l.name, category: l.category });
+            });
+
+            KNOWN_PRESET_LOGGERS.forEach(l => {
+                if (!candidateMap.has(l.name)) {
+                    candidateMap.set(l.name, { name: l.name, category: l.category });
+                }
+            });
+
+            const matches = Array.from(candidateMap.values()).filter(item =>
+                item.name.toLowerCase().includes(query)
+            ).slice(0, 15);
+
+            if (matches.length === 0) {
+                hideSuggestionsDropdown();
+                return;
+            }
+
+            dropdown.innerHTML = matches.map((item, idx) => {
+                let badgeClass = "bg-secondary text-white";
+                if (item.category === 'APP') badgeClass = "bg-primary text-white";
+                else if (item.category === 'HIKARI') badgeClass = "bg-purple text-white";
+                else if (item.category === 'SPRING') badgeClass = "bg-success text-white";
+                else if (item.category === 'DB') badgeClass = "bg-warning text-dark";
+
+                const categoryStyle = item.category === 'HIKARI' ? 'background-color: #a855f7; color: #fff;' : '';
+
+                return `
+                    <div class="suggestion-item" data-index="${idx}" onclick="selectSuggestion('${escapeHtml(item.name)}')">
+                        <span>
+                            <i class="bi bi-diagram-2 text-primary me-2"></i>
+                            ${highlightMatch(item.name, query)}
+                        </span>
+                        <span class="suggestion-badge ${badgeClass}" style="${categoryStyle}">
+                            ${item.category}
+                        </span>
+                    </div>`;
+            }).join('');
+
+            dropdown.classList.remove('d-none');
+        }
+
+        function highlightMatch(text, query) {
+            const idx = text.toLowerCase().indexOf(query);
+            if (idx === -1) return escapeHtml(text);
+            const before = text.substring(0, idx);
+            const match = text.substring(idx, idx + query.length);
+            const after = text.substring(idx + query.length);
+            return `${escapeHtml(before)}<strong class="text-primary">${escapeHtml(match)}</strong>${escapeHtml(after)}`;
+        }
+
+        function handleCustomLoggerKeydown(e) {
+            const dropdown = document.getElementById('loggerSuggestionsDropdown');
+            if (dropdown.classList.contains('d-none')) return;
+
+            const items = dropdown.querySelectorAll('.suggestion-item');
+            if (items.length === 0) return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                activeSuggestionIndex = (activeSuggestionIndex + 1) % items.length;
+                updateActiveSuggestion(items);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                activeSuggestionIndex = (activeSuggestionIndex - 1 + items.length) % items.length;
+                updateActiveSuggestion(items);
+            } else if (e.key === 'Enter') {
+                if (activeSuggestionIndex >= 0 && activeSuggestionIndex < items.length) {
+                    e.preventDefault();
+                    items[activeSuggestionIndex].click();
+                }
+            } else if (e.key === 'Escape') {
+                hideSuggestionsDropdown();
+            }
+        }
+
+        function updateActiveSuggestion(items) {
+            items.forEach((item, idx) => {
+                if (idx === activeSuggestionIndex) {
+                    item.classList.add('active-item');
+                    item.scrollIntoView({ block: 'nearest' });
+                } else {
+                    item.classList.remove('active-item');
+                }
+            });
+        }
+
+        function selectSuggestion(loggerName) {
+            document.getElementById('customLoggerInput').value = loggerName;
+            hideSuggestionsDropdown();
+        }
+
+        function hideSuggestionsDropdown() {
+            const dropdown = document.getElementById('loggerSuggestionsDropdown');
+            if (dropdown) {
+                dropdown.classList.add('d-none');
+                dropdown.innerHTML = '';
+            }
+            activeSuggestionIndex = -1;
+        }
+
+        async function applyCustomLoggerLevel() {
+            const loggerName = document.getElementById('customLoggerInput').value.trim();
+            const level = document.getElementById('customLevelSelect').value;
+
+            if (!loggerName) {
+                showToast('Please enter a valid logger package or class name', 'danger');
+                return;
+            }
+
+            hideSuggestionsDropdown();
+            await updateLogLevel(loggerName, level);
+        }
+
+        function previewCategoryLoggers() {
+            const catKey = document.getElementById('categorySelect').value;
+            const strategy = document.getElementById('conflictStrategySelect').value;
+            const cat = CATEGORY_DEFINITIONS[catKey];
+
+            if (!cat) return;
+
+            document.getElementById('categoryCountBadge').textContent = `${cat.loggers.length} Loggers Target`;
+            const container = document.getElementById('categoryLoggersList');
+            container.innerHTML = cat.loggers.map(l => `<span class="badge bg-secondary bg-opacity-25 text-body px-2 py-1">${escapeHtml(l)}</span>`).join('');
+
+            const noticeEl = document.getElementById('conflictNoticeText');
+            if (strategy === 'specific') {
+                noticeEl.textContent = 'Strategy: Specific class/subpackage rules (e.g. HikariPool) override broader parent package rules (e.g. com.zaxxer.hikari).';
+            } else if (strategy === 'last_applied') {
+                noticeEl.textContent = 'Strategy: Last-Applied Wins (The most recently configured category rule immediately overrides overlapping loggers).';
+            } else if (strategy === 'most_verbose') {
+                noticeEl.textContent = 'Strategy: Diagnostic First Priority (Pick most verbose log level: TRACE > DEBUG > INFO > WARN > ERROR).';
+            } else if (strategy === 'most_restrictive') {
+                noticeEl.textContent = 'Strategy: Security Restrictive Priority (Pick least verbose log level: OFF > ERROR > WARN > INFO > DEBUG).';
+            }
+        }
+
+        async function applyCategoryBatchLevel() {
+            const catKey = document.getElementById('categorySelect').value;
+            const targetLevel = document.getElementById('categoryLevelSelect').value;
+            const cat = CATEGORY_DEFINITIONS[catKey];
+
+            if (!cat) return;
+
+            showToast(`Applying level ${targetLevel} to Category [${cat.name}] (${cat.loggers.length} loggers)...`, 'info');
+
+            for (const loggerName of cat.loggers) {
+                await updateLogLevel(loggerName, targetLevel, true);
+            }
+
+            showToast(`Successfully applied ${targetLevel} to all loggers in ${cat.name}!`, 'success');
+            await loadLoggers();
         }
 
         async function loadLoggers() {
@@ -690,6 +1202,22 @@
             }
         }
 
+        function getLoggerCategory(name, appPrefix) {
+            if (name.startsWith(appPrefix) || name.startsWith("com.smartinventory") || name === "app" || name.startsWith("app.")) {
+                return "APP";
+            }
+            if (name.includes("hikari") || name.startsWith("com.zaxxer.hikari")) {
+                return "HIKARI";
+            }
+            if (name.startsWith("org.springframework")) {
+                return "SPRING";
+            }
+            if (name.startsWith("org.hibernate") || name.startsWith("org.flywaydb")) {
+                return "DB";
+            }
+            return "INFRA";
+        }
+
         function normalizeLoggers(data, cfg) {
             const loggersList = [];
             if (cfg.type === "actuator" && data.loggers) {
@@ -698,16 +1226,16 @@
                         name: name,
                         effectiveLevel: info.effectiveLevel || "NOTSET",
                         configuredLevel: info.configuredLevel || "NOT-CONFIGURED",
-                        isApp: name.startsWith(cfg.appPrefix)
+                        category: getLoggerCategory(name, cfg.appPrefix)
                     });
                 }
             } else if (cfg.type === "fastapi" && data.loggers) {
                 for (const [name, info] of Object.entries(data.loggers)) {
                     loggersList.push({
                         name: name,
-                        effectiveLevel: info.effective_level || "NOTSET",
-                        configuredLevel: info.configured_level || "NOT-CONFIGURED",
-                        isApp: name.startsWith(cfg.appPrefix) || name === "uvicorn"
+                        effectiveLevel: info.effectiveLevel || info.effective_level || "NOTSET",
+                        configuredLevel: info.configuredLevel || info.configured_level || "NOT-CONFIGURED",
+                        category: getLoggerCategory(name, cfg.appPrefix)
                     });
                 }
             }
@@ -719,7 +1247,9 @@
             const levelFilter = document.getElementById('levelFilterSelect').value;
 
             const filtered = currentLoggers.filter(l => {
-                if (currentScope === 'app' && !l.isApp) return false;
+                if (currentScope === 'app' && l.category !== 'APP') return false;
+                if (currentScope === 'hikari' && l.category !== 'HIKARI' && l.category !== 'DB') return false;
+                if (currentScope === 'spring' && l.category !== 'SPRING') return false;
                 if (term && !l.name.toLowerCase().includes(term)) return false;
                 if (levelFilter !== 'ALL' && l.effectiveLevel !== levelFilter) return false;
                 return true;
@@ -735,7 +1265,9 @@
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="5" class="text-center text-secondary py-5">
-                            No loggers matched the search criteria.
+                            <i class="bi bi-search fs-4 d-block mb-2"></i>
+                            No loggers matched the search criteria.<br>
+                            <small class="text-secondary">Tip: Use the <strong>Dynamic Logger Configurator</strong> card above to add or change log levels for any custom class/package!</small>
                         </td>
                     </tr>`;
                 return;
@@ -744,24 +1276,37 @@
             tbody.innerHTML = '';
             loggers.forEach((l, index) => {
                 const tr = document.createElement('tr');
-                if (l.isApp) tr.classList.add('tr-app-logger');
+                if (l.category === 'APP') tr.classList.add('tr-app-logger');
+                else if (l.category === 'HIKARI') tr.classList.add('tr-hikari-logger');
+
+                let badgeHtml = '';
+                if (l.category === 'APP') {
+                    badgeHtml = '<span class="badge bg-primary bg-opacity-25 text-primary ms-1 px-2 py-0 fs-8">APP</span>';
+                } else if (l.category === 'HIKARI') {
+                    badgeHtml = '<span class="badge bg-purple bg-opacity-25 text-purple ms-1 px-2 py-0 fs-8" style="background-color: rgba(168,85,247,0.2); color: #c084fc;">HIKARI</span>';
+                } else if (l.category === 'SPRING') {
+                    badgeHtml = '<span class="badge bg-success bg-opacity-25 text-success ms-1 px-2 py-0 fs-8">SPRING</span>';
+                } else if (l.category === 'DB') {
+                    badgeHtml = '<span class="badge bg-warning bg-opacity-25 text-warning ms-1 px-2 py-0 fs-8">DB</span>';
+                }
 
                 tr.innerHTML = `
                     <td class="text-secondary small">${index + 1}</td>
                     <td>
-                        <span class="font-monospace fw-semibold" style="color: var(--text-heading);">${l.name}</span>
-                        ${l.isApp ? '<span class="badge bg-primary bg-opacity-25 text-primary ms-1 px-2 py-0 fs-8">APP</span>' : ''}
+                        <span class="font-monospace fw-semibold" style="color: var(--text-heading);">${escapeHtml(l.name)}</span>
+                        ${badgeHtml}
                     </td>
                     <td><span class="level-pill level-${l.effectiveLevel}">${l.effectiveLevel}</span></td>
                     <td><span class="level-pill level-${l.configuredLevel}">${l.configuredLevel}</span></td>
                     <td>
                         <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-secondary" onclick="updateLogLevel('${l.name}', 'TRACE')">TRACE</button>
-                            <button class="btn btn-outline-primary" onclick="updateLogLevel('${l.name}', 'DEBUG')">DEBUG</button>
-                            <button class="btn btn-outline-success" onclick="updateLogLevel('${l.name}', 'INFO')">INFO</button>
-                            <button class="btn btn-outline-warning" onclick="updateLogLevel('${l.name}', 'WARN')">WARN</button>
-                            <button class="btn btn-outline-danger" onclick="updateLogLevel('${l.name}', 'ERROR')">ERROR</button>
-                            <button class="btn btn-outline-secondary" onclick="updateLogLevel('${l.name}', 'OFF')">OFF</button>
+                            <button class="btn btn-outline-secondary" onclick="updateLogLevel('${escapeHtml(l.name)}', 'TRACE')">TRACE</button>
+                            <button class="btn btn-outline-primary" onclick="updateLogLevel('${escapeHtml(l.name)}', 'DEBUG')">DEBUG</button>
+                            <button class="btn btn-outline-success" onclick="updateLogLevel('${escapeHtml(l.name)}', 'INFO')">INFO</button>
+                            <button class="btn btn-outline-warning" onclick="updateLogLevel('${escapeHtml(l.name)}', 'WARN')">WARN</button>
+                            <button class="btn btn-outline-danger" onclick="updateLogLevel('${escapeHtml(l.name)}', 'ERROR')">ERROR</button>
+                            <button class="btn btn-outline-secondary" onclick="updateLogLevel('${escapeHtml(l.name)}', 'OFF')">OFF</button>
+                            <button class="btn btn-outline-info" title="Reset level to inherit from parent" onclick="updateLogLevel('${escapeHtml(l.name)}', 'RESET')">RESET</button>
                         </div>
                     </td>
                 `;
@@ -769,34 +1314,132 @@
             });
         }
 
-        async function updateLogLevel(loggerName, newLevel) {
+        async function updateLogLevel(loggerName, newLevel, suppressReload = false) {
             const serviceKey = document.getElementById('serviceSelect').value;
             const cfg = SERVICE_CONFIGS[serviceKey];
             const targetUrl = `${cfg.baseUrl}${cfg.endpoint}/${encodeURIComponent(loggerName)}`;
+
+            // Find current log level before update
+            const existing = currentLoggers.find(l => l.name === loggerName);
+            const prevLevel = existing ? existing.effectiveLevel : "NOT-CONFIGURED";
 
             try {
                 const headers = { 'Content-Type': 'application/json' };
                 if (cfg.type === "actuator") {
                     headers['Authorization'] = 'Basic ' + btoa('admin:admin123');
                 }
+
+                let bodyPayload;
+                if (newLevel === "RESET") {
+                    bodyPayload = cfg.type === "actuator" ? { configuredLevel: null } : { level: "NOTSET" };
+                } else {
+                    bodyPayload = { configuredLevel: newLevel, level: newLevel };
+                }
+
                 const res = await fetch(targetUrl, {
                     method: 'POST',
                     headers: headers,
-                    body: JSON.stringify({ configuredLevel: newLevel, level: newLevel })
+                    body: JSON.stringify(bodyPayload)
                 });
 
                 if (!res.ok) throw new Error(`Server returned HTTP ${res.status}`);
-                showToast(`Logger [${loggerName}] changed to ${newLevel}`, 'success');
-                await loadLoggers();
+
+                // Record history audit entry
+                const nowTime = new Date().toLocaleTimeString();
+                const historyEntry = {
+                    id: 'mod-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+                    service: cfg.name,
+                    loggerName: loggerName,
+                    oldLevel: prevLevel,
+                    newLevel: newLevel,
+                    timestamp: nowTime
+                };
+
+                lastAppliedChange = historyEntry;
+                modificationHistory.unshift(historyEntry);
+                if (modificationHistory.length > 20) modificationHistory.pop();
+
+                try {
+                    sessionStorage.setItem('smart_inventory_log_history', JSON.stringify(modificationHistory));
+                } catch(e) {}
+
+                showLastAppliedBanner(historyEntry);
+                renderModificationHistory();
+
+                if (!suppressReload) {
+                    showToast(`Logger [${loggerName}] updated to ${newLevel}`, 'success');
+                    await loadLoggers();
+                }
             } catch (err) {
                 showToast(`Failed to update logger: ${err.message}`, 'danger');
             }
         }
 
-        async function setGroupLevel(level) {
-            const serviceKey = document.getElementById('serviceSelect').value;
-            const cfg = SERVICE_CONFIGS[serviceKey];
-            await updateLogLevel(cfg.appPrefix, level);
+        function showLastAppliedBanner(entry) {
+            const container = document.getElementById('lastAppliedAlert');
+            container.innerHTML = `
+                <div class="alert alert-success d-flex align-items-center justify-content-between py-2 px-3 mb-0 border-0 shadow-sm font-monospace" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4) !important; color: #34d399; border-radius: 8px;">
+                    <div>
+                        <i class="bi bi-check-circle-fill me-2 text-success"></i>
+                        <strong>LOG LEVEL APPLIED:</strong> <code class="text-white">${escapeHtml(entry.loggerName)}</code> ➔ <span class="badge bg-success">${entry.newLevel}</span>
+                        <span class="text-secondary small ms-2">(Previous: <span class="text-warning">${entry.oldLevel}</span> | ${entry.timestamp})</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-outline-light font-monospace py-0 px-2 fs-8" onclick="revertModification('${entry.id}')">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Undo / Revert
+                        </button>
+                    </div>
+                </div>`;
+            container.classList.remove('d-none');
+        }
+
+        async function revertModification(id) {
+            const entry = modificationHistory.find(h => h.id === id);
+            if (!entry) return;
+
+            showToast(`Reverting [${entry.loggerName}] back to ${entry.oldLevel}...`, 'info');
+            await updateLogLevel(entry.loggerName, entry.oldLevel);
+            showToast(`Successfully reverted [${entry.loggerName}] to ${entry.oldLevel}`, 'success');
+        }
+
+        function renderModificationHistory() {
+            const container = document.getElementById('recentHistoryList');
+            if (!modificationHistory || modificationHistory.length === 0) {
+                container.innerHTML = `<div class="text-secondary small font-monospace py-1"><i class="bi bi-info-circle me-1"></i> No log level modifications performed in this session yet.</div>`;
+                return;
+            }
+
+            container.innerHTML = modificationHistory.slice(0, 10).map(entry => `
+                <div class="history-item font-monospace">
+                    <div>
+                        <span class="text-secondary small me-2">[${entry.timestamp}]</span>
+                        <span class="fw-semibold text-white me-2">${escapeHtml(entry.loggerName)}</span>
+                        <span class="level-pill level-${entry.oldLevel} py-0 px-1 fs-8">${entry.oldLevel}</span>
+                        <i class="bi bi-arrow-right text-secondary mx-1"></i>
+                        <span class="level-pill level-${entry.newLevel} py-0 px-1 fs-8">${entry.newLevel}</span>
+                    </div>
+                    <div class="d-flex gap-1">
+                        <button class="btn btn-sm btn-outline-warning py-0 px-2 fs-8" title="Revert to previous level (${entry.oldLevel})" onclick="revertModification('${entry.id}')">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Revert
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary py-0 px-2 fs-8" title="Modify level further" onclick="fillCustomLogger('${escapeHtml(entry.loggerName)}')">
+                            <i class="bi bi-pencil me-1"></i> Modify
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function clearModificationHistory() {
+            modificationHistory = [];
+            try { sessionStorage.removeItem('smart_inventory_log_history'); } catch(e) {}
+            document.getElementById('lastAppliedAlert').classList.add('d-none');
+            renderModificationHistory();
+            showToast('Modification history cleared', 'info');
+        }
+
+        async function setGroupLevel(prefix, level) {
+            await updateLogLevel(prefix, level);
         }
 
         function showToast(msg, type = 'info') {
@@ -823,7 +1466,7 @@
                 '"': '&quot;',
                 "'": '&#039;'
             };
-            return text.replace(/[&<>"']/g, m => map[m]);
+            return String(text).replace(/[&<>"']/g, m => map[m]);
         }
     </script>
 </body>

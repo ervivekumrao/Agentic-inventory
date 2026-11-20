@@ -16,9 +16,12 @@
 package com.smartinventory.inventory.controller;
 
 import com.smartinventory.inventory.db.dialect.QueryDialect;
+import com.smartinventory.inventory.dto.BulkImportResult;
+import com.smartinventory.inventory.importer.BulkDataImporter;
 import com.smartinventory.inventory.model.InventoryItem;
 import com.smartinventory.inventory.model.StockTransaction;
 import com.smartinventory.inventory.service.InventoryService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +30,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -39,10 +44,12 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
     private final QueryDialect queryDialect;
+    private final BulkDataImporter bulkDataImporter;
 
-    public InventoryController(InventoryService inventoryService, QueryDialect queryDialect) {
+    public InventoryController(InventoryService inventoryService, QueryDialect queryDialect, BulkDataImporter bulkDataImporter) {
         this.inventoryService = inventoryService;
         this.queryDialect = queryDialect;
+        this.bulkDataImporter = bulkDataImporter;
     }
 
     @GetMapping
@@ -89,6 +96,25 @@ public class InventoryController {
         log.info("POST /api/inventory/bulk requested with {} items", items != null ? items.size() : 0);
         List<InventoryItem> created = inventoryService.createInventoryItemsBulk(items);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @PostMapping(value = "/import/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @Operation(summary = "Bulk import inventory records from CSV file via high-performance connection pooling")
+    public ResponseEntity<BulkImportResult> importInventoryFile(@RequestParam("file") MultipartFile file) throws IOException {
+        log.info("POST /api/inventory/import/file requested with filename: {}, size: {} bytes",
+                file.getOriginalFilename(), file.getSize());
+        BulkImportResult result = bulkDataImporter.importFromCsvStream(file.getInputStream());
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping(value = "/import/csv", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @Operation(summary = "Bulk import inventory records from raw CSV text content via high-performance connection pooling")
+    public ResponseEntity<BulkImportResult> importInventoryCsvText(@RequestBody String csvContent) {
+        log.info("POST /api/inventory/import/csv requested with raw CSV string content");
+        BulkImportResult result = bulkDataImporter.importFromCsvContent(csvContent);
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/{sku}/adjust")

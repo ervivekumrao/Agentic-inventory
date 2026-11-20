@@ -29,13 +29,23 @@ public class AiQueryResponse {
     @JsonAlias({"risk_level", "riskLevel"})
     private String riskLevel;
 
+    private boolean degraded = false;
+
+    private String asOf;
+
     public AiQueryResponse() {
     }
 
     public AiQueryResponse(String answer, List<String> recommendations, String riskLevel) {
+        this(answer, recommendations, riskLevel, false, java.time.Instant.now().toString());
+    }
+
+    public AiQueryResponse(String answer, List<String> recommendations, String riskLevel, boolean degraded, String asOf) {
         this.answer = answer;
         this.recommendations = recommendations;
         this.riskLevel = riskLevel;
+        this.degraded = degraded;
+        this.asOf = asOf;
     }
 
     public String getAnswer() {
@@ -60,5 +70,21 @@ public class AiQueryResponse {
 
     public void setRiskLevel(String riskLevel) {
         this.riskLevel = riskLevel;
+    }
+
+    public boolean isDegraded() {
+        return degraded;
+    }
+
+    public void setDegraded(boolean degraded) {
+        this.degraded = degraded;
+    }
+
+    public String getAsOf() {
+        return asOf;
+    }
+
+    public void setAsOf(String asOf) {
+        this.asOf = asOf;
     }
 }

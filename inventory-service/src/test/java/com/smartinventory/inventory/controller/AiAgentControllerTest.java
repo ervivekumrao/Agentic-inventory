@@ -49,6 +49,15 @@ class AiAgentControllerTest {
     @MockitoBean
     private AiAgentService aiAgentService;
 
+    @MockitoBean
+    private com.smartinventory.inventory.service.SalesHistoryAggregationService salesHistoryAggregationService;
+
+    @MockitoBean
+    private com.smartinventory.inventory.service.PurchaseOrderCopilotService purchaseOrderCopilotService;
+
+    @MockitoBean
+    private com.smartinventory.inventory.service.DeadStockAdvisorService deadStockAdvisorService;
+
     @Test
     @WithMockUser
     void chatWithAgent_shouldReturnHumanLikeAnswer() throws Exception {

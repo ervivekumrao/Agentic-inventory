@@ -23,7 +23,7 @@ services:
       POSTGRES_USER: ${DB_USER:-inventory}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-inventory}
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -32,6 +32,31 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    networks:
+      - inventory-net
+
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    container_name: pgbouncer_proxy
+    profiles:
+      - postgres
+    environment:
+      DB_HOST: postgres_db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-inventory}
+      DB_PASSWORD: ${DB_PASSWORD:-inventory}
+      DB_NAME: inventory
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: 1000
+      DEFAULT_POOL_SIZE: 20
+      MIN_POOL_SIZE: 5
+      RESERVE_POOL_SIZE: 5
+      LISTEN_PORT: 6432
+    ports:
+      - "6432:6432"
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - inventory-net
 
@@ -194,6 +219,38 @@ services:
       timeout: 5s
       retries: 5
       start_period: 20s
+    networks:
+      - inventory-net
+
+  prometheus:
+    image: prom/prometheus:v2.50.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - inventory-net
+
+  grafana:
+    image: grafana/grafana:10.3.3
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
     networks:
       - inventory-net
 

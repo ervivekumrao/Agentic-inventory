@@ -19,13 +19,17 @@ package com.smartinventory.inventory.service;
 import com.smartinventory.inventory.kafka.KafkaProducerService;
 import com.smartinventory.inventory.kafka.StockUpdateEvent;
 import com.smartinventory.inventory.model.InventoryItem;
+import com.smartinventory.inventory.model.InventoryReservation;
 import com.smartinventory.inventory.model.InventoryReservationUnit;
 import com.smartinventory.inventory.model.StockTransaction;
 import com.smartinventory.inventory.repository.InventoryRepository;
+import com.smartinventory.inventory.repository.InventoryReservationRepository;
 import com.smartinventory.inventory.repository.InventoryReservationUnitRepository;
 import com.smartinventory.inventory.repository.StockTransactionRepository;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -47,21 +52,47 @@ public class InventoryReservationService {
     private static final Logger log = LoggerFactory.getLogger(InventoryReservationService.class);
     public static final int DEFAULT_MAX_POOL_SIZE = 500;
     public static final int DEFAULT_TTL_SECONDS = 600; // 10 minutes
+    public static final int MAX_TTL_SECONDS = 900; // 15 minutes max
+    public static final int MAX_RESERVATION_QUANTITY = 50;
 
     private final InventoryReservationUnitRepository unitRepository;
+    private final InventoryReservationRepository reservationRepository;
     private final InventoryRepository inventoryRepository;
     private final StockTransactionRepository transactionRepository;
     private final KafkaProducerService kafkaProducerService;
+    private final MeterRegistry meterRegistry;
 
+    @Autowired
     public InventoryReservationService(
             InventoryReservationUnitRepository unitRepository,
+            InventoryReservationRepository reservationRepository,
             InventoryRepository inventoryRepository,
             StockTransactionRepository transactionRepository,
-            KafkaProducerService kafkaProducerService) {
+            KafkaProducerService kafkaProducerService,
+            @Autowired(required = false) MeterRegistry meterRegistry) {
         this.unitRepository = unitRepository;
+        this.reservationRepository = reservationRepository;
         this.inventoryRepository = inventoryRepository;
         this.transactionRepository = transactionRepository;
         this.kafkaProducerService = kafkaProducerService;
+        this.meterRegistry = meterRegistry;
+    }
+
+    public InventoryReservationService(
+            InventoryReservationUnitRepository unitRepository,
+            InventoryReservationRepository reservationRepository,
+            InventoryRepository inventoryRepository,
+            StockTransactionRepository transactionRepository,
+            KafkaProducerService kafkaProducerService) {
+        this(unitRepository, reservationRepository, inventoryRepository, transactionRepository, kafkaProducerService, null);
+    }
+
+    private void recordCounter(String metricName, String... tags) {
+        if (meterRegistry != null) {
+            try {
+                meterRegistry.counter(metricName, tags).increment();
+            } catch (Exception ignored) {}
+        }
     }
 
     /**
@@ -73,21 +104,31 @@ public class InventoryReservationService {
         if (quantity <= 0) {
             throw new IllegalArgumentException("Reservation quantity must be strictly positive");
         }
+        if (quantity > MAX_RESERVATION_QUANTITY) {
+            throw new IllegalArgumentException("Reservation quantity exceeds maximum limit of " + MAX_RESERVATION_QUANTITY);
+        }
 
         String reservationId = (clientReservationId != null && !clientReservationId.isBlank())
                 ? clientReservationId.trim()
                 : UUID.randomUUID().toString();
 
-        // 1. Idempotency Check: if this reservation ID already reserved units, return existing reservation
-        List<InventoryReservationUnit> existing = unitRepository.findByReservationId(reservationId);
-        if (!existing.isEmpty()) {
-            log.info("Idempotent reservation replay detected for reservationId: {}, units: {}", reservationId, existing.size());
+        // 1. Authoritative Header Check: if reservation exists, enforce idempotency or conflict
+        Optional<InventoryReservation> existingHeader = reservationRepository.findById(reservationId);
+        if (existingHeader.isPresent()) {
+            InventoryReservation res = existingHeader.get();
+            if (!res.getSku().equalsIgnoreCase(sku) || res.getQuantity() != quantity) {
+                log.warn("Reservation ID {} reused with conflicting SKU/quantity: original={}:{}, requested={}:{}",
+                        reservationId, res.getSku(), res.getQuantity(), sku, quantity);
+                throw new IllegalStateException("Reservation ID " + reservationId + " already exists with conflicting parameters");
+            }
+            log.info("Idempotent reservation replay detected for reservationId: {}, status: {}", reservationId, res.getStatus());
+            recordCounter("inventory.reservation.requests", "status", "REPLAYED", "sku", res.getSku());
             return new ReservationResult(
                     reservationId,
-                    sku,
-                    existing.size(),
-                    existing.get(0).getStatus(),
-                    existing.get(0).getExpiresAt(),
+                    res.getSku(),
+                    res.getQuantity(),
+                    res.getStatus(),
+                    res.getExpiresAt(),
                     "Idempotent reservation retrieved"
             );
         }
@@ -104,10 +145,11 @@ public class InventoryReservationService {
         if (lockedUnits.size() < quantity) {
             log.warn("Insufficient stock available in reservation pool for SKU: {}. Requested: {}, Available: {}",
                     sku, quantity, lockedUnits.size());
+            recordCounter("inventory.reservation.requests", "status", "INSUFFICIENT_STOCK", "sku", sku);
             throw new IllegalArgumentException("Insufficient inventory available to reserve " + quantity + " units for SKU: " + sku);
         }
 
-        int ttl = (ttlSeconds != null && ttlSeconds > 0) ? ttlSeconds : DEFAULT_TTL_SECONDS;
+        int ttl = (ttlSeconds != null && ttlSeconds > 0) ? Math.min(ttlSeconds, MAX_TTL_SECONDS) : DEFAULT_TTL_SECONDS;
         Instant expiresAt = Instant.now().plusSeconds(ttl);
 
         for (InventoryReservationUnit unit : lockedUnits) {
@@ -115,14 +157,18 @@ public class InventoryReservationService {
         }
         unitRepository.saveAll(lockedUnits);
 
+        InventoryReservation header = new InventoryReservation(reservationId, sku, quantity, expiresAt);
+        reservationRepository.save(header);
+
         log.info("Successfully reserved {} units for SKU: {} with reservationId: {} expiring at: {}",
                 lockedUnits.size(), sku, reservationId, expiresAt);
+        recordCounter("inventory.reservation.requests", "status", "SUCCESS", "sku", sku);
 
         return new ReservationResult(
                 reservationId,
                 sku,
                 lockedUnits.size(),
-                InventoryReservationUnit.STATUS_RESERVED,
+                InventoryReservation.STATUS_PENDING_PAYMENT,
                 expiresAt,
                 "Stock successfully reserved with non-blocking SKIP LOCKED"
         );
@@ -130,13 +176,22 @@ public class InventoryReservationService {
 
     /**
      * Claims a previously reserved batch upon successful payment completion.
-     * Permanently decrements the master ledger and records the stock transaction.
+     * Permanently decrements the master ledger atomically and records the stock transaction.
+     * Strictly idempotent: replayed callbacks return true without duplicate deductions.
      */
     @Transactional
     public boolean claimReservation(String reservationId) {
+        Optional<InventoryReservation> headerOpt = reservationRepository.findById(reservationId);
+        if (headerOpt.isPresent() && InventoryReservation.STATUS_COMPLETED.equals(headerOpt.get().getStatus())) {
+            log.info("Reservation {} already claimed. Idempotent success returned.", reservationId);
+            recordCounter("inventory.reservation.claims", "status", "ALREADY_CLAIMED");
+            return true;
+        }
+
         List<InventoryReservationUnit> units = unitRepository.findByReservationId(reservationId);
         if (units.isEmpty()) {
             log.warn("Cannot claim reservation: no units found for ID: {}", reservationId);
+            recordCounter("inventory.reservation.claims", "status", "FAILED");
             return false;
         }
 
@@ -150,32 +205,57 @@ public class InventoryReservationService {
         }
 
         if (count == 0) {
+            // Check if all units are already claimed
+            boolean allClaimed = units.stream().allMatch(u -> InventoryReservationUnit.STATUS_CLAIMED.equals(u.getStatus()));
+            if (allClaimed) {
+                log.info("All units for reservationId {} already claimed. Idempotent success.", reservationId);
+                recordCounter("inventory.reservation.claims", "status", "ALREADY_CLAIMED");
+                return true;
+            }
             log.warn("No active RESERVED units to claim for reservationId: {}", reservationId);
+            recordCounter("inventory.reservation.claims", "status", "FAILED");
             return false;
         }
 
         unitRepository.saveAll(units);
 
-        // Permanent deduction from master ledger
+        // Atomic deduction from master ledger (avoids read-modify-write lost updates and negative stock masking)
+        int updatedRows = inventoryRepository.decrementStockIfSufficient(sku, count);
+        if (updatedRows == 0) {
+            log.error("Failed to decrement master stock for SKU: {} by count: {}. Insufficient stock on hand!", sku, count);
+            recordCounter("inventory.reservation.claims", "status", "FAILED");
+            throw new IllegalStateException("Insufficient master stock to claim reserved units for SKU: " + sku);
+        }
+
         InventoryItem item = inventoryRepository.findBySku(sku).orElse(null);
-        if (item != null) {
-            int newQty = Math.max(0, item.getQuantity() - count);
-            item.setQuantity(newQty);
-            inventoryRepository.save(item);
-            transactionRepository.save(new StockTransaction(sku, -count, "RESERVATION_CLAIM", reservationId));
-            kafkaProducerService.sendStockUpdateEvent(new StockUpdateEvent(sku, newQty, "RESERVATION_CLAIMED"));
+        int newQty = item != null ? item.getQuantity() : 0;
+        transactionRepository.save(new StockTransaction(sku, -count, "RESERVATION_CLAIM", reservationId));
+        kafkaProducerService.sendStockUpdateEvent(new StockUpdateEvent(sku, newQty, "RESERVATION_CLAIMED"));
+
+        if (headerOpt.isPresent()) {
+            InventoryReservation header = headerOpt.get();
+            header.markCompleted("GATEWAY-CALLBACK");
+            reservationRepository.save(header);
         }
 
         log.info("Successfully claimed {} reserved units for SKU: {} (reservationId: {})", count, sku, reservationId);
+        recordCounter("inventory.reservation.claims", "status", "SUCCESS", "sku", sku);
         return true;
     }
 
     /**
      * Releases a reservation (e.g. buyer abandoned cart, payment declined, or cancelled).
      * Units immediately return to AVAILABLE status in the pool without master ledger writes.
+     * Strictly idempotent: replayed releases return true.
      */
     @Transactional
     public boolean releaseReservation(String reservationId) {
+        Optional<InventoryReservation> headerOpt = reservationRepository.findById(reservationId);
+        if (headerOpt.isPresent() && InventoryReservation.STATUS_FAILED.equals(headerOpt.get().getStatus())) {
+            log.info("Reservation {} already released/failed. Idempotent success returned.", reservationId);
+            return true;
+        }
+
         List<InventoryReservationUnit> units = unitRepository.findByReservationId(reservationId);
         if (units.isEmpty()) {
             return false;
@@ -189,8 +269,13 @@ public class InventoryReservationService {
             }
         }
 
-        if (count > 0) {
+        if (count > 0 || (headerOpt.isPresent() && InventoryReservation.STATUS_PENDING_PAYMENT.equals(headerOpt.get().getStatus()))) {
             unitRepository.saveAll(units);
+            if (headerOpt.isPresent()) {
+                InventoryReservation header = headerOpt.get();
+                header.markFailed();
+                reservationRepository.save(header);
+            }
             log.info("Released {} reserved units back to available pool for reservationId: {}", count, reservationId);
             return true;
         }
@@ -200,21 +285,34 @@ public class InventoryReservationService {
     /**
      * Automated Reaper: Runs periodically to reclaim expired reservations.
      * Any reservation exceeding its TTL is freed back to AVAILABLE for other buyers.
+     * Updates header status to EXPIRED to maintain full audit trail.
      */
     @Scheduled(fixedRate = 15000)
     @Transactional
     public void cleanupExpiredReservations() {
-        List<InventoryReservationUnit> expired = unitRepository.findByStatusAndExpiresAtBefore(
+        List<InventoryReservationUnit> expiredUnits = unitRepository.findByStatusAndExpiresAtBefore(
                 InventoryReservationUnit.STATUS_RESERVED,
                 Instant.now()
         );
 
-        if (!expired.isEmpty()) {
-            for (InventoryReservationUnit unit : expired) {
+        if (!expiredUnits.isEmpty()) {
+            for (InventoryReservationUnit unit : expiredUnits) {
                 unit.release();
             }
-            unitRepository.saveAll(expired);
-            log.info("Auto-reaper reclaimed {} expired reservation units back to pool", expired.size());
+            unitRepository.saveAll(expiredUnits);
+            log.info("Auto-reaper reclaimed {} expired reservation units back to pool", expiredUnits.size());
+        }
+
+        List<InventoryReservation> expiredHeaders = reservationRepository.findByStatusAndExpiresAtBefore(
+                InventoryReservation.STATUS_PENDING_PAYMENT,
+                Instant.now()
+        );
+        if (!expiredHeaders.isEmpty()) {
+            for (InventoryReservation res : expiredHeaders) {
+                res.markExpired();
+            }
+            reservationRepository.saveAll(expiredHeaders);
+            log.info("Auto-reaper marked {} reservation headers as EXPIRED", expiredHeaders.size());
         }
     }
 
@@ -238,12 +336,18 @@ public class InventoryReservationService {
 
     /**
      * Replenishes the bounded unit pool from the master InventoryItem ledger.
-     * Uses pessimistic write lock on the master ledger record to prevent race conditions across distributed cluster pods.
+     * Uses non-blocking check followed by pessimistic write lock on the master ledger record
+     * to prevent race conditions across distributed cluster pods without JVM-level instance monitors.
      */
     @Transactional
-    public synchronized void replenishPoolFromMasterLedger(String sku, int minimumNeeded) {
+    public void replenishPoolFromMasterLedger(String sku, int minimumNeeded) {
+        // Fast-path: Check item without locking first to avoid lock contention on depleted items
+        Optional<InventoryItem> checkItem = inventoryRepository.findBySku(sku);
+        if (checkItem.isEmpty() || checkItem.get().getQuantity() <= 0) {
+            return;
+        }
+
         InventoryItem item = inventoryRepository.findBySkuForUpdate(sku)
-                .or(() -> inventoryRepository.findBySku(sku))
                 .orElse(null);
         if (item == null) {
             return;

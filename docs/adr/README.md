@@ -16,3 +16,4 @@ This directory documents key architectural decisions made for the **Smart Invent
 | **[ADR-0008](0008-seasonal-forecasting-and-runtime-config.md)** | Seasonal Holt-Winters Forecasting & Zero-Downtime Dynamic Runtime Config | Approved | 2026-05-20 |
 | **[ADR-0009](0009-centralized-algorithm-agnostic-hashing-framework.md)** | Centralized Algorithm-Agnostic Hashing Framework | Approved | 2026-05-20 |
 | **[ADR-0010](0010-pgvector-interaction-learning-feedback-loop.md)** | pgvector Interaction Learning Feedback Loop & Active Learning Engine | Approved | 2026-05-20 |
+| **[ADR-0011](0011-multi-location-stock-positions-and-hot-sku-bucketed-counters.md)** | Multi-Location Stock Positions and Hot-SKU Bucketed Counter Architecture | Proposed | 2026-11-19 |

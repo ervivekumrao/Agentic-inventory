@@ -210,18 +210,11 @@ def forecast_demand(req: ForecastRequest):
     statistical anomaly detection, and safety stock / reorder point calculations.
     """
     logger.info("Demand forecast requested for SKU: %s over horizon: %d days", req.sku, req.horizon)
-    if not req.historical_sales:
-        logger.warning("No historical sales provided for SKU: %s, using fallback baseline prediction", req.sku)
-        predictions = [10.0] * req.horizon
-        return ForecastResponse(
-            sku=req.sku,
-            horizon=req.horizon,
-            predictions=predictions,
-            confidence_score=0.75,
-            trend="STABLE",
-            safety_stock_recommendation=15.0,
-            reorder_point_recommendation=65.0,
-            anomalies=[]
+    if not req.historical_sales or len(req.historical_sales) < 3:
+        logger.warning("Insufficient historical sales provided for SKU: %s (count: %d). Rejecting forecast request.", req.sku, len(req.historical_sales) if req.historical_sales else 0)
+        raise HTTPException(
+            status_code=422,
+            detail=f"Insufficient historical sales data for SKU '{req.sku}'. At least 3 transaction data points required to compute Holt-Winters trend and confidence intervals."
         )
 
     series = pd.Series(req.historical_sales, dtype=float)

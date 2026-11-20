@@ -20,9 +20,11 @@ import com.smartinventory.inventory.model.StockTransaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 
 @Repository
 public interface StockTransactionRepository extends JpaRepository<StockTransaction, Long> {
     List<StockTransaction> findBySku(String sku);
+    List<StockTransaction> findBySkuAndTimestampAfterOrderByTimestampAsc(String sku, Instant after);
 }

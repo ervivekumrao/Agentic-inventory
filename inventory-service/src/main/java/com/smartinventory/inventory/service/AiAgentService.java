@@ -98,6 +98,12 @@ public class AiAgentService {
                     List<InventoryItem> res = inventoryRepository.findTop250By();
                     return (res != null && !res.isEmpty()) ? res : inventoryRepository.findAll();
                 });
+            } else if (queryText.contains("summary") || queryText.contains("portfolio") || queryText.contains("valuation") || queryText.contains("overview") || queryText.contains("total")) {
+                // Use pushdown aggregation for high-scale summaries without table scans
+                var projection = inventoryRepository.getPortfolioSummaryProjection();
+                log.debug("Pushdown projection retrieved: totalSkus={}, totalQty={}", projection.getTotalSkus(), projection.getTotalQuantity());
+                List<InventoryItem> res = inventoryRepository.findTop250By();
+                items = (res != null && !res.isEmpty()) ? res : inventoryRepository.findAll();
             } else if (queryText.contains("low stock") || queryText.contains("low in stock") || queryText.contains("reorder") || queryText.contains("shortage") || queryText.contains("out of stock") || queryText.contains("depleted")) {
                 items = inventoryRepository.findLowStockItems();
                 if (items == null || items.isEmpty()) {
@@ -350,6 +356,6 @@ public class AiAgentService {
             riskLevel = "HIGH";
         }
 
-        return new AiQueryResponse(sb.toString(), recommendations, riskLevel);
+        return new AiQueryResponse(sb.toString(), recommendations, riskLevel, true, java.time.Instant.now().toString());
     }
 }
