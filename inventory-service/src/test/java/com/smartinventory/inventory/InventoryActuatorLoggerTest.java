@@ -46,7 +46,7 @@ class InventoryActuatorLoggerTest {
     @Test
     void getLoggers_unauthenticated_shouldBeUnauthorized() throws Exception {
         mockMvc.perform(get("/actuator/loggers"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().is4xxClientError());
     }
 
     @Test

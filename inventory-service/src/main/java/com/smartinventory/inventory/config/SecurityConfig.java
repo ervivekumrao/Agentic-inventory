@@ -80,7 +80,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/actuator/health/**", "/actuator/info", "/actuator/prometheus").permitAll()
                 .requestMatchers("/actuator/**", "/logging-admin.html").hasRole("ADMIN")
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/chat.html", "/index.html", "/", "/*.html", "/static/**", "/assets/**", "/vendor/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/chat.html", "/index.html", "/", "/*.html", "/static/**", "/assets/**", "/vendor/**", "/favicon.ico", "/vite.svg", "/*.js", "/*.css").permitAll()
                 .requestMatchers("/api/ai/**").hasAnyRole("ADMIN", "MANAGER", "ENTRY_OPERATOR", "USER")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/inventory/**").hasAnyRole("ADMIN", "MANAGER", "ENTRY_OPERATOR", "USER")
@@ -90,7 +90,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/inventory/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
-            .httpBasic(Customizer.withDefaults());
+            .httpBasic(AbstractHttpConfigurer::disable);
 
         if (jwtAuthenticationFilter != null) {
             http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

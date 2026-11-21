@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Package, DollarSign, AlertTriangle, Layers, Building2, RefreshCw } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from 'recharts';
+import { useAuth } from '../context/AuthContext';
 
 interface InventoryItem {
   id: number;
@@ -16,6 +17,7 @@ interface InventoryItem {
 const COLORS = ['#38bdf8', '#818cf8', '#34d399', '#fbbf24', '#f87171', '#a78bfa'];
 
 export const InventoryDashboard: React.FC = () => {
+  const { token } = useAuth();
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,8 +36,10 @@ export const InventoryDashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchInventory();
-  }, []);
+    if (token) {
+      fetchInventory();
+    }
+  }, [token]);
 
   const totalSkus = items.length;
   const totalQuantity = items.reduce((acc, curr) => acc + (curr.quantity || 0), 0);
@@ -84,6 +88,12 @@ export const InventoryDashboard: React.FC = () => {
           Refresh Metrics
         </button>
       </div>
+
+      {error && (
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs">
+          {error}
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -150,20 +160,27 @@ export const InventoryDashboard: React.FC = () => {
           </h3>
           <p className="text-xs text-slate-400 mb-6">Stock unit distribution across warehouses</p>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={warehouseData}>
-                <XAxis dataKey="name" stroke="#64748b" fontSize={11} tickLine={false} />
-                <YAxis stroke="#64748b" fontSize={11} tickLine={false} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', fontSize: '12px' }}
-                />
-                <Bar dataKey="quantity" radius={[6, 6, 0, 0]}>
-                  {warehouseData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            {warehouseData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                <BarChart data={warehouseData}>
+                  <XAxis dataKey="name" stroke="#64748b" fontSize={11} tickLine={false} />
+                  <YAxis stroke="#64748b" fontSize={11} tickLine={false} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', fontSize: '12px', color: '#f8fafc' }}
+                  />
+                  <Bar dataKey="quantity" radius={[6, 6, 0, 0]}>
+                    {warehouseData.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-slate-500 border border-dashed border-slate-800 rounded-xl bg-slate-950/40">
+                <Building2 className="w-8 h-8 mb-2 text-slate-600" />
+                <span className="text-xs">{loading ? 'Loading warehouse distribution...' : 'No warehouse stock telemetry available'}</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -175,29 +192,36 @@ export const InventoryDashboard: React.FC = () => {
           </h3>
           <p className="text-xs text-slate-400 mb-6">Capital allocation across inventory categories</p>
           <div className="h-64 flex items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={categoryData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  innerRadius={45}
-                  paddingAngle={4}
-                  label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                >
-                  {categoryData.map((_, index) => (
-                    <Cell key={`pie-cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', fontSize: '12px' }}
-                  formatter={(val: number) => `$${val.toLocaleString()}`}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            {categoryData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                <PieChart>
+                  <Pie
+                    data={categoryData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    innerRadius={45}
+                    paddingAngle={4}
+                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                  >
+                    {categoryData.map((_, index) => (
+                      <Cell key={`pie-cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', fontSize: '12px', color: '#f8fafc' }}
+                    formatter={(val: number) => `$${val.toLocaleString()}`}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 border border-dashed border-slate-800 rounded-xl bg-slate-950/40">
+                <DollarSign className="w-8 h-8 mb-2 text-slate-600" />
+                <span className="text-xs">{loading ? 'Loading category valuation...' : 'No category valuation telemetry available'}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

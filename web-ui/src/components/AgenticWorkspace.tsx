@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-import { Bot, Send, User, Download, FileSpreadsheet, FileText, Sparkles, ThumbsUp, ThumbsDown, Check } from 'lucide-react';
+import { Bot, Send, User, Download, FileSpreadsheet, FileText, Sparkles, ThumbsUp, ThumbsDown, Check, Loader2 } from 'lucide-react';
 import { marked } from 'marked';
 import * as XLSX from 'xlsx';
 import { Document, Packer, Paragraph, TextRun } from 'docx';
@@ -37,6 +37,16 @@ export const AgenticWorkspace: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [feedbackDone, setFeedbackDone] = useState<Record<string, boolean>>({});
 
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, loading]);
+
   const handleSend = async (queryText?: string) => {
     const q = (queryText || input).trim();
     if (!q || loading) return;
@@ -69,7 +79,7 @@ export const AgenticWorkspace: React.FC = () => {
       const errorMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'agent',
-        text: `⚠️ **AI Query Error**: ${err.response?.data?.message || 'Failed to communicate with AI forecasting service.'}`,
+        text: `⚠️ **AI Query Error**: ${err.response?.data?.message || err.response?.data?.error || 'Failed to communicate with AI forecasting service.'}`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, errorMsg]);
@@ -165,7 +175,7 @@ export const AgenticWorkspace: React.FC = () => {
 
               <div
                 id={`msg-content-${msg.id}`}
-                className={`p-4 rounded-2xl text-sm leading-relaxed ${
+                className={`p-4 rounded-2xl text-sm leading-relaxed overflow-x-auto ${
                   msg.sender === 'user'
                     ? 'bg-sky-600 text-white rounded-tr-none shadow-lg'
                     : 'bg-slate-950 border border-slate-800 text-slate-200 rounded-tl-none shadow-md prose prose-invert max-w-none'
@@ -236,10 +246,25 @@ export const AgenticWorkspace: React.FC = () => {
             </div>
           </div>
         ))}
+
+        {/* Loading / Thinking Indicator */}
+        {loading && (
+          <div className="flex items-start gap-3.5">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold text-xs bg-gradient-to-tr from-indigo-500 to-purple-600 text-white shadow-indigo-500/20">
+              <Bot className="w-4 h-4" />
+            </div>
+            <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-slate-400 text-xs flex items-center gap-2 rounded-tl-none shadow-md">
+              <Loader2 className="w-4 h-4 animate-spin text-sky-400" />
+              <span>Agentic AI is querying inventory telemetry & analyzing forecasting models...</span>
+            </div>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Quick Prompts Bar */}
-      <div className="px-6 py-2.5 bg-slate-950/60 border-t border-slate-800 flex items-center gap-2 overflow-x-auto">
+      <div className="px-6 py-2.5 bg-slate-950/60 border-t border-slate-800 flex items-center gap-2 overflow-x-auto no-scrollbar">
         <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider shrink-0 flex items-center gap-1">
           <Sparkles className="w-3 h-3 text-sky-400" /> Quick Prompts:
         </span>
@@ -247,7 +272,8 @@ export const AgenticWorkspace: React.FC = () => {
           <button
             key={idx}
             onClick={() => handleSend(prompt)}
-            className="px-3 py-1 rounded-full bg-slate-900 hover:bg-sky-500/15 text-slate-300 hover:text-sky-300 text-xs font-medium border border-slate-800 hover:border-sky-500/30 shrink-0 transition-all"
+            disabled={loading}
+            className="px-3 py-1 rounded-full bg-slate-900 hover:bg-sky-500/15 text-slate-300 hover:text-sky-300 text-xs font-medium border border-slate-800 hover:border-sky-500/30 shrink-0 transition-all disabled:opacity-50"
           >
             {prompt}
           </button>

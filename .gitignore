@@ -147,6 +147,10 @@ replay_pid*
 *.rar
 *.7z
 
+# --- Node & Frontend ---
+**/node_modules/
+.npm/
+
 # --- Architecture Assessment Artifacts ---
 architecture-assessment/
 

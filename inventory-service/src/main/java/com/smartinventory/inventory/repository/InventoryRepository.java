@@ -35,8 +35,8 @@ public interface InventoryRepository extends JpaRepository<InventoryItem, Long> 
     @Query("SELECT i FROM InventoryItem i WHERE i.sku = :sku")
     Optional<InventoryItem> findBySkuForUpdate(@Param("sku") String sku);
 
-    @org.springframework.data.jpa.repository.Modifying
-    @Query("UPDATE InventoryItem i SET i.quantity = i.quantity - :count WHERE i.sku = :sku AND i.quantity >= :count")
+    @org.springframework.data.jpa.repository.Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE InventoryItem i SET i.quantity = i.quantity - :count WHERE LOWER(i.sku) = LOWER(:sku) AND i.quantity >= :count")
     int decrementStockIfSufficient(@Param("sku") String sku, @Param("count") int count);
 
     @Query("SELECT i FROM InventoryItem i WHERE i.quantity <= i.reorderThreshold")

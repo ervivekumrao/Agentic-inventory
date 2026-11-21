@@ -11,6 +11,8 @@ import {
 } from '@tanstack/react-table';
 import { Search, Filter, AlertTriangle, RefreshCw, ShoppingCart, Sliders, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 
+import { useAuth } from '../context/AuthContext';
+
 interface InventoryItem {
   id: number;
   sku: string;
@@ -22,6 +24,7 @@ interface InventoryItem {
 }
 
 export const InventoryTable: React.FC = () => {
+  const { token } = useAuth();
   const [data, setData] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -46,8 +49,10 @@ export const InventoryTable: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchInventory();
-  }, []);
+    if (token) {
+      fetchInventory();
+    }
+  }, [token]);
 
   const filteredData = useMemo(() => {
     return data.filter((item) => {

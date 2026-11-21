@@ -14,29 +14,23 @@ interface AuthContextType {
   isAuthenticated: boolean;
 }
 
+// Synchronously configure axios defaults on initial module evaluation
+const initialSavedToken = localStorage.getItem('smart_inventory_jwt');
+if (initialSavedToken) {
+  axios.defaults.headers.common['Authorization'] = `Bearer ${initialSavedToken}`;
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(localStorage.getItem('smart_inventory_jwt'));
+  const [token, setToken] = useState<string | null>(initialSavedToken);
   const [user, setUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('smart_inventory_user');
     return saved ? JSON.parse(saved) : null;
   });
 
-  useEffect(() => {
-    const interceptor = axios.interceptors.request.use((config) => {
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
-    });
-
-    return () => {
-      axios.interceptors.request.eject(interceptor);
-    };
-  }, [token]);
-
   const login = (newToken: string, username: string, roles: string[]) => {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
     setToken(newToken);
     const userInfo = { username, roles };
     setUser(userInfo);
@@ -45,11 +39,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
+    delete axios.defaults.headers.common['Authorization'];
     setToken(null);
     setUser(null);
     localStorage.removeItem('smart_inventory_jwt');
     localStorage.removeItem('smart_inventory_user');
   };
+
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          logout();
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated: !!token }}>

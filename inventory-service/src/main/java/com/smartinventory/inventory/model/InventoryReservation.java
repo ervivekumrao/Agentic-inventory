@@ -39,7 +39,7 @@ public class InventoryReservation {
     public static final String STATUS_EXPIRED = "EXPIRED";
 
     @Id
-    @Column(nullable = false, length = 128, unique = true)
+    @Column(name = "id", nullable = false, length = 128, unique = true)
     @NotBlank(message = "Reservation ID is mandatory")
     private String reservationId;
 

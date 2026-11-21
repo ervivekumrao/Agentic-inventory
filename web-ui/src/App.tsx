@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { InventoryDashboard } from './components/InventoryDashboard';
 import { InventoryTable } from './components/InventoryTable';
 import { AgenticWorkspace } from './components/AgenticWorkspace';
 import { LoggingAdmin } from './components/LoggingAdmin';
 import { LoginModal } from './components/LoginModal';
+import { LoginScreen } from './components/LoginScreen';
 
 export const AppContent: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory' | 'chat' | 'logging'>('dashboard');
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+
+  if (!isAuthenticated) {
+    return <LoginScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">

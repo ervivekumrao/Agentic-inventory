@@ -54,7 +54,7 @@ public class AiAgentController {
         this.deadStockAdvisorService = deadStockAdvisorService;
     }
 
-    @PostMapping("/agent/chat")
+    @PostMapping({"/query", "/agent/chat", "/inventory-assistant"})
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR', 'USER')")
     @Operation(summary = "Chat with AI Inventory Agent", description = "Answers complex inventory questions, provides valuation, reorder recommendations, and human-like operational advice.")
     public ResponseEntity<AiQueryResponse> chatWithAgent(@Valid @RequestBody AiQueryRequest request) {

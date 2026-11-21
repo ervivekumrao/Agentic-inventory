@@ -19,3 +19,52 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* Ensure Recharts SVGs and responsive wrappers never render white backgrounds */
+.recharts-responsive-container,
+.recharts-wrapper,
+.recharts-surface,
+.recharts-legend-wrapper {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* AI Response Markdown Table Styling */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.8125rem;
+  display: table;
+}
+
+.prose th {
+  background-color: #0f172a;
+  color: #38bdf8;
+  border: 1px solid #334155;
+  padding: 0.5rem 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.025em;
+}
+
+.prose td {
+  border: 1px solid #1e293b;
+  padding: 0.5rem 0.75rem;
+  color: #e2e8f0;
+}
+
+.prose tr:nth-child(even) {
+  background-color: rgba(15, 23, 42, 0.5);
+}
+
+/* Utility to hide heavy native scrollbars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
