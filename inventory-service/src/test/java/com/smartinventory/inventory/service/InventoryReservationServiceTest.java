@@ -161,6 +161,28 @@ class InventoryReservationServiceTest {
     }
 
     @Test
+    void claimReservation_shouldThrowSecurityException_whenCallerNotOwnerAndNotAdmin() {
+        InventoryReservation header = new InventoryReservation("RES-OWNED", "SKU-TEST", 1, Instant.now().plusSeconds(300));
+        header.setReservedByUser("alice");
+
+        when(reservationRepository.findById("RES-OWNED")).thenReturn(Optional.of(header));
+
+        assertThrows(SecurityException.class, () ->
+                reservationService.claimReservation("RES-OWNED", "bob", false));
+    }
+
+    @Test
+    void releaseReservation_shouldThrowSecurityException_whenCallerNotOwnerAndNotAdmin() {
+        InventoryReservation header = new InventoryReservation("RES-OWNED", "SKU-TEST", 1, Instant.now().plusSeconds(300));
+        header.setReservedByUser("alice");
+
+        when(reservationRepository.findById("RES-OWNED")).thenReturn(Optional.of(header));
+
+        assertThrows(SecurityException.class, () ->
+                reservationService.releaseReservation("RES-OWNED", "bob", false));
+    }
+
+    @Test
     void cleanupExpiredReservations_shouldReleaseExpiredUnits() {
         unit1.reserve("RES-EXPIRED", Instant.now().minusSeconds(10));
 

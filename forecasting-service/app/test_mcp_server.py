@@ -114,6 +114,14 @@ def test_execute_mcp_tool_endpoint_success():
     assert data["total_low_stock_skus"] == 1
 
 
+def test_create_purchase_order_draft():
+    from app.mcp_server import create_purchase_order_draft
+    res = create_purchase_order_draft("SUP-001", [{"sku": "SKU-001", "orderedQuantity": 50, "unitCost": 12.5}])
+    assert res["status"] == "DRAFT_CREATED"
+    assert res["requires_approval"] is True
+    assert "PO-AI-" in res["purchase_order"]["orderNumber"]
+
+
 def test_execute_mcp_tool_endpoint_not_found():
     payload = {
         "tool_name": "non_existent_tool",

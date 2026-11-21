@@ -16,6 +16,7 @@
 
 package com.smartinventory.inventory.kafka;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartinventory.inventory.model.OutboxEvent;
 import com.smartinventory.inventory.repository.OutboxEventRepository;
 import org.slf4j.Logger;
@@ -31,17 +32,20 @@ public class KafkaProducerService {
     private static final String TOPIC = "inventory-stock-events";
     private final KafkaTemplate<String, StockUpdateEvent> kafkaTemplate;
     private final OutboxEventRepository outboxEventRepository;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public KafkaProducerService(
             KafkaTemplate<String, StockUpdateEvent> kafkaTemplate,
-            @Autowired(required = false) OutboxEventRepository outboxEventRepository) {
+            @Autowired(required = false) OutboxEventRepository outboxEventRepository,
+            @Autowired(required = false) ObjectMapper objectMapper) {
         this.kafkaTemplate = kafkaTemplate;
         this.outboxEventRepository = outboxEventRepository;
+        this.objectMapper = objectMapper != null ? objectMapper.copy().findAndRegisterModules() : new ObjectMapper().findAndRegisterModules();
     }
 
     public KafkaProducerService(KafkaTemplate<String, StockUpdateEvent> kafkaTemplate) {
-        this(kafkaTemplate, null);
+        this(kafkaTemplate, null, null);
     }
 
     public void sendStockUpdateEvent(StockUpdateEvent event) {
@@ -49,48 +53,16 @@ public class KafkaProducerService {
     }
 
     public void sendStockUpdateEvent(StockUpdateEvent event, OutboxEvent existingOutbox) {
-        log.debug("Publishing StockUpdateEvent to Kafka topic '{}': SKU={}, Quantity={}, EventType={}",
-                TOPIC, event.getSku(), event.getQuantity(), event.getEventType());
+        log.debug("Persisting Transactional Outbox event for SKU={}, Quantity={}, EventType={}",
+                event.getSku(), event.getQuantity(), event.getEventType());
 
-        OutboxEvent outbox = existingOutbox;
-        if (outbox == null && outboxEventRepository != null) {
+        if (existingOutbox == null && outboxEventRepository != null) {
             try {
-                String payload = String.format("{\"sku\":\"%s\",\"quantity\":%d,\"eventType\":\"%s\"}",
-                        event.getSku(), event.getQuantity(), event.getEventType());
-                outbox = outboxEventRepository.save(new OutboxEvent("INVENTORY", event.getSku(), event.getEventType(), payload));
+                String payload = objectMapper.writeValueAsString(event);
+                outboxEventRepository.save(new OutboxEvent("INVENTORY", event.getSku(), event.getEventType(), payload));
+                log.debug("OutboxEvent successfully persisted for SKU: {}", event.getSku());
             } catch (Exception e) {
                 log.warn("Failed to persist Transactional Outbox record for SKU {}: {}", event.getSku(), e.getMessage());
-            }
-        }
-
-        final OutboxEvent trackedOutbox = outbox;
-        try {
-            kafkaTemplate.send(TOPIC, event.getSku(), event).whenComplete((result, ex) -> {
-                if (ex == null) {
-                    log.debug("StockUpdateEvent successfully published for SKU: {}", event.getSku());
-                    if (trackedOutbox != null && outboxEventRepository != null) {
-                        try {
-                            trackedOutbox.markSent();
-                            outboxEventRepository.save(trackedOutbox);
-                        } catch (Exception ignored) {}
-                    }
-                } else {
-                    log.warn("Failed to publish StockUpdateEvent for SKU {}: {}", event.getSku(), ex.getMessage());
-                    if (trackedOutbox != null && outboxEventRepository != null) {
-                        try {
-                            trackedOutbox.markFailed();
-                            outboxEventRepository.save(trackedOutbox);
-                        } catch (Exception ignored) {}
-                    }
-                }
-            });
-        } catch (Exception e) {
-            log.warn("Exception during Kafka event publishing for SKU {}: {}", event.getSku(), e.getMessage());
-            if (trackedOutbox != null && outboxEventRepository != null) {
-                try {
-                    trackedOutbox.markFailed();
-                    outboxEventRepository.save(trackedOutbox);
-                } catch (Exception ignored) {}
             }
         }
     }

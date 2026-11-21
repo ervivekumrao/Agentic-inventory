@@ -19,7 +19,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>(function(){var t;try{t=localStorage.getItem("theme");}catch(e){}if(!t){t="dark";}document.documentElement.setAttribute("data-theme",t);})();</script>
+    <script>(function(){var t;try{t=localStorage.getItem("smart_inventory_theme")||localStorage.getItem("theme");}catch(e){}if(!t){t="dark";}document.documentElement.setAttribute("data-theme",t);})();</script>
     <title>Smart Inventory - Logger Administration</title>
     <link rel="icon" type="image/svg+xml" href="/assets/logo/favicon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo/favicon-32x32.png">
@@ -1179,9 +1179,6 @@
 
             try {
                 const headers = {};
-                if (cfg.type === "actuator") {
-                    headers['Authorization'] = 'Basic ' + btoa('admin:admin123');
-                }
                 const response = await fetch(url, { headers });
                 if (!response.ok) {
                     throw new Error(`Endpoint returned status ${response.status} (${response.statusText})`);
@@ -1325,9 +1322,6 @@
 
             try {
                 const headers = { 'Content-Type': 'application/json' };
-                if (cfg.type === "actuator") {
-                    headers['Authorization'] = 'Basic ' + btoa('admin:admin123');
-                }
 
                 let bodyPayload;
                 if (newLevel === "RESET") {

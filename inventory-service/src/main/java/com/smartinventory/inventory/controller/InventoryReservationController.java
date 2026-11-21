@@ -52,24 +52,34 @@ public class InventoryReservationController {
 
     @PostMapping("/reserve")
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR', 'USER')")
-    public ResponseEntity<ReservationResult> reserveStock(@Valid @RequestBody ReserveStockRequest request) {
-        log.info("POST /api/inventory/reservations/reserve requested for SKU: {}, qty: {}, ref: {}",
-                request.sku(), request.quantity(), request.reservationId());
+    public ResponseEntity<ReservationResult> reserveStock(
+            @Valid @RequestBody ReserveStockRequest request,
+            org.springframework.security.core.Authentication authentication) {
+        String username = authentication != null ? authentication.getName() : "ANONYMOUS";
+        log.info("POST /api/inventory/reservations/reserve requested by user: {} for SKU: {}, qty: {}, ref: {}",
+                username, request.sku(), request.quantity(), request.reservationId());
 
         ReservationResult result = reservationService.reserveStock(
                 request.sku(),
                 request.quantity(),
                 request.reservationId(),
-                request.ttlSeconds()
+                request.ttlSeconds(),
+                username
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @PostMapping("/claim/{reservationId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR', 'USER')")
-    public ResponseEntity<Map<String, Object>> claimReservation(@PathVariable String reservationId) {
-        log.info("POST /api/inventory/reservations/claim/{} requested", reservationId);
-        boolean success = reservationService.claimReservation(reservationId);
+    public ResponseEntity<Map<String, Object>> claimReservation(
+            @PathVariable String reservationId,
+            org.springframework.security.core.Authentication authentication) {
+        String username = authentication != null ? authentication.getName() : "ANONYMOUS";
+        boolean isAdminOrManager = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_MANAGER"));
+
+        log.info("POST /api/inventory/reservations/claim/{} requested by user: {}", reservationId, username);
+        boolean success = reservationService.claimReservation(reservationId, username, isAdminOrManager);
         if (success) {
             return ResponseEntity.ok(Map.of(
                     "reservationId", reservationId,
@@ -87,9 +97,15 @@ public class InventoryReservationController {
 
     @PostMapping("/release/{reservationId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR', 'USER')")
-    public ResponseEntity<Map<String, Object>> releaseReservation(@PathVariable String reservationId) {
-        log.info("POST /api/inventory/reservations/release/{} requested", reservationId);
-        boolean success = reservationService.releaseReservation(reservationId);
+    public ResponseEntity<Map<String, Object>> releaseReservation(
+            @PathVariable String reservationId,
+            org.springframework.security.core.Authentication authentication) {
+        String username = authentication != null ? authentication.getName() : "ANONYMOUS";
+        boolean isAdminOrManager = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_MANAGER"));
+
+        log.info("POST /api/inventory/reservations/release/{} requested by user: {}", reservationId, username);
+        boolean success = reservationService.releaseReservation(reservationId, username, isAdminOrManager);
         if (success) {
             return ResponseEntity.ok(Map.of(
                     "reservationId", reservationId,

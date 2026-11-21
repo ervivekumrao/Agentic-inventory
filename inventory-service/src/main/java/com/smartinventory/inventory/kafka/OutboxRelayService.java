@@ -66,7 +66,7 @@ public class OutboxRelayService {
     }
 
     /**
-     * Polls PENDING or FAILED events in batches and dispatches them to Kafka.
+     * Polls PENDING or FAILED events with FOR UPDATE SKIP LOCKED and dispatches them to Kafka.
      */
     @Scheduled(fixedDelay = 2000)
     @Transactional
@@ -75,9 +75,14 @@ public class OutboxRelayService {
             return;
         }
 
-        List<OutboxEvent> pending = outboxEventRepository.findTop50ByStatusOrderByCreatedAtAsc(OutboxEvent.STATUS_PENDING);
-        if (pending.isEmpty()) {
-            pending = outboxEventRepository.findTop50ByStatusOrderByCreatedAtAsc(OutboxEvent.STATUS_FAILED);
+        List<OutboxEvent> pending;
+        try {
+            pending = outboxEventRepository.fetchPendingEventsForUpdateSkipLocked(OutboxEvent.STATUS_PENDING, 50);
+            if (pending.isEmpty()) {
+                pending = outboxEventRepository.fetchPendingEventsForUpdateSkipLocked(OutboxEvent.STATUS_FAILED, 50);
+            }
+        } catch (Exception e) {
+            pending = outboxEventRepository.findTop50ByStatusOrderByCreatedAtAsc(OutboxEvent.STATUS_PENDING);
         }
 
         if (pending.isEmpty()) {
@@ -88,25 +93,42 @@ public class OutboxRelayService {
         for (OutboxEvent event : pending) {
             try {
                 StockUpdateEvent stockEvent = objectMapper.readValue(event.getPayload(), StockUpdateEvent.class);
-                kafkaTemplate.send(TOPIC, event.getAggregateId(), stockEvent).whenComplete((result, ex) -> {
-                    if (ex == null) {
-                        event.markSent();
-                        outboxEventRepository.save(event);
-                        recordMetric("SENT");
-                        log.debug("Outbox event {} successfully relayed to Kafka for SKU: {}", event.getId(), event.getAggregateId());
-                    } else {
-                        event.markFailed();
-                        outboxEventRepository.save(event);
-                        recordMetric("FAILED");
-                        log.warn("Failed to relay outbox event {}: {}", event.getId(), ex.getMessage());
-                    }
-                });
-            } catch (Exception e) {
-                log.warn("Could not deserialize outbox event {}: {}", event.getId(), e.getMessage());
-                event.markFailed();
+                kafkaTemplate.send(TOPIC, event.getAggregateId(), stockEvent).get(5, java.util.concurrent.TimeUnit.SECONDS);
+                event.markSent();
                 outboxEventRepository.save(event);
-                recordMetric("FAILED");
+                recordMetric("SENT");
+                log.debug("Outbox event {} successfully relayed to Kafka for SKU: {}", event.getId(), event.getAggregateId());
+            } catch (Exception e) {
+                if (e instanceof com.fasterxml.jackson.core.JsonProcessingException) {
+                    log.warn("Could not deserialize outbox event {}: {}. Marking as DEAD_LETTER.", event.getId(), e.getMessage());
+                    event.setStatus("DEAD_LETTER");
+                    outboxEventRepository.save(event);
+                    recordMetric("DEAD_LETTER");
+                } else {
+                    event.markFailed();
+                    outboxEventRepository.save(event);
+                    recordMetric("FAILED");
+                    log.warn("Failed to relay outbox event {}: {}", event.getId(), e.getMessage());
+                }
             }
+        }
+    }
+
+    /**
+     * Retention Purge Task: Cleans up SENT outbox event records older than 7 days.
+     */
+    @Scheduled(cron = "0 0 2 * * ?")
+    @Transactional
+    public void purgeOldSentEvents() {
+        if (outboxEventRepository == null) {
+            return;
+        }
+        try {
+            java.time.Instant cutoff = java.time.Instant.now().minus(java.time.Duration.ofDays(7));
+            int deleted = outboxEventRepository.deleteSentEventsOlderThan(cutoff);
+            log.info("Purged {} SENT outbox events older than 7 days", deleted);
+        } catch (Exception e) {
+            log.warn("Failed to purge old sent outbox events: {}", e.getMessage());
         }
     }
 

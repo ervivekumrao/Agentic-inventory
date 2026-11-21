@@ -1,7 +1,7 @@
 # ADR 0001: Multi-Database Dialect Abstraction Framework
 
 ## Status
-Approved
+Approved (PostgreSQL & MySQL Primary; Dialect-Specific Migration Scripts Required for Oracle/SQL Server/DB2)
 
 ## Context
 The `inventory-service` must support enterprise deployments across five major relational database engines: PostgreSQL, MySQL, Microsoft SQL Server, Oracle, and IBM DB2. Each database engine uses distinct vendor-specific SQL syntax for pagination, locking, and string manipulation (e.g., PostgreSQL `LIMIT/OFFSET`, Oracle `FETCH NEXT`, DB2 `FETCH FIRST`, SQL Server `OFFSET FETCH`). Relying exclusively on standard Hibernate JPA forces generic SQL generation that lacks database-specific performance optimizations and creates commercial licensing lock-in concerns.

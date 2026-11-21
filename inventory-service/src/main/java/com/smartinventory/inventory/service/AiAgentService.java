@@ -21,6 +21,7 @@ import com.smartinventory.inventory.dto.AiQueryResponse;
 import com.smartinventory.inventory.dto.RuntimeConfigDto;
 import com.smartinventory.inventory.model.InventoryItem;
 import com.smartinventory.inventory.repository.InventoryRepository;
+import com.smartinventory.inventory.repository.InventorySummaryProjection;
 import com.smartinventory.inventory.security.pii.PiiLogSanitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +91,9 @@ public class AiAgentService {
             String queryText = request.getQuery() != null ? request.getQuery().toLowerCase() : "";
 
             // Check for targeted SKU pattern
-            Matcher skuMatcher = Pattern.compile("(?i)\\b([A-Z0-9]+-[A-Z0-9-]+|SKU[0-9_]+)\b").matcher(request.getQuery() != null ? request.getQuery() : "");
+            Matcher skuMatcher = Pattern.compile("(?i)\\b([A-Z0-9]+-[A-Z0-9-]+|SKU[0-9_]+)\\b").matcher(request.getQuery() != null ? request.getQuery() : "");
+            InventorySummaryProjection summaryProjection = null;
+
             if (skuMatcher.find()) {
                 String targetSku = skuMatcher.group(1);
                 Optional<InventoryItem> singleItem = inventoryRepository.findBySku(targetSku);
@@ -100,8 +103,10 @@ public class AiAgentService {
                 });
             } else if (queryText.contains("summary") || queryText.contains("portfolio") || queryText.contains("valuation") || queryText.contains("overview") || queryText.contains("total")) {
                 // Use pushdown aggregation for high-scale summaries without table scans
-                var projection = inventoryRepository.getPortfolioSummaryProjection();
-                log.debug("Pushdown projection retrieved: totalSkus={}, totalQty={}", projection.getTotalSkus(), projection.getTotalQuantity());
+                summaryProjection = inventoryRepository.getPortfolioSummaryProjection();
+                if (summaryProjection != null) {
+                    log.debug("Pushdown projection retrieved: totalSkus={}, totalQty={}", summaryProjection.getTotalSkus(), summaryProjection.getTotalQuantity());
+                }
                 List<InventoryItem> res = inventoryRepository.findTop250By();
                 items = (res != null && !res.isEmpty()) ? res : inventoryRepository.findAll();
             } else if (queryText.contains("low stock") || queryText.contains("low in stock") || queryText.contains("reorder") || queryText.contains("shortage") || queryText.contains("out of stock") || queryText.contains("depleted")) {
@@ -116,6 +121,16 @@ public class AiAgentService {
             }
 
             List<Map<String, Object>> contextList = new ArrayList<>();
+            if (summaryProjection != null) {
+                Map<String, Object> summaryMap = new HashMap<>();
+                summaryMap.put("type", "PORTFOLIO_SUMMARY");
+                summaryMap.put("totalSkus", summaryProjection.getTotalSkus());
+                summaryMap.put("totalQuantity", summaryProjection.getTotalQuantity());
+                summaryMap.put("lowStockCount", summaryProjection.getLowStockCount());
+                summaryMap.put("outOfStockCount", summaryProjection.getOutOfStockCount());
+                summaryMap.put("overstockedCount", summaryProjection.getOverstockedCount());
+                contextList.add(summaryMap);
+            }
             for (InventoryItem item : items) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("sku", item.getSku());
@@ -141,9 +156,14 @@ public class AiAgentService {
         // 3. Delegate to Forecasting AI Agent service
         try {
             log.debug("Delegating query to forecasting AI service at {}", forecastingServiceUrl);
-            AiQueryResponse response = restClient.post()
+            String apiKey = System.getenv("FORECASTING_API_KEY");
+            var requestSpec = restClient.post()
                     .uri(forecastingServiceUrl + "/api/ai/agent/chat")
-                    .contentType(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON);
+            if (apiKey != null && !apiKey.isBlank()) {
+                requestSpec.header("X-API-KEY", apiKey);
+            }
+            AiQueryResponse response = requestSpec
                     .body(request)
                     .retrieve()
                     .body(AiQueryResponse.class);

@@ -64,7 +64,7 @@ class InventoryReservationControllerTest {
                 "Stock successfully reserved"
         );
 
-        when(reservationService.reserveStock(eq("SKU-001"), eq(2), any(), any())).thenReturn(result);
+        when(reservationService.reserveStock(eq("SKU-001"), eq(2), any(), any(), anyString())).thenReturn(result);
 
         mockMvc.perform(post("/api/inventory/reservations/reserve")
                         .with(csrf())
@@ -79,7 +79,7 @@ class InventoryReservationControllerTest {
     @Test
     @WithMockUser
     void claimReservation_shouldReturn200_whenClaimed() throws Exception {
-        when(reservationService.claimReservation("RES-123")).thenReturn(true);
+        when(reservationService.claimReservation(eq("RES-123"), anyString(), anyBoolean())).thenReturn(true);
 
         mockMvc.perform(post("/api/inventory/reservations/claim/RES-123").with(csrf()))
                 .andExpect(status().isOk())
@@ -89,7 +89,7 @@ class InventoryReservationControllerTest {
     @Test
     @WithMockUser
     void releaseReservation_shouldReturn200_whenReleased() throws Exception {
-        when(reservationService.releaseReservation("RES-123")).thenReturn(true);
+        when(reservationService.releaseReservation(eq("RES-123"), anyString(), anyBoolean())).thenReturn(true);
 
         mockMvc.perform(post("/api/inventory/reservations/release/RES-123").with(csrf()))
                 .andExpect(status().isOk())

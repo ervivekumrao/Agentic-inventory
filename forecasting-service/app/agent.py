@@ -41,8 +41,8 @@ class InventoryAIAgent:
 
     def sync_feedback(self, payload: Dict[str, Any]):
         """
-        Ingests user interaction feedback, updates in-memory active learning cache,
-        and appends new gold-standard queries to persistent datasets.
+        Ingests user interaction feedback, updates active learning cache,
+        and persists feedback vectors to PostgreSQL / pgvector table.
         """
         if not payload or not isinstance(payload, dict):
             return
@@ -52,6 +52,68 @@ class InventoryAIAgent:
         
         self.feedback_cache.append(payload)
         logger.info("Active learning feedback ingested for query: '%s', corrected intent: '%s'", orig_q, payload.get("correctedIntent"))
+
+        try:
+            import psycopg2
+            db_host = os.getenv("DB_HOST", "localhost")
+            db_name = os.getenv("DB_NAME", "inventory")
+            db_user = os.getenv("DB_USER", "inventory")
+            db_pass = os.getenv("DB_PASSWORD", "inventory")
+            db_port = os.getenv("DB_PORT", "5432")
+            conn = psycopg2.connect(
+                host=db_host, database=db_name, user=db_user, password=db_pass, port=db_port, connect_timeout=2
+            )
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO user_feedback_vectors (original_query, user_correction, corrected_intent, sort_field, sort_order, rating) VALUES (%s, %s, %s, %s, %s, %s)",
+                (
+                    orig_q,
+                    payload.get("userCorrection") or payload.get("user_correction"),
+                    payload.get("correctedIntent") or payload.get("corrected_intent"),
+                    payload.get("sortField") or payload.get("sort_field"),
+                    payload.get("sortOrder") or payload.get("sort_order"),
+                    payload.get("rating", "THUMBS_DOWN")
+                )
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+            logger.info("Persisted user feedback vector record to PostgreSQL for query: '%s'", orig_q)
+        except Exception as e:
+            logger.debug("Failed to persist feedback vector record to PostgreSQL: %s", e)
+
+    def _query_vector_feedback(self, query: str) -> Optional[Dict[str, Any]]:
+        """Queries pgvector / PostgreSQL feedback table for learned overrides."""
+        db_host = os.getenv("DB_HOST", "localhost")
+        db_name = os.getenv("DB_NAME", "inventory")
+        db_user = os.getenv("DB_USER", "inventory")
+        db_pass = os.getenv("DB_PASSWORD", "inventory")
+        db_port = os.getenv("DB_PORT", "5432")
+        try:
+            import psycopg2
+            conn = psycopg2.connect(
+                host=db_host, database=db_name, user=db_user, password=db_pass, port=db_port, connect_timeout=2
+            )
+            cursor = conn.cursor()
+            # Attempt exact match query first
+            cursor.execute(
+                "SELECT original_query, user_correction, corrected_intent, sort_field, sort_order FROM user_feedback_vectors WHERE LOWER(original_query) = %s ORDER BY id DESC LIMIT 1",
+                (query.lower().strip(),)
+            )
+            row = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            if row:
+                return {
+                    "originalQuery": row[0],
+                    "userCorrection": row[1],
+                    "correctedIntent": row[2],
+                    "sortField": row[3],
+                    "sortOrder": row[4]
+                }
+        except Exception as e:
+            logger.debug("pgvector feedback query error (falling back to memory): %s", e)
+        return None
 
     def _load_ml_model(self):
         """Loads trained scikit-learn intent classifier pipeline if available."""
@@ -85,19 +147,26 @@ class InventoryAIAgent:
 
         # Check Active Learning Feedback Cache for User Correction Overrides
         q_clean = query.lower().strip()
+        matched_fb = None
         for fb in reversed(self.feedback_cache):
             fb_orig = (fb.get("originalQuery") or fb.get("original_query") or "").lower().strip()
             if fb_orig and fb_orig == q_clean:
-                if fb.get("correctedIntent"):
-                    intent = fb["correctedIntent"]
-                    confidence = 1.0
-                if fb.get("sortField"):
-                    entities["sort_field"] = fb["sortField"]
-                if fb.get("sortOrder"):
-                    entities["sort_order"] = fb["sortOrder"]
-                logger.info("Active learning override applied for query '%s': intent='%s', sort_field='%s', sort_order='%s'",
-                            query, intent, entities.get("sort_field"), entities.get("sort_order"))
+                matched_fb = fb
                 break
+
+        if not matched_fb:
+            matched_fb = self._query_vector_feedback(query)
+
+        if matched_fb:
+            if matched_fb.get("correctedIntent"):
+                intent = matched_fb["correctedIntent"]
+                confidence = 1.0
+            if matched_fb.get("sortField"):
+                entities["sort_field"] = matched_fb["sortField"]
+            if matched_fb.get("sortOrder"):
+                entities["sort_order"] = matched_fb["sortOrder"]
+            logger.info("Active learning override applied for query '%s': intent='%s', sort_field='%s', sort_order='%s'",
+                        query, intent, entities.get("sort_field"), entities.get("sort_order"))
 
         logger.info("Classified query intent as '%s' (confidence: %.2f%%) with entities: %s", intent, confidence * 100, entities)
 
@@ -132,11 +201,19 @@ class InventoryAIAgent:
         catalog_context: List[Dict[str, Any]]
     ) -> Dict[str, Any]:
         """
-        Computes comprehensive inventory metrics from context data.
+        Computes comprehensive inventory metrics from context data, supporting pushdown PORTFOLIO_SUMMARY headers.
         """
         catalog_by_sku = {prod.get("sku"): prod for prod in catalog_context if prod.get("sku")}
 
-        total_skus = len(inventory_context)
+        portfolio_summary = None
+        filtered_items = []
+        for item in inventory_context:
+            if isinstance(item, dict) and item.get("type") == "PORTFOLIO_SUMMARY":
+                portfolio_summary = item
+            else:
+                filtered_items.append(item)
+
+        total_skus = len(filtered_items)
         total_quantity = 0
         total_valuation = 0.0
         low_stock_items = []
@@ -151,7 +228,7 @@ class InventoryAIAgent:
 
         sku_details = []
 
-        for item in inventory_context:
+        for item in filtered_items:
             sku = item.get("sku", "UNKNOWN")
             qty = item.get("quantity", 0)
             threshold = item.get("reorderThreshold", 10)
@@ -204,11 +281,15 @@ class InventoryAIAgent:
             if qty > (threshold * 5) and qty >= 50:
                 overstocked_items.append(detail)
 
+        if portfolio_summary:
+            total_skus = portfolio_summary.get("totalSkus", total_skus)
+            total_quantity = portfolio_summary.get("totalQuantity", total_quantity)
+
         return {
             "total_skus": total_skus,
             "total_quantity": total_quantity,
             "total_valuation": round(total_valuation, 2),
-            "low_stock_count": len(low_stock_items),
+            "low_stock_count": portfolio_summary.get("lowStockCount", len(low_stock_items)) if portfolio_summary else len(low_stock_items),
             "low_stock_items": low_stock_items,
             "out_of_stock_count": len(out_of_stock_items),
             "out_of_stock_items": out_of_stock_items,
@@ -983,7 +1064,6 @@ class InventoryAIAgent:
                 }
                 with httpx.Client(timeout=10.0) as client:
                     res = client.post(gemini_url, json=gemini_payload, headers=gemini_headers)
-                    res = client.post(gemini_url, json=gemini_payload)
                     if res.status_code == 200:
                         content = res.json()["candidates"][0]["content"]["parts"][0]["text"]
                         parsed = json.loads(content)

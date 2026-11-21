@@ -13,6 +13,7 @@ mssql = "13.6.0.jre11"
 db2 = "12.1.5.0"
 
 # Common Utilities & Transitive Security Hardening
+jjwt = "0.12.6"
 commons-lang3 = "3.18.0"
 commons-compress = "1.27.1"
 commons-io = "2.18.0"
@@ -62,6 +63,9 @@ testcontainers-mongodb = { module = "org.testcontainers:mongodb" }
 testcontainers-kafka = { module = "org.testcontainers:kafka" }
 
 # Security Hardening & Utilities
+jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
+jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
+jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
 commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons-lang3" }
 commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commons-compress" }
 commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }

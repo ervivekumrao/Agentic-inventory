@@ -45,11 +45,17 @@ public class InventoryController {
     private final InventoryService inventoryService;
     private final QueryDialect queryDialect;
     private final BulkDataImporter bulkDataImporter;
+    private final com.smartinventory.inventory.repository.StockPositionRepository stockPositionRepository;
 
-    public InventoryController(InventoryService inventoryService, QueryDialect queryDialect, BulkDataImporter bulkDataImporter) {
+    public InventoryController(
+            InventoryService inventoryService,
+            QueryDialect queryDialect,
+            BulkDataImporter bulkDataImporter,
+            @org.springframework.beans.factory.annotation.Autowired(required = false) com.smartinventory.inventory.repository.StockPositionRepository stockPositionRepository) {
         this.inventoryService = inventoryService;
         this.queryDialect = queryDialect;
         this.bulkDataImporter = bulkDataImporter;
+        this.stockPositionRepository = stockPositionRepository;
     }
 
     @GetMapping
@@ -163,6 +169,17 @@ public class InventoryController {
         List<StockTransaction> transactions = inventoryService.getTransactionsForSku(sku);
         log.trace("Found {} transactions for SKU: {}", transactions.size(), sku);
         return ResponseEntity.ok(transactions);
+    }
+
+    @GetMapping("/{sku}/locations")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'ENTRY_OPERATOR', 'USER')")
+    public ResponseEntity<List<com.smartinventory.inventory.model.StockPosition>> getMultiLocationStock(@PathVariable String sku) {
+        log.debug("GET /api/inventory/{}/locations requested", sku);
+        if (stockPositionRepository != null) {
+            List<com.smartinventory.inventory.model.StockPosition> positions = stockPositionRepository.findBySku(sku);
+            return ResponseEntity.ok(positions);
+        }
+        return ResponseEntity.ok(List.of());
     }
 
     @GetMapping("/database-info")

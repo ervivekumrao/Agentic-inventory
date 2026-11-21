@@ -64,6 +64,12 @@ public class InventoryReservation {
     @Column(length = 255)
     private String paymentReference;
 
+    @Column(length = 100)
+    private String reservedByUser;
+
+    @Column(length = 100)
+    private String ownerServiceId;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
@@ -101,6 +107,12 @@ public class InventoryReservation {
 
     public String getPaymentReference() { return paymentReference; }
     public void setPaymentReference(String paymentReference) { this.paymentReference = paymentReference; }
+
+    public String getReservedByUser() { return reservedByUser; }
+    public void setReservedByUser(String reservedByUser) { this.reservedByUser = reservedByUser; }
+
+    public String getOwnerServiceId() { return ownerServiceId; }
+    public void setOwnerServiceId(String ownerServiceId) { this.ownerServiceId = ownerServiceId; }
 
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }

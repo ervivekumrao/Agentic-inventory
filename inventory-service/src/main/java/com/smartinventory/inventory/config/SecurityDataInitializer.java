@@ -58,8 +58,9 @@ public class SecurityDataInitializer {
             PasswordEncoder passwordEncoder) {
         return args -> {
             // Warn if default credentials are detected in the environment
-            if ("admin123".equals(adminDefaultPassword)) {
-                log.warn("⚠️ SECURITY NOTICE: Default administrator password is in use. Set APP_SECURITY_DEFAULT_ADMIN_PASSWORD in production environments.");
+            if ("admin123".equals(adminDefaultPassword) || "manager123".equals(managerDefaultPassword)
+                    || "operator123".equals(operatorDefaultPassword) || "viewer123".equals(viewerDefaultPassword)) {
+                log.warn("⚠️ SECURITY WARNING: Default user credentials are active (admin/admin123, manager/manager123, operator/operator123, viewer/viewer123). Please override via environment variables APP_SECURITY_DEFAULT_ADMIN_PASSWORD, APP_SECURITY_DEFAULT_MANAGER_PASSWORD, APP_SECURITY_DEFAULT_OPERATOR_PASSWORD, APP_SECURITY_DEFAULT_VIEWER_PASSWORD before production deployment.");
             }
 
             // 1. Seed Roles

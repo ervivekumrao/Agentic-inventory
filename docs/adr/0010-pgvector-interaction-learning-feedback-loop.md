@@ -1,7 +1,7 @@
 # ADR 0010: pgvector Interaction Learning Feedback Loop & Persistent Active Learning Engine
 
 ## Status
-Approved
+Proposed - Scheduled for Phase 2 implementation
 
 ## Context
 Standard NLP intent classifiers use static training datasets. When users enter novel, ambiguous, or mistyped queries (e.g., "lowes per value item") and receive an undesired answer, changing business source code for every phrasing variation is brittle and anti-pattern. The AI Assistant requires a closed-loop active learning architecture to capture user corrections in real time, store dense semantic vector embeddings, and persist learning across container restarts without data loss.

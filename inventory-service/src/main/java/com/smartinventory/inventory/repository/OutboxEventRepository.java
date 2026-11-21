@@ -18,11 +18,22 @@ package com.smartinventory.inventory.repository;
 
 import com.smartinventory.inventory.model.OutboxEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 
 @Repository
 public interface OutboxEventRepository extends JpaRepository<OutboxEvent, Long> {
     List<OutboxEvent> findTop50ByStatusOrderByCreatedAtAsc(String status);
+
+    @Query(value = "SELECT * FROM outbox_events WHERE status = :status ORDER BY created_at ASC LIMIT :limit FOR UPDATE SKIP LOCKED", nativeQuery = true)
+    List<OutboxEvent> fetchPendingEventsForUpdateSkipLocked(@Param("status") String status, @Param("limit") int limit);
+
+    @Modifying
+    @Query(value = "DELETE FROM outbox_events WHERE status = 'SENT' AND sent_at < :cutoff", nativeQuery = true)
+    int deleteSentEventsOlderThan(@Param("cutoff") Instant cutoff);
 }

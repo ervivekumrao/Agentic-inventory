@@ -68,10 +68,12 @@ public class PurchaseOrderCopilotService {
                 // Calculate 30-day sales velocity
                 var salesHistory = salesHistoryAggregationService.getSalesHistoryForSku(item.getSku(), 30);
                 long thirtyDaySales = salesHistory.totalUnitsSold();
+                double avgDailySales = thirtyDaySales / 30.0;
 
-                // Target stock level = max(reorderPoint * 3, 30-day sales velocity + safety buffer)
-                int targetStock = (int) Math.max(reorderPoint * 3L, thirtyDaySales + 20);
-                int recommendedOrderQty = Math.max(10, targetStock - currentQty);
+                int leadTimeDays = 7;
+                // Forecast-grounded target stock level = max(reorderPoint * 3, (dailySales * leadTime) + safetyBuffer)
+                int targetStock = (int) Math.max(reorderPoint * 3L, Math.round(avgDailySales * leadTimeDays * 1.5) + 20);
+                int recommendedOrderQty = Math.max(10, targetStock - currentQty); // Enforces MOQ of 10 units minimum
 
                 orderItems.add(new PurchaseOrderItemDraft(
                         item.getSku(),
@@ -79,8 +81,8 @@ public class PurchaseOrderCopilotService {
                         currentQty,
                         reorderPoint,
                         recommendedOrderQty,
-                        7, // Default supplier lead time: 7 days
-                        "AUTOMATIC_STOCKOUT_PREVENTION"
+                        leadTimeDays,
+                        "FORECAST_GROUNDED_STOCKOUT_PREVENTION"
                 ));
                 totalReorderUnits += recommendedOrderQty;
             }

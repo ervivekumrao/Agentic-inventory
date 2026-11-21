@@ -58,7 +58,7 @@ class OutboxRelayServiceTest {
         OutboxEvent event = new OutboxEvent("INVENTORY", "SKU-TEST", "CREATED", payload);
         event.setId(1L);
 
-        when(outboxEventRepository.findTop50ByStatusOrderByCreatedAtAsc(OutboxEvent.STATUS_PENDING))
+        when(outboxEventRepository.fetchPendingEventsForUpdateSkipLocked(eq(OutboxEvent.STATUS_PENDING), eq(50)))
                 .thenReturn(List.of(event));
         when(kafkaTemplate.send(eq("inventory-stock-events"), eq("SKU-TEST"), any(StockUpdateEvent.class)))
                 .thenReturn(CompletableFuture.completedFuture(null));
@@ -71,9 +71,9 @@ class OutboxRelayServiceTest {
 
     @Test
     void relayPendingEvents_whenEmpty_shouldDoNothing() {
-        when(outboxEventRepository.findTop50ByStatusOrderByCreatedAtAsc(OutboxEvent.STATUS_PENDING))
+        when(outboxEventRepository.fetchPendingEventsForUpdateSkipLocked(eq(OutboxEvent.STATUS_PENDING), eq(50)))
                 .thenReturn(Collections.emptyList());
-        when(outboxEventRepository.findTop50ByStatusOrderByCreatedAtAsc(OutboxEvent.STATUS_FAILED))
+        when(outboxEventRepository.fetchPendingEventsForUpdateSkipLocked(eq(OutboxEvent.STATUS_FAILED), eq(50)))
                 .thenReturn(Collections.emptyList());
 
         outboxRelayService.relayPendingEvents();

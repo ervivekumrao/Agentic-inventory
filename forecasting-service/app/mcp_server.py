@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import logging
+import os
+import httpx
 import numpy as np
 import pandas as pd
 from typing import List, Dict, Any, Optional
@@ -21,18 +23,31 @@ from app.agent import InventoryAIAgent
 logger = logging.getLogger("app.mcp_server")
 
 agent = InventoryAIAgent()
+INVENTORY_SERVICE_URL = os.getenv("INVENTORY_SERVICE_URL", "http://localhost:8080")
+
+def _fetch_live_inventory_context() -> List[Dict[str, Any]]:
+    """Fetches live inventory data from inventory-service REST endpoint."""
+    try:
+        with httpx.Client(timeout=3.0) as client:
+            res = client.get(f"{INVENTORY_SERVICE_URL}/api/inventory")
+            if res.status_code == 200:
+                return res.json()
+    except Exception as e:
+        logger.debug("Could not fetch live inventory from %s: %s", INVENTORY_SERVICE_URL, e)
+    return []
 
 # Native python tool functions (can be executed directly or registered via FastMCP)
 
 def get_low_stock_reorder_list(
-    inventory_context: List[Dict[str, Any]],
+    inventory_context: Optional[list] = None,
     deficit_multiplier: float = 2.0
 ) -> Dict[str, Any]:
     """
     Identifies inventory items below threshold and calculates replenishment deficits.
     """
-    if not inventory_context:
-        return {"total_low_stock": 0, "reorder_items": [], "total_procurement_cost": 0.0}
+    context = inventory_context if inventory_context else _fetch_live_inventory_context()
+    if not context:
+        return {"total_low_stock": 0, "total_low_stock_skus": 0, "reorder_items": [], "total_procurement_cost": 0.0, "total_estimated_procurement_cost": 0.0, "risk_assessment": "HEALTHY"}
 
     low_stock_items = []
     total_cost = 0.0
@@ -208,6 +223,47 @@ def query_inventory_agent(
         inventory_context=inventory_context or [],
         catalog_context=catalog_context or []
     )
+
+
+def create_purchase_order_draft(
+    supplier_code: str,
+    items: List[Dict[str, Any]]
+) -> Dict[str, Any]:
+    """
+    Creates a draft purchase order with human approval requirement.
+    """
+    import random
+    po_number = f"PO-AI-{random.randint(1000, 9999)}"
+    payload = {
+        "orderNumber": po_number,
+        "supplierCode": supplier_code,
+        "status": "DRAFT",
+        "items": items
+    }
+    try:
+        with httpx.Client(timeout=4.0) as client:
+            res = client.post(f"{INVENTORY_SERVICE_URL}/api/inventory/po", json=payload)
+            if res.status_code in (200, 201):
+                return {
+                    "status": "DRAFT_CREATED",
+                    "purchase_order": res.json(),
+                    "requires_approval": True,
+                    "approval_action": f"POST /api/inventory/po/{po_number}/approve"
+                }
+            else:
+                logger.warning("PO draft creation failed with HTTP status %s: %s", res.status_code, res.text)
+                return {
+                    "status": "DRAFT_FAILED",
+                    "error": f"Failed to create PO draft on inventory service. HTTP {res.status_code}",
+                    "purchase_order": payload
+                }
+    except Exception as e:
+        logger.warning("Could not submit PO draft to live inventory-service: %s", e)
+        return {
+            "status": "DRAFT_FAILED",
+            "error": f"Network exception calling inventory-service: {str(e)}",
+            "purchase_order": payload
+        }
 
 
 # FastMCP Server Registration (if mcp package is installed)

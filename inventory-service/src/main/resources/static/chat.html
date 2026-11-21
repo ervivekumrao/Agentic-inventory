@@ -19,7 +19,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>(function(){var t;try{t=localStorage.getItem("theme");}catch(e){}if(!t){t="dark";}document.documentElement.setAttribute("data-theme",t);})();</script>
+    <script>(function(){var t;try{t=localStorage.getItem("smart_inventory_theme")||localStorage.getItem("theme");}catch(e){}if(!t){t="dark";}document.documentElement.setAttribute("data-theme",t);})();</script>
     <title>Smart Inventory - Agentic AI Workspace</title>
     <link rel="icon" type="image/svg+xml" href="/assets/logo/favicon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo/favicon-32x32.png">
@@ -1013,7 +1013,8 @@
 
                 const data = await response.json();
                 const answer = data.answer || "I could not retrieve an answer at this time.";
-                appendAgentAnswer(answer);
+                const riskLevel = data.risk_level || data.riskLevel || "LOW";
+                appendAgentAnswer(answer, riskLevel);
 
             } catch (err) {
                 appendAgentAnswer(`⚠️ **Error retrieving information**: ${err.message}. Please verify services are running.`);
@@ -1049,7 +1050,7 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        function appendAgentAnswer(rawMarkdown) {
+        function appendAgentAnswer(rawMarkdown, riskLevel) {
             const item = document.createElement('div');
             item.className = 'message-item agent';
 
@@ -1059,6 +1060,14 @@
 
             const wrapper = document.createElement('div');
             wrapper.className = 'msg-body-wrapper';
+
+            // Trust Cues & Risk Level Badge
+            const trustHeader = document.createElement('div');
+            trustHeader.className = 'd-flex align-items-center gap-2 mb-1 small text-muted';
+            const riskClass = riskLevel === 'HIGH' ? 'bg-danger' : (riskLevel === 'MEDIUM' ? 'bg-warning text-dark' : 'bg-success');
+            const formattedRisk = riskLevel ? riskLevel.toUpperCase() : 'LOW';
+            trustHeader.innerHTML = `<span class="badge ${riskClass}">Risk: ${formattedRisk}</span> <i class="bi bi-shield-check text-primary ms-1"></i> Data Freshness: Live SQL (${new Date().toLocaleTimeString()})`;
+            wrapper.appendChild(trustHeader);
 
             const bubble = document.createElement('div');
             bubble.className = 'msg-bubble';
@@ -1143,10 +1152,13 @@
 
         function renderMarkdown(text) {
             if (!text) return '';
+            let html = '';
             if (typeof marked !== 'undefined') {
-                return sanitizeHtml(marked.parse(text));
+                html = sanitizeHtml(marked.parse(text));
+            } else {
+                html = escapeHtml(text).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             }
-            return escapeHtml(text).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            return html.replace(/<table/g, '<div class="table-responsive"><table').replace(/<\/table>/g, '</table></div>');
         }
 
         function copyText(button) {

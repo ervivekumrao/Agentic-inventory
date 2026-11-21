@@ -101,6 +101,11 @@ public class InventoryReservationService {
      */
     @Transactional
     public ReservationResult reserveStock(String sku, int quantity, String clientReservationId, Integer ttlSeconds) {
+        return reserveStock(sku, quantity, clientReservationId, ttlSeconds, null);
+    }
+
+    @Transactional
+    public ReservationResult reserveStock(String sku, int quantity, String clientReservationId, Integer ttlSeconds, String reservedByUser) {
         if (quantity <= 0) {
             throw new IllegalArgumentException("Reservation quantity must be strictly positive");
         }
@@ -158,6 +163,9 @@ public class InventoryReservationService {
         unitRepository.saveAll(lockedUnits);
 
         InventoryReservation header = new InventoryReservation(reservationId, sku, quantity, expiresAt);
+        if (reservedByUser != null && !reservedByUser.isBlank()) {
+            header.setReservedByUser(reservedByUser);
+        }
         reservationRepository.save(header);
 
         log.info("Successfully reserved {} units for SKU: {} with reservationId: {} expiring at: {}",
@@ -181,11 +189,26 @@ public class InventoryReservationService {
      */
     @Transactional
     public boolean claimReservation(String reservationId) {
+        return claimReservation(reservationId, null, true);
+    }
+
+    @Transactional
+    public boolean claimReservation(String reservationId, String currentUser, boolean isAdminOrManager) {
         Optional<InventoryReservation> headerOpt = reservationRepository.findById(reservationId);
-        if (headerOpt.isPresent() && InventoryReservation.STATUS_COMPLETED.equals(headerOpt.get().getStatus())) {
-            log.info("Reservation {} already claimed. Idempotent success returned.", reservationId);
-            recordCounter("inventory.reservation.claims", "status", "ALREADY_CLAIMED");
-            return true;
+        if (headerOpt.isPresent()) {
+            InventoryReservation header = headerOpt.get();
+            if (header.getReservedByUser() != null && !header.getReservedByUser().isBlank() && !isAdminOrManager) {
+                if (currentUser == null || !header.getReservedByUser().equalsIgnoreCase(currentUser)) {
+                    log.warn("Unauthorized attempt by user '{}' to claim reservation '{}' owned by '{}'",
+                            currentUser, reservationId, header.getReservedByUser());
+                    throw new SecurityException("User not authorized to claim reservation: " + reservationId);
+                }
+            }
+            if (InventoryReservation.STATUS_COMPLETED.equals(header.getStatus())) {
+                log.info("Reservation {} already claimed. Idempotent success returned.", reservationId);
+                recordCounter("inventory.reservation.claims", "status", "ALREADY_CLAIMED");
+                return true;
+            }
         }
 
         List<InventoryReservationUnit> units = unitRepository.findByReservationId(reservationId);
@@ -250,10 +273,25 @@ public class InventoryReservationService {
      */
     @Transactional
     public boolean releaseReservation(String reservationId) {
+        return releaseReservation(reservationId, null, true);
+    }
+
+    @Transactional
+    public boolean releaseReservation(String reservationId, String currentUser, boolean isAdminOrManager) {
         Optional<InventoryReservation> headerOpt = reservationRepository.findById(reservationId);
-        if (headerOpt.isPresent() && InventoryReservation.STATUS_FAILED.equals(headerOpt.get().getStatus())) {
-            log.info("Reservation {} already released/failed. Idempotent success returned.", reservationId);
-            return true;
+        if (headerOpt.isPresent()) {
+            InventoryReservation header = headerOpt.get();
+            if (header.getReservedByUser() != null && !header.getReservedByUser().isBlank() && !isAdminOrManager) {
+                if (!header.getReservedByUser().equalsIgnoreCase(currentUser)) {
+                    log.warn("Unauthorized attempt by user '{}' to release reservation '{}' owned by '{}'",
+                            currentUser, reservationId, header.getReservedByUser());
+                    throw new SecurityException("User not authorized to release reservation: " + reservationId);
+                }
+            }
+            if (InventoryReservation.STATUS_FAILED.equals(header.getStatus())) {
+                log.info("Reservation {} already released/failed. Idempotent success returned.", reservationId);
+                return true;
+            }
         }
 
         List<InventoryReservationUnit> units = unitRepository.findByReservationId(reservationId);

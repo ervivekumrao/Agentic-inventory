@@ -19,7 +19,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>(function(){var t;try{t=localStorage.getItem("theme");}catch(e){}if(!t){t="dark";}document.documentElement.setAttribute("data-theme",t);})();</script>
+    <script>(function(){var t;try{t=localStorage.getItem("smart_inventory_theme")||localStorage.getItem("theme");}catch(e){}if(!t){t="dark";}document.documentElement.setAttribute("data-theme",t);})();</script>
     <title>Smart Inventory - Operations & High-Scale Reservation Hub</title>
     <link rel="icon" type="image/svg+xml" href="/assets/logo/favicon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo/favicon-32x32.png">
@@ -933,6 +933,14 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="d-flex align-items-center justify-content-between p-3 border-top" style="border-color: var(--border-subtle) !important;">
+                        <span class="text-muted small" id="paginationInfo">Showing 0-0 of 0 items</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <button class="btn btn-sm btn-outline-secondary" id="btnPrevPage" onclick="changePage(-1)" disabled><i class="bi bi-chevron-left"></i> Previous</button>
+                            <span class="small fw-bold px-2" id="currentPageDisplay">Page 1</span>
+                            <button class="btn btn-sm btn-outline-secondary" id="btnNextPage" onclick="changePage(1)" disabled>Next <i class="bi bi-chevron-right"></i></button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1211,6 +1219,14 @@
             refreshPoolStatus();
         }
 
+        let currentPage = 1;
+        const pageSize = 10;
+
+        function changePage(delta) {
+            currentPage += delta;
+            filterInventoryTable();
+        }
+
         function filterInventoryTable() {
             const search = document.getElementById('inventorySearch').value.toLowerCase().trim();
             const warehouse = document.getElementById('warehouseFilter').value;
@@ -1228,13 +1244,32 @@
 
         function renderInventoryTable(items) {
             const tbody = document.getElementById('inventoryTableBody');
+            const total = items.length;
+            const totalPages = Math.max(1, Math.ceil(total / pageSize));
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const start = (currentPage - 1) * pageSize;
+            const end = Math.min(start + pageSize, total);
+            const pageItems = items.slice(start, end);
+
+            const paginationInfo = document.getElementById('paginationInfo');
+            const pageDisplay = document.getElementById('currentPageDisplay');
+            const btnPrev = document.getElementById('btnPrevPage');
+            const btnNext = document.getElementById('btnNextPage');
+
+            if (paginationInfo) paginationInfo.textContent = total > 0 ? `Showing ${start + 1}-${end} of ${total} items` : 'Showing 0-0 of 0 items';
+            if (pageDisplay) pageDisplay.textContent = `Page ${currentPage} of ${totalPages}`;
+            if (btnPrev) btnPrev.disabled = currentPage <= 1;
+            if (btnNext) btnNext.disabled = currentPage >= totalPages;
+
             if (items.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted"><i class="bi bi-inbox fs-3 d-block mb-2"></i>No inventory records found matching filters.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = '';
-            items.forEach(item => {
+            pageItems.forEach(item => {
                 const tr = document.createElement('tr');
 
                 const qty = item.quantity || 0;

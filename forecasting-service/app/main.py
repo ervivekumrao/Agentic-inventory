@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, model_validator
@@ -42,14 +43,30 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Enable CORS for web dashboard access securely without wildcard credentials (CWE-942)
+# Enable CORS for web dashboard access securely without wildcard origins (CWE-942)
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "http://localhost:8080,http://127.0.0.1:8080,http://localhost:3000")
+allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=False,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+from fastapi import Request
+from fastapi.responses import JSONResponse
+
+@app.middleware("http")
+async def verify_api_key_middleware(request: Request, call_next):
+    required_api_key = os.getenv("FORECASTING_API_KEY")
+    exempt_paths = ["/health", "/docs", "/openapi.json", "/redoc"]
+    if required_api_key and request.url.path not in exempt_paths:
+        provided_key = request.headers.get("X-API-KEY")
+        if provided_key != required_api_key:
+            return JSONResponse(status_code=401, content={"detail": "Unauthorized: Invalid or missing X-API-KEY header."})
+    return await call_next(request)
 
 agent = InventoryAIAgent()
 
@@ -219,25 +236,77 @@ def forecast_demand(req: ForecastRequest):
 
     series = pd.Series(req.historical_sales, dtype=float)
     n = len(series)
-
-    # 1. Statistical Baseline & Linear / Holt-Winters Trend & Seasonal Regression
-    x = np.arange(n)
     y = series.values
-    if n >= 2:
-        slope, intercept = np.polyfit(x, y, 1)
-    else:
-        slope, intercept = 0.0, float(y[0])
-
     std_dev = float(series.std()) if n > 1 else 0.0
     mean_val = float(series.mean())
 
-    # Seasonal pattern detection (period = 7 days) if history >= 14
-    seasonal_factors = np.ones(7)
-    if n >= 14:
-        weekly_averages = [series[i::7].mean() for i in range(7)]
-        overall_avg = series.mean()
-        if overall_avg > 0:
-            seasonal_factors = np.array([max(0.2, avg / overall_avg) for avg in weekly_averages])
+    # 1. Advanced Model Selection: Intermittent (Croston) vs Seasonal Holt-Winters / Exponential Smoothing
+    zero_count = np.sum(y == 0)
+    is_intermittent = (zero_count / n) > 0.3
+
+    predictions = []
+    lower_bound = []
+    upper_bound = []
+
+    if is_intermittent:
+        # Croston's Method for intermittent demand forecasting
+        non_zero_indices = np.where(y > 0)[0]
+        if len(non_zero_indices) > 0:
+            demand_sizes = y[non_zero_indices]
+            intervals = np.diff(np.insert(non_zero_indices, 0, -1))
+            alpha = 0.2
+            z_est = demand_sizes[0]
+            p_est = intervals[0] if len(intervals) > 0 else 1.0
+
+            for i in range(1, len(demand_sizes)):
+                z_est = alpha * demand_sizes[i] + (1 - alpha) * z_est
+                p_est = alpha * intervals[i] + (1 - alpha) * p_est
+
+            croston_forecast = max(0.1, z_est / max(1.0, p_est))
+            for step in range(1, req.horizon + 1):
+                pred = round(float(croston_forecast), 2)
+                margin = max(1.0, 1.96 * std_dev)
+                predictions.append(pred)
+                lower_bound.append(round(max(0.0, pred - margin), 2))
+                upper_bound.append(round(pred + margin, 2))
+            trend_str = "INTERMITTENT"
+        else:
+            predictions = [0.0] * req.horizon
+            lower_bound = [0.0] * req.horizon
+            upper_bound = [0.0] * req.horizon
+            trend_str = "STABLE"
+    else:
+        # Holt-Winters / Double-Exponential Smoothing
+        alpha, beta = 0.3, 0.1
+        level = y[0]
+        trend = y[1] - y[0] if n > 1 else 0.0
+
+        for i in range(1, n):
+            val = y[i]
+            last_level = level
+            level = alpha * val + (1 - alpha) * (level + trend)
+            trend = beta * (level - last_level) + (1 - beta) * trend
+
+        # Apply weekly seasonal index if history >= 14
+        seasonal_factors = np.ones(7)
+        if n >= 14:
+            weekly_averages = [series[i::7].mean() for i in range(7)]
+            overall_avg = series.mean()
+            if overall_avg > 0:
+                seasonal_factors = np.array([max(0.2, avg / overall_avg) for avg in weekly_averages])
+
+        for step in range(1, req.horizon + 1):
+            s_idx = (n + step - 1) % 7
+            season_mult = seasonal_factors[s_idx] if n >= 14 else 1.0
+            base_pred = max(0.0, level + (trend * step))
+            pred = round(base_pred * season_mult, 2)
+            margin = max(1.0, 1.96 * (std_dev if std_dev > 0 else 1.0) * np.sqrt(step * 0.5))
+            predictions.append(pred)
+            lower_bound.append(round(max(0.0, pred - margin), 2))
+            upper_bound.append(round(pred + margin, 2))
+
+        slope = trend
+        trend_str = "INCREASING" if slope > 0.2 else ("DECREASING" if slope < -0.2 else "STABLE")
 
     # 2. Anomaly Detection (Z-score > 2.0)
     anomalies = []
@@ -245,31 +314,7 @@ def forecast_demand(req: ForecastRequest):
         z_scores = np.abs((y - mean_val) / std_dev)
         anomalies = [int(idx) for idx, z in enumerate(z_scores) if z > 2.0]
 
-    # 3. Dynamic Future Horizon Predictions & Intervals
-    predictions = []
-    lower_bound = []
-    upper_bound = []
-
-    last_val = series.iloc[-1]
-    for step in range(1, req.horizon + 1):
-        if n >= 14:
-            s_idx = (n + step - 1) % 7
-            season_mult = seasonal_factors[s_idx]
-            base_pred = max(0.0, float(last_val + (slope * step * 0.3)))
-            pred = round(base_pred * season_mult, 2)
-        else:
-            # Blend autoregressive momentum with linear trend projection
-            pred = round(max(0.0, float(last_val + (slope * step * 0.5))), 2)
-
-        margin = max(1.0, 1.96 * (std_dev if std_dev > 0 else 1.0))
-        predictions.append(pred)
-        lower_bound.append(round(max(0.0, pred - margin), 2))
-        upper_bound.append(round(pred + margin, 2))
-
-    trend_str = "INCREASING" if slope > 0.2 else ("DECREASING" if slope < -0.2 else "STABLE")
-
-    # 4. Inventory Supply Chain Safety Stock & Reorder Point (ROP) Formulas
-    # Safety Stock = Z * sigma * sqrt(lead_time), where Z = 1.65 (95% service level)
+    # 3. Dynamic Safety Stock Formula (Z = 1.65 for 95% service level)
     lead_time = req.lead_time_days
     safety_stock = round(1.65 * (std_dev if std_dev > 0 else 1.5) * np.sqrt(lead_time), 1)
     daily_demand = max(1.0, mean_val)

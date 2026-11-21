@@ -38,6 +38,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation(libs.querydsl.sql)
     implementation(libs.spring.boot.starter.security)
+    implementation("io.jsonwebtoken:jjwt-api:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
     implementation(libs.spring.boot.starter.validation)
     implementation(libs.springdoc.openapi)
     implementation(libs.commons.lang3)
@@ -89,3 +92,16 @@ tasks.register<Jar>("buildSeederJar") {
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+
+tasks.register<Exec>("buildWebUi") {
+    group = "build"
+    description = "Builds the modern React 19 SPA frontend from web-ui/ into inventory-service static resources."
+    workingDir = file("${rootDir}/web-ui")
+    if (org.gradle.internal.os.OperatingSystem.current().isWindows) {
+        commandLine("cmd", "/c", "npm install && npm run build")
+    } else {
+        commandLine("sh", "-c", "npm install && npm run build")
+    }
+    isIgnoreExitValue = true
+}
+
